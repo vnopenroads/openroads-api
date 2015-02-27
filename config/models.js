@@ -17,7 +17,7 @@ module.exports.models = {
   * connections (see `config/connections.js`)                                *
   *                                                                          *
   ***************************************************************************/
-  // connection: 'localDiskDb',
+  connection: 'osmPostgreSQL',
 
   /***************************************************************************
   *                                                                          *
@@ -27,7 +27,15 @@ module.exports.models = {
   * See http://sailsjs.org/#/documentation/concepts/ORM/model-settings.html  *
   *                                                                          *
   ***************************************************************************/
-  // migrate: 'alter'
-  migrate: 'safe'
+  migrate: 'safe',
+
+  /* Since not all tables require a timestamp, default to off.
+   * Turn on case-by-case as required.
+   * Schema: http://chrisnatali.github.io/osm_notes/osm_schema.html#way_nodes.way_id
+   *
+   * See http://sailsjs.org/#!/documentation/concepts/ORM/model-settings.html?q=autocreatedat
+   */
+  autoCreatedAt: false,
+  autoUpdatedAt: false,
 
 };
