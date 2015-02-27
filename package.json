@@ -25,7 +25,8 @@
   },
   "scripts": {
     "start": "node app.js",
-    "debug": "node debug app.js"
+    "debug": "node debug app.js",
+    "test": "mocha --recursive"
   },
   "main": "app.js",
   "repository": {
@@ -35,6 +36,7 @@
   "author": "DER",
   "license": "",
   "devDependencies": {
+    "mocha": "^2.1.0",
     "sails-postgresql": "^0.10.14"
   }
 }
