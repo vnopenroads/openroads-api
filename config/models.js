@@ -38,4 +38,7 @@ module.exports.models = {
   autoCreatedAt: false,
   autoUpdatedAt: false,
 
+  // We probably don't want to auto-generate primary keys for everything either.
+  autoPk: false,
+
 };
