@@ -33,5 +33,8 @@
     "url": "git://github.com/DER/openroads.git"
   },
   "author": "DER",
-  "license": ""
+  "license": "",
+  "devDependencies": {
+    "sails-postgresql": "^0.10.14"
+  }
 }
