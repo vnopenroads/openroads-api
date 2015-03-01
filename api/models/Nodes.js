@@ -10,7 +10,7 @@
 module.exports = {
 
   attributes: {
-    id: {
+    node_id: {
       type: 'integer',
       autoIncrement: true,
       unique: true,
