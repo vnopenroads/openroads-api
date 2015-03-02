@@ -25,11 +25,12 @@ module.exports = {
     return Math.round((lat + 90.0) * 65535.0 / 180.0);
   },
 
-  tilesForArea: function(minlat, minlon, maxlat, maxlon) {
-    var minx = this.lon2x(minlon);
-    var maxx = this.lon2x(maxlon);
-    var miny = this.lat2y(minlat);
-    var maxy = this.lat2y(maxlat);
+  tilesForArea: function(bbox) {
+    var minx = this.lon2x(bbox.minLon);
+    var maxx = this.lon2x(bbox.maxLon);
+    var miny = this.lat2y(bbox.minLat);
+    var maxy = this.lat2y(bbox.maxLat);
+    var xy2tile = this.xy2tile;
 
     var tiles = [];
     for (var x = minx; x <= maxx; x++) {
@@ -37,5 +38,6 @@ module.exports = {
         tiles.push(xy2tile(x, y));
       }
     }
+    return tiles;
   }
 }
