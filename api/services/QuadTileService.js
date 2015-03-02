@@ -5,10 +5,13 @@
 module.exports = {
     xy2tile: function(x, y) {
         var tile = 0;
-
-        for (var i = 15; i >= 0; --i) {
-            tile = (tile << 1) | ((x >> i) & 1);
-            tile = (tile << 1) | ((y >> i) & 1);
+        var i;
+    
+        for (i = 15; i >= 0; --i) {
+            tile = ((tile << 1)>>>0) | ((x >>> i) & 1);
+            tile = tile >>> 0;
+            tile = ((tile << 1)>>>0) | ((y >>> i) & 1);
+            tile = tile >>> 0;
         }
         return tile;
     },
