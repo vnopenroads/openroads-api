@@ -33,7 +33,6 @@ module.exports = {
     // TODO do we need to include this?
     tile: {
       type: 'integer',
-      unique: true,
     },
     version: {
       type: 'integer',
