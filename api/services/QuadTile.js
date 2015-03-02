@@ -30,6 +30,7 @@ module.exports = {
     var maxx = this.lon2x(bbox.maxLon);
     var miny = this.lat2y(bbox.minLat);
     var maxy = this.lat2y(bbox.maxLat);
+    var xy2tile = this.xy2tile;
 
     var tiles = [];
     for (var x = minx; x <= maxx; x++) {
