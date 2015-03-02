@@ -33,7 +33,10 @@ module.exports.connections = {
   },
 
   osmPostgreSQL: {
-    adapter: 'sails-postgresql'
+    adapter: 'sails-postgresql',
+    url: process.env.DATABASE_URL,
+    pool: true,
+    ssl: true
   }
 
   /***************************************************************************
