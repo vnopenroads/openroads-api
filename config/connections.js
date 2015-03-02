@@ -21,23 +21,6 @@
 
 module.exports.connections = {
 
-  /***************************************************************************
-  *                                                                          *
-  * Local disk storage for DEVELOPMENT ONLY                                  *
-  *                                                                          *
-  * Installed by default.                                                    *
-  *                                                                          *
-  ***************************************************************************/
-  localDiskDb: {
-    adapter: 'sails-disk'
-  },
-
-  osmPostgreSQL: {
-    adapter: 'sails-postgresql',
-    url: process.env.DATABASE_URL,
-    pool: true,
-    ssl: true
-  }
 
   /***************************************************************************
   *                                                                          *
@@ -45,4 +28,7 @@ module.exports.connections = {
   *                                                                          *
   ***************************************************************************/
 
+  /* DEVELOPMENT uses a local postgresql adapter, specified in local.js
+   * TODO point to a production adapter
+   */
 };
