@@ -37,6 +37,7 @@
   "license": "",
   "devDependencies": {
     "mocha": "^2.1.0",
-    "sails-postgresql": "^0.10.14"
+    "sails-postgresql": "^0.10.14",
+    "should": "^5.0.1"
   }
 }
