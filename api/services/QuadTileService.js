@@ -12,6 +12,7 @@ module.exports = {
             tile = tile >>> 0;
             tile = ((tile << 1)>>>0) | ((y >>> i) & 1);
             tile = tile >>> 0;
+
         }
         return tile;
     },
