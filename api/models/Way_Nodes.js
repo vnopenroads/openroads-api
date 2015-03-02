@@ -8,7 +8,17 @@
 module.exports = {
 
   attributes: {
-
+    way_id: {
+        type: 'integer',
+        primaryKey: true
+    },
+    sequence_id: {
+        type: 'integer',
+        primaryKey: true
+    },
+    node_id: {
+        type: 'integer'
+    }
   }
 };
 

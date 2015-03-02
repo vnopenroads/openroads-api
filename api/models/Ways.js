@@ -8,7 +8,23 @@
 module.exports = {
 
   attributes: {
-
+    way_id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true
+    },
+    changeset_id: {
+        type: 'integer'
+    },
+    timestamp: {
+        type: 'datetime'
+    },
+    visible: {
+        type: 'boolean'
+    },
+    version: {
+        type: 'integer'
+    }
   }
 };
 

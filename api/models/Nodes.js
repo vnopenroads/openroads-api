@@ -16,23 +16,24 @@ module.exports = {
       unique: true,
       primaryKey: true,
     },
-    latitude: 'float',
-    longitude: 'float',
-    changeset_id: 'integer',
+    latitude: {
+      type: 'integer'
+    },
+    longitude: { 
+      type: 'integer'
+    },
+    changeset_id: {
+      type: 'integer'
+    },
     visible: {
       type: 'boolean',
     },
     timestamp: {
       type: 'datetime',
     },
-
-    // OSM uses tile # to narrow down bbox queries.
-    // Since we have far fewer nodes,
-    // assume we can just do bbox queries on the entire node table.
-    // TODO make sure this doesn't bog down for record size.
-    // TODO do we need to include this?
     tile: {
       type: 'integer',
+      index: true
     },
     version: {
       type: 'integer',
