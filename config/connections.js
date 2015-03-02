@@ -19,8 +19,6 @@
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.connections.html
  */
 
-var local = require('./local');
-
 module.exports.connections = {
 
   /***************************************************************************
@@ -35,11 +33,7 @@ module.exports.connections = {
   },
 
   osmPostgreSQL: {
-    adapter: 'sails-postgresql',
-    host: local.postgres.host,
-    user: local.postgres.user,
-    password: local.postgres.password,
-    database: local.postgres.db
+    adapter: 'sails-postgresql'
   }
 
   /***************************************************************************
