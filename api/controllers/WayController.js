@@ -1,7 +1,7 @@
 /**
- * RoadController
+ * WayController
  *
- * @description :: Server-side logic for managing roads
+ * @description :: Server-side logic for managing ways
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
