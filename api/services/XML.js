@@ -1,4 +1,5 @@
 var libxml = require('libxmljs');
+var info = require('./GeoInfo');
 
 module.exports = {
   write: function(obj) {
@@ -31,8 +32,8 @@ module.exports = {
           timestamp: node.timestamp,
           user: 'DevelopmentSeed',
           uid: 1,
-          lat: node.latitude,
-          lon: node.longitude
+          lat: node.latitude / info.ratio,
+          lon: node.longitude / info.ratio
         };
         root.node('node').attr(attr);
       }
