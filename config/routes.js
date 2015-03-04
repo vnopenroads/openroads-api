@@ -46,7 +46,12 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/map': 'MapController.bbox'
+  '/map': {
+    controller: 'MapController',
+    action: 'bbox',
+    cors: true
+  },
+
 
 
 };
