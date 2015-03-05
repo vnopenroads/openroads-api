@@ -52,6 +52,12 @@ module.exports.routes = {
     cors: true
   },
 
+  'put /changeset/create': {
+    controller: 'ChangesetsController',
+    action: 'create',
+    cors: true
+  },
+
 
 
 };

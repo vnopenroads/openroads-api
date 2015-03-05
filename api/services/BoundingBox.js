@@ -99,5 +99,16 @@ module.exports = {
     else {
       return new Bbox(nullLatLon);
     }
-  }
+  },
+  fromCoordinates: function(minLon, minLat, maxLon, maxLat) {
+    var coordinates = [minLon, minLat, maxLon, maxLat];
+    if (_.every([coordinates], function(coordinate) {
+      return coordinate && !isNaN(coordinate);
+    })) {
+      return new Bbox(coordinates);
+    }
+    else {
+      return new Bbox(nullLatLon);
+    }
+  },
 }
