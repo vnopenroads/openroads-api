@@ -41,7 +41,7 @@ module.exports = {
 
     // Foreign keys
     //changeset_id_fkey: {
-      //model: 'changeset'
+      //model: 'changesets'
     //},
   }
 };
