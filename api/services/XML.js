@@ -2,6 +2,10 @@ var libxml = require('libxmljs');
 var info = require('./GeoInfo');
 
 module.exports = {
+  read: function(xmlString) {
+    return libxml.parseXmlString(xmlString);
+  },
+
   write: function(obj) {
     var obj = obj || {},
       nodes = obj.nodes,
