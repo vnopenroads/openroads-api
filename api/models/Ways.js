@@ -1,7 +1,9 @@
 /**
 * Way.js
 *
-* @description :: TODO: You might write a short summary of how this model works and what it represents here.
+* @description :: Represents ways, or roads.
+* Schema : : http://chrisnatali.github.io/osm_notes/osm_schema.html#current_ways
+*
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 

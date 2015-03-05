@@ -1,8 +1,8 @@
 /**
-* Node.js
+* Nodes.js
 *
 * @description :: Represents nodes.
-* For schema, see: http://chrisnatali.github.io/osm_notes/osm_schema.html#current_nodes
+* Schema : : http://chrisnatali.github.io/osm_notes/osm_schema.html#current_nodes
 *
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
@@ -19,7 +19,7 @@ module.exports = {
     latitude: {
       type: 'integer'
     },
-    longitude: { 
+    longitude: {
       type: 'integer'
     },
     changeset_id: {
