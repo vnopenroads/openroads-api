@@ -2,8 +2,52 @@ var libxml = require('libxmljs');
 var info = require('./GeoInfo');
 
 module.exports = {
-  read: function(xmlString) {
-    return libxml.parseXmlString(xmlString);
+  readChanges: function(xmlString) {
+    var entities = [];
+    var currEntity = {};
+    var sequence_id = 0;
+    var entity_id = 0;
+    var lastElem;
+    var mode = 'create'
+    var parser = new libxml.SaxParser();
+    parser.on('startElementNS', function(elem, attrs, prefix, uri, namespace) {
+      if (elem === 'create' || elem === 'modify' || elem === 'destroy') {
+        mode = elem;
+      } 
+      if (elem === 'node' || elem === 'way' || elem === 'nd' || elem === 'tag') {
+        currEntity = {
+          action: mode,
+          entity: elem,
+          attributes: _.chain(attrs)
+            .map(function (kvArray) { return [kvArray[0], kvArray[3]] })
+            .zipObject()
+            .value()
+        }
+      }
+      if (elem === 'node' || elem === 'way') {
+        lastElem = elem;
+        entity_id = currEntity.attributes.id;
+      }
+      if (elem === 'nd') { //way_node
+        currEntity.attributes['way_id'] = entity_id;
+        currEntity.attributes['sequence_id'] = sequence_id;
+        sequence_id += 1;
+      }
+      if (elem === 'tag') {
+        currEntity.attributes['entity'] = lastElem
+        currEntity.attributes['entity_id'] = entity_id;
+      }
+      if (_.has(currEntity, 'entity')) {
+        entities.push(currEntity); currEntity = {};
+      }
+    });
+    parser.on('endElementNS', function(elem, attrs, prefix, uri, namespace) {
+      if (elem === 'way') {
+        sequence_id = 0;
+      }
+    })
+    parser.parseString(xmlString);
+    return entities
   },
 
   write: function(obj) {
