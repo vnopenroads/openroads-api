@@ -6,18 +6,18 @@ var xmlNodeModify = '<osmChange version="0.3" generator="iD">' +
   '<delete if-unused="true"/>' +
 '</osmChange>' 
 
-var jsonNodeModify = [
-  {
+var jsonNodeModify = [ 
+  { 
     action: 'modify',
-    attributes: {
-      changeset: '123',
+    model: 'node',
+    attributes: { 
       id: '-76703',
-      lat: '9.632539331799256',
       lon: '123.83676223498107',
-      version: '1'
-    },
-    entity: 'node'
-  }
+      lat: '9.632539331799256',
+      version: '1',
+      changeset: '123' 
+    } 
+  } 
 ]
 
 var xmlCreateWay = '<osmChange version="0.3" generator="iD">' +
@@ -38,8 +38,8 @@ var xmlCreateWay = '<osmChange version="0.3" generator="iD">' +
 var jsonWayCreate = [ 
   { 
     action: 'create',
-    entity: 'node',
-    attributes:  { 
+    model: 'node',
+    attributes: { 
       id: '-7',
       lon: '123.83621506434201',
       lat: '9.632200849325827',
@@ -49,7 +49,7 @@ var jsonWayCreate = [
   },
   { 
     action: 'create',
-    entity: 'node',
+    model: 'node',
     attributes: { 
       id: '-10',
       lon: '123.84027056437253',
@@ -58,30 +58,33 @@ var jsonWayCreate = [
       changeset: '123' 
     } 
   },
-  { action: 'create',
-    entity: 'way',
+  { 
+    action: 'create',
+    model: 'way',
     attributes: { id: '-4', version: '0', changeset: '123' } 
   },
   { 
     action: 'create',
-    entity: 'nd',
-    attributes: { ref: '-7', way_id: '-4', sequence_id: 0 } 
-  },
-  { action: 'create',
-    entity: 'nd',
-    attributes: { ref: '-10', way_id: '-4', sequence_id: 1 } 
+    model: 'way_node',
+    attributes: { node_id: '-7', way_id: '-4', sequence_id: 0 } 
   },
   { 
     action: 'create',
-    entity: 'tag',
-    attributes: { k: 'highway', v: 'residential', entity: 'way', entity_id: '-4' } 
+    model: 'way_node',
+    attributes: { node_id: '-10', way_id: '-4', sequence_id: 1 } 
   },
   { 
     action: 'create',
-    entity: 'tag',
-    attributes: { k: 'name', v: 'Fake Street', entity: 'way', entity_id: '-4' } 
+    model: 'way_tag',
+    attributes: { k: 'highway', v: 'residential', way_id: '-4' } 
+  },
+  { 
+    action: 'create',
+    model: 'way_tag',
+    attributes: { k: 'name', v: 'Fake Street', way_id: '-4' } 
   } 
 ]
+
 
 describe('XML', function() {
   describe('#readChanges', function() {

@@ -17,7 +17,7 @@ module.exports = {
       if (elem === 'node' || elem === 'way' || elem === 'nd' || elem === 'tag') {
         currEntity = {
           action: mode,
-          entity: elem,
+          model: elem,
           attributes: _.chain(attrs)
             .map(function (kvArray) { return [kvArray[0], kvArray[3]] })
             .zipObject()
@@ -29,15 +29,18 @@ module.exports = {
         entity_id = currEntity.attributes.id;
       }
       if (elem === 'nd') { //way_node
+        currEntity.model = 'way_node';
+        currEntity.attributes['node_id'] = currEntity.attributes['ref']; // rename attribute
+        delete currEntity.attributes.ref;
         currEntity.attributes['way_id'] = entity_id;
         currEntity.attributes['sequence_id'] = sequence_id;
         sequence_id += 1;
       }
       if (elem === 'tag') {
-        currEntity.attributes['entity'] = lastElem
-        currEntity.attributes['entity_id'] = entity_id;
+        currEntity.model = lastElem + '_tag';
+        currEntity.attributes[lastElem + '_id'] = entity_id;
       }
-      if (_.has(currEntity, 'entity')) {
+      if (_.has(currEntity, 'model')) {
         entities.push(currEntity); currEntity = {};
       }
     });
