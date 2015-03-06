@@ -7,28 +7,41 @@ module.exports = {
     var currEntity = {};
     var sequence_id = 0;
     var entity_id = 0;
-    var lastElem;
-    var mode = 'create'
+    var parentElem;
+    var mode = 'create' //Modes can be either create, modify or destroy
+
+    // Start a streaming parser. On each tag, we check what it is and create entities
     var parser = new libxml.SaxParser();
+
+    // On every starting tag
     parser.on('startElementNS', function(elem, attrs, prefix, uri, namespace) {
+
+      // Set the mode
       if (elem === 'create' || elem === 'modify' || elem === 'destroy') {
         mode = elem;
+        return
       } 
+
+      // Check if we're processing an entity
       if (elem === 'node' || elem === 'way' || elem === 'nd' || elem === 'tag') {
         currEntity = {
           action: mode,
           model: elem,
-          attributes: _.chain(attrs)
+          attributes: _.chain(attrs) //Grab all the attributes and zip them into one attribute object
             .map(function (kvArray) { return [kvArray[0], kvArray[3]] })
             .zipObject()
             .value()
         }
       }
+
+      // If we're going to process a way_node or a tag, we need to save the parent ID
       if (elem === 'node' || elem === 'way') {
-        lastElem = elem;
+        parentElem = elem;
         entity_id = currEntity.attributes.id;
       }
-      if (elem === 'nd') { //way_node
+
+      // If we're processing a way node, we need to do some modifications to the attributes
+      if (elem === 'nd') { 
         currEntity.model = 'way_node';
         currEntity.attributes['node_id'] = currEntity.attributes['ref']; // rename attribute
         delete currEntity.attributes.ref;
@@ -36,19 +49,28 @@ module.exports = {
         currEntity.attributes['sequence_id'] = sequence_id;
         sequence_id += 1;
       }
+
+      // For tags, we have to add the parent's id
       if (elem === 'tag') {
-        currEntity.model = lastElem + '_tag';
-        currEntity.attributes[lastElem + '_id'] = entity_id;
+        currEntity.model = parentElem + '_tag';
+        currEntity.attributes[parentElem + '_id'] = entity_id;
       }
+
+      // If the entity is "not empty", then we can push it to the array
       if (_.has(currEntity, 'model')) {
         entities.push(currEntity); currEntity = {};
       }
     });
+
+    // On every closing tags, we are closing parent ways
     parser.on('endElementNS', function(elem, attrs, prefix, uri, namespace) {
       if (elem === 'way') {
+        //reset the counter
         sequence_id = 0;
       }
     })
+
+    // Pass in the XML string
     parser.parseString(xmlString);
     return entities
   },
