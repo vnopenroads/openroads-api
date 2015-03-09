@@ -1,19 +1,22 @@
 # OpenRoads
 The main repo for the Philippines OpenRoads project.
 
-## Installing locally
+## Contributing
 
+### Installing dependencies 
 ```sh
 git clone git@github.com:developmentseed/openroads.git
 cd openroads
 npm install
 ```
 
-Install sails globally
+Install sails globally:
 
 ```sh
 sudo npm install -g sails 
 ```
+
+### Local configuration
 
 Before running the server, you will need to modify `config/local.js` to include directions to the postgresql database. You'll want to include the following:
 
@@ -32,6 +35,13 @@ module.exports.connections = {
   }
 }
 ```
+
+### Installing a database with docker
+
+The `db-server` directory contains instructions on running your own postgresql database with the appropriate table schema using Docker. For Mac OS X users you might need [boot2docker](https://docs.docker.com/installation/mac/)
+
+
+### Running
 
 To run the server, run the following command:
 
