@@ -11,21 +11,27 @@ module.exports = {
 
   attributes: {
     way_id: {
-        type: 'integer',
-        primaryKey: true,
-        autoIncrement: true
+      type: 'integer',
+      autoIncrement: true,
+      unique: true,
+      primaryKey: true,
+      numerical: true
     },
     changeset_id: {
-        type: 'integer'
+      type: 'integer',
+      index: true,
+      numerical: true,
     },
     timestamp: {
-        type: 'datetime'
+      type: 'datetime',
+      date: true
     },
     visible: {
-        type: 'boolean'
+      type: 'boolean',
     },
     version: {
-        type: 'integer'
+      type: 'integer',
+      numerical: true
     }
   }
 };
