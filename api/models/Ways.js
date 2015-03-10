@@ -19,7 +19,6 @@ module.exports = {
     },
     changeset_id: {
       type: 'integer',
-      index: true,
       numerical: true,
     },
     timestamp: {
@@ -28,6 +27,7 @@ module.exports = {
     },
     visible: {
       type: 'boolean',
+      boolean: true
     },
     version: {
       type: 'integer',

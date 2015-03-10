@@ -11,15 +11,18 @@ module.exports = {
 
   attributes: {
     way_id: {
-        type: 'integer',
-        primaryKey: true
+      type: 'integer',
+      primaryKey: true,
+      numerical: true
     },
     sequence_id: {
-        type: 'integer',
-        primaryKey: true
+      type: 'integer',
+      primaryKey: true,
+      numerical: true
     },
     node_id: {
-        type: 'integer'
+      type: 'integer',
+      numerical: true
     }
   }
 };
