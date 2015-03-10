@@ -12,7 +12,8 @@ module.exports = {
   attributes: {
     way_id: {
         type: 'integer',
-        primaryKey: true
+        primaryKey: true,
+        model: 'ways'
     },
     sequence_id: {
         type: 'integer',
@@ -20,6 +21,16 @@ module.exports = {
     },
     node_id: {
         type: 'integer'
+    },
+  },
+
+   //Translate the entity from the XML parser into a proper model
+  fromJXEntity: function(entityAttr) {
+    return {
+      way_id: Number(entityAttr.way_id),
+      node_id: Number(entityAttr.ref),
+      version: entityAttr.version || 0,
+      sequence_id: entityAttr.sequence_id
     }
   }
 };
