@@ -8,6 +8,21 @@
 */
 
 module.exports = {
+  attachNodeIDs: function(ways, wayNodes) {
+    // For each way, attach every node it contains using the wayNodes server response.
+    for (var j = 0, jj = ways.length; j < jj; ++j) {
+      var way = ways[j];
+      var nodesInWay = [];
+      for (var i = 0, ii = wayNodes.length; i < ii; ++i) {
+        var wayNode = wayNodes[i];
+        if (wayNode.way_id === way.way_id) {
+          nodesInWay.push(wayNode);
+        }
+      }
+      way.nodes = nodesInWay;
+    }
+    return ways;
+  },
 
   attributes: {
     way_id: {
