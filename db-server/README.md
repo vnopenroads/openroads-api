@@ -1,9 +1,8 @@
-From https://github.com/openstreetmap/osmosis/tree/master/db-server
+Adapted from https://github.com/openstreetmap/osmosis/tree/master/db-server
 
 
-This directory contains the scripts to create a docker-based database server to be used for unit testing.
-In order to use this server, docker must be installed on the local workstation.  Beyond that, no additional
-configuration should be required.
+This directory contains the scripts to create a docker-based database server to be used for testing.
+In order to use this server, docker must be installed on the local workstation.
 
 To build the docker image, run the following script.
 
@@ -11,15 +10,8 @@ To build the docker image, run the following script.
 ./build.sh
 ```
 
-To run the docker image, run the following command.  To stop the server, press Ctrl-C.
+To run the docker image, run the following command. You will get a container ID that you can use to [start/stop](https://docs.docker.com/userguide/usingdocker/) the process.
 
 ```sh
-docker run -ti --rm=true --name osmosis-build -p 5432:5432 bretth/osmosis-build
-```
-
-If you wish to troubleshoot a running server, you may run the following command to get a bash prompt
-inside the docker container.
-
-```sh
-docker exec -ti osmosis-build /bin/bash
+docker run -ti -p 5432:5432 developmentseed/openroads-db
 ```
