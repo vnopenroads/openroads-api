@@ -10,18 +10,21 @@ module.exports = {
   attributes: {
     way_id: {
         type: 'integer',
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
     k: {
-        type: 'string'
+        type: 'string',
+        truthy: true
     },
     v: {
-        type: 'string'
-    }
+        type: 'string',
+        truthy: true
+    },
     version: {
-        type: 'integer'
+        type: 'integer',
+        numerical: true
     }
-
   }
 };
 
