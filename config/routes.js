@@ -58,6 +58,12 @@ module.exports.routes = {
     cors: true
   },
 
+  'get /ways/:id/full': {
+    controller: 'WaysController',
+    action: 'full',
+    skipAssets: true,
+    cors: true
+  },
 
 
 };
