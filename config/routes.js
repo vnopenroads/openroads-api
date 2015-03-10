@@ -58,7 +58,7 @@ module.exports.routes = {
     cors: true
   },
 
-  'get /ways/:id/full': {
+  'get /ways/:way_id/full': {
     controller: 'WaysController',
     action: 'full',
     skipAssets: true,
