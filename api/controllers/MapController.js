@@ -26,7 +26,8 @@ module.exports = {
       // If no nodes are found, just return an empty XML document.
       else if (!nodes.length) {
         res.set('Content-Type', 'text/xml');
-        return res.send('<osm version="6" generator="DevelopmentSeed"></osm>');
+        return res.send('<osm version="' + Api.version + '" generator="'
+                        + Api.generator + '"></osm>');
       }
 
       else {
