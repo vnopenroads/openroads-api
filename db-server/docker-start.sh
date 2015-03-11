@@ -18,11 +18,6 @@ if [ ! "$(ls -A $DATADIR)" ]; then
 	echo "listen_addresses = '*'" >> "${DATADIR}/postgresql.conf"
 	echo "host all osm 0.0.0.0/0 md5" >> "${DATADIR}/pg_hba.conf"
 
-	# Create the pgsnapshot database owned by osm.
-	su postgres sh -lc "postgres --single -jE" <<-EOSQL
-		CREATE DATABASE pgosmsnap06_test OWNER osm;
-	EOSQL
-
 	# Create the apidb database owned by osm.
 	su postgres sh -lc "postgres --single -jE" <<-EOSQL
 		CREATE DATABASE api06_test OWNER osm;
@@ -31,20 +26,10 @@ if [ ! "$(ls -A $DATADIR)" ]; then
 	# Start the database server temporarily while we configure the databases.
 	su postgres sh -lc "pg_ctl -w start"
 
-	# Configure the pgosmsnap06_test database as the OSM user.
-	su postgres sh -lc "psql -U osm pgosmsnap06_test" <<-EOSQL
-		CREATE EXTENSION hstore;
-		CREATE EXTENSION postgis;
-		\i /install/script/pgsnapshot_schema_0.6.sql
-		\i /install/script/pgsnapshot_schema_0.6_action.sql
-		\i /install/script/pgsnapshot_schema_0.6_bbox.sql
-		\i /install/script/pgsnapshot_schema_0.6_linestring.sql
-	EOSQL
-
 	# Configure the api06_test database as the OSM user.
 	su postgres sh -lc "psql -U osm api06_test" <<-EOSQL
-		\i /install/script/contrib/apidb_0.6.sql
-		\i /install/script/contrib/apidb_0.6_osmosis_xid_indexing.sql
+		\i /install/script/apidb_0.6.sql
+		\i /install/script/apidb_0.6_osmosis_xid_indexing.sql
 	EOSQL
 
 	# Stop the database.
