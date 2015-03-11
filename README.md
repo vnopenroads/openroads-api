@@ -3,7 +3,7 @@ The main repo for the Philippines OpenRoads project.
 
 ## Contributing
 
-### Installing dependencies 
+### Installing dependencies
 ```sh
 git clone git@github.com:developmentseed/openroads.git
 cd openroads
@@ -13,7 +13,7 @@ npm install
 Install sails globally:
 
 ```sh
-sudo npm install -g sails 
+sudo npm install -g sails
 ```
 
 ### Local configuration
@@ -52,5 +52,5 @@ sails lift
 To test the bounding box query:
 
 ```sh
-curl http://localhost:1337/map?bbox=123.81042480468751,9.584500864717155,123.81591796875,9.58991730708743
+curl http://localhost:1337/xml/map?bbox=123.81042480468751,9.584500864717155,123.81591796875,9.58991730708743
 ```
