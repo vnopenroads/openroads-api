@@ -1,5 +1,8 @@
 # OpenRoads
-The main repo for the Philippines OpenRoads project.
+This is the main repo for the Philippines OpenRoads project containing the API. Other projects part of this project:
+
+- [OR network editor](https://github.com/developmentseed/openroads-iD) - fork of iD
+- [OR verification platform](https://github.com/developmentseed/openroads-tofix) - fork of To-fix
 
 ## Contributing
 
