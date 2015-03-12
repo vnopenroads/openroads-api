@@ -1,6 +1,6 @@
 Adapted from https://github.com/openstreetmap/osmosis/tree/master/db-server
 
-### Dependencies 
+### Dependencies
 
 - [Docker](https://docs.docker.com/installation/#Installation)
 
@@ -12,7 +12,7 @@ This directory contains the scripts to create a docker-based database server to 
 
 Initialize the docker VM (on Mac this is done by running boot2docker)
 
-When the VM loads, it will show you variables to add to your environment, it should be something like 
+When the VM loads, it will show you variables to add to your environment, it should be something like
 
 ```
 To connect the Docker client to the Docker daemon, please set:
@@ -33,4 +33,4 @@ To run the docker image, run the following command. You will get a container ID 
 docker run -ti -p 5432:5432 developmentseed/openroads-db
 ```
 
-Note that you are no longer using the standard PostgreSQL port of 5434 but should instead use 5434 when connecting to the database.
+Note that you are no longer using the standard PostgreSQL port of 5434 but should instead use 5432 when connecting to the database.
