@@ -61,14 +61,14 @@ module.exports.routes = {
   },
 
   // Single node or ways
-  'get /xml/node/:node_id': {
+  'get /xml/nodes/:node_id': {
     controller: 'NodesController',
     action: 'single',
     skipAssets: true,
     cors: true
   },
 
-  'get /xml/way/:way_id/full': {
+  'get /xml/ways/:way_id/full': {
     controller: 'WaysController',
     action: 'full',
     skipAssets: true,
