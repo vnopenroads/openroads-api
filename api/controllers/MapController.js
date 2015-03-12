@@ -19,9 +19,7 @@ module.exports = {
 
     // Calculate the tiles within this bounding box.
     // See api/services/QuadTile.js.
-    var tiles = _.map(QuadTile.tilesForArea(bbox), function(tile) {
-      return '' + tile;
-    });
+    var tiles = QuadTile.tilesForArea(bbox);
 
     // Query the node table for nodes with this tile.
     Nodes.find({ tile: tiles }).exec(function nodeResp(err, nodes) {
@@ -37,7 +35,7 @@ module.exports = {
       else {
 
         // Create a list of node ID's.
-        var nodeIDs = _.pluck(nodes, 'node_id');
+        var nodeIDs = _.pluck(nodes, 'id');
 
         // Query the way_nodes endpoint, returning every wayNode containing our nodes.
         Way_Nodes.find({ node_id: nodeIDs }).exec(function wayNodeResp(err, wayNodes) {
@@ -53,7 +51,7 @@ module.exports = {
 
             // First query returns the actual ways.
             ways: function(cb) {
-              Ways.find({ way_id: wayIDs }).exec(cb);
+              Ways.find({ id: wayIDs }).exec(cb);
             },
 
             // Second query hits way_nodes table again
@@ -73,7 +71,7 @@ module.exports = {
 
             // Need to hit the Nodes server again.
             if (missingNodes.length) {
-              Nodes.find({ node_id: missingNodes }).exec(function missingNodeResp(err, missingNodes) {
+              Nodes.find({ id: missingNodes }).exec(function missingNodeResp(err, missingNodes) {
                 nodes = nodes.concat(missingNodes);
                 xmlDoc = XML.write({bbox: bbox, nodes: nodes, ways: ways});
                 res.set('Content-Type', 'text/xml');
@@ -103,7 +101,7 @@ function attachNodeIDs(obj) {
     var nodesInWay = [];
     for (var i = 0, ii = wayNodes.length; i < ii; ++i) {
       var wayNode = wayNodes[i];
-      if (wayNode.way_id === way.way_id) {
+      if (wayNode.way_id === way.id) {
         nodesInWay.push(wayNode);
       }
     }
