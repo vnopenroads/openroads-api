@@ -46,7 +46,7 @@ module.exports = {
   },
 
   //Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entity, create) {
+  fromJXEntity: function(entity) {
     var ratio = GeoInfo.ratio;
     var lat = parseFloat(entity.lat) * ratio | 0;
     var lon = parseFloat(entity.lon) * ratio | 0;
@@ -60,10 +60,6 @@ module.exports = {
       version: parseInt(entity.version, 10) || 0,
       timestamp: new Date()
     };
-
-    if (!create && entity.id) {
-      model.id = parseInt(entity.id, 10);
-    }
     return model;
   },
 
