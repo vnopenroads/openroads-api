@@ -9,32 +9,32 @@
 
 module.exports = {
 
+  tableName: 'current_ways',
+
   attributes: {
-    way_id: {
-        type: 'integer',
-        primaryKey: true,
-        autoIncrement: true
+    id: {
+      type: 'integer',
+      unique: true,
+      primaryKey: true,
+      autoIncrement: true,
+      index: true
     },
     changeset_id: {
-        type: 'integer',
-        model: 'changesets'
+      type: 'integer',
+      model: 'changesets'
     },
     timestamp: {
-        type: 'datetime'
+      type: 'datetime',
+      index: true
     },
     visible: {
-        type: 'boolean'
+      type: 'boolean'
     },
     version: {
-        type: 'integer'
+      type: 'integer'
     },
-
-    //Foreign Keys
-    // TODO this is the wrong column name, throws an error
-    //ways_changeset_id_fkey: {
-        //model: 'changesets'
-    //}
   },
+
 
   //Translate the entity from the XML parser into a proper model
   fromJXEntity: function(entity, create) {
