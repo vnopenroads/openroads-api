@@ -17,26 +17,39 @@ module.exports = {
       primaryKey: true,
     },
     latitude: {
-      type: 'integer'
+      type: 'integer',
+      required: true,
+      numerical: true,
+      truthy: true
     },
     longitude: {
-      type: 'integer'
+      type: 'integer',
+      required: true,
+      numerical: true,
+      truthy: true
     },
     changeset_id: {
-      type: 'integer'
+      type: 'integer',
+      numerical: true
     },
     visible: {
       type: 'boolean',
+      boolean: true
     },
     timestamp: {
       type: 'datetime',
+      datetime: true
     },
     tile: {
       type: 'integer',
-      index: true
+      index: true,
+      numerical: true,
+      required: true
     },
     version: {
       type: 'integer',
+      numerical: true,
+      required: true
     },
 
     // Foreign keys

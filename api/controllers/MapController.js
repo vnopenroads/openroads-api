@@ -26,7 +26,8 @@ module.exports = {
       // If no nodes are found, just return an empty XML document.
       else if (!nodes.length) {
         res.set('Content-Type', 'text/xml');
-        return res.send('<osm version="6" generator="DevelopmentSeed"></osm>');
+        return res.send('<osm version="' + Api.version + '" generator="'
+                        + Api.generator + '"></osm>');
       }
 
       else {
@@ -59,7 +60,7 @@ module.exports = {
 
             var allNodeIDs = _(resp.wayNodes).pluck('node_id').uniq().value();
             var missingNodes = _.difference(allNodeIDs, nodeIDs);
-            var ways = attachNodeIDs(resp);
+            var ways = Ways.attachNodeIDs(resp.ways, resp.wayNodes);
             var xmlDoc;
 
             // Need to hit the Nodes server again.
@@ -84,21 +85,3 @@ module.exports = {
     });
   }
 };
-
-function attachNodeIDs(obj) {
-  var ways = obj.ways;
-  var wayNodes = obj.wayNodes;
-  // For each way, attach every node it contains using the wayNodes server response.
-  for (var j = 0, jj = ways.length; j < jj; ++j) {
-    var way = ways[j];
-    var nodesInWay = [];
-    for (var i = 0, ii = wayNodes.length; i < ii; ++i) {
-      var wayNode = wayNodes[i];
-      if (wayNode.way_id === way.way_id) {
-        nodesInWay.push(wayNode);
-      }
-    }
-    way.nodes = nodesInWay;
-  }
-  return ways;
-}

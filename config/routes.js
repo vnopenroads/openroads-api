@@ -46,18 +46,34 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/map': {
-    controller: 'MapController',
-    action: 'bbox',
-    cors: true
-  },
-
+  // Creating changesets
   'put /changeset/create': {
     controller: 'ChangesetsController',
     action: 'create',
     cors: true
   },
 
+  // Bounding box query
+  'get /xml/map': {
+    controller: 'MapController',
+    action: 'bbox',
+    cors: true
+  },
+
+  // Single node or ways
+  'get /xml/nodes/:node_id': {
+    controller: 'NodesController',
+    action: 'single',
+    skipAssets: true,
+    cors: true
+  },
+
+  'get /xml/ways/:way_id/full': {
+    controller: 'WaysController',
+    action: 'full',
+    skipAssets: true,
+    cors: true
+  },
 
 
 };
