@@ -69,6 +69,7 @@ module.exports = {
         Changesets.destroy({ id: cs.id });
         return res.badRequest('Problem parsing changeset xml');
       }
+      var transactionError = false;
 
       // Create a mapping of nodes and ways to their associated way_node and tags.
       // First group by type.
