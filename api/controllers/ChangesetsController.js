@@ -70,44 +70,91 @@ module.exports = {
         return res.badRequest('Problem parsing changeset xml');
       }
 
-      // Uses change representation to update the database
-      knex.transaction(function(trx) {
-        Promise.each(actions, function(entry) {
-          if (entry.action === 'create') {
-            var table = entry.model + 's';
-            return knex(table).insert(entry.attributes).transacting(trx)
-          }
-          else if (entry.action === 'modify') {
-            // TODO
-          }
-          else if (entry.action === 'delete') {
-            // TODO
-          }
-        })
-        .then(trx.commit)
-        .catch(trx.rollback)
-      }).then(function() {
-        sails.log('at the end')
-      }).catch(function(error) {
-        Changesets.destroy({ id: cs.id });
-        sails.log('error: ', error)
-      });
-
-      // If all goes well, update the changeset
-      var bbox = BoundingBox.fromScaledActions(actions).toScaled();
-      Changesets.update({ id: cs.id }, {
-        min_lon: bbox.minLon,
-        min_lat: bbox.minLat,
-        max_lon: bbox.maxLon,
-        max_lat: bbox.maxLat,
-        closed_at: new Date()
-      }).exec(function updateChangeset(err, changeset) {
-        if (err) {
-          sails.log(err);
+      // Create a mapping of nodes and ways to their associated way_node and tags.
+      // First group by type.
+      var map = {
+        node: {},
+        way: {}
+      };
+      var associated = [];
+      for (var i = 0, ii = actions.length; i < ii; ++i) {
+        var action = actions[i];
+        if (map[action.model]) {
+          // Create an empty array to hold future associations
+          action.associated = [];
+          // Create an object that uses the node_id or way_id as pointers to the action.
+          map[action.model][action.id] = action;
         }
-        return res.ok(changeset);
+        else {
+          // Tags and way_nodes go here.
+          associated.push(action);
+        }
+      }
+
+      _.each(map, function(entityMap, name) {
+        var accessor = name + '_id';
+        for (var k = 0, kk = associated.length; k < kk; ++k) {
+          var id = associated[k].attributes[accessor];
+          var entity = entityMap[id];
+          if (entity) {
+            entity.associated.push(associated[k]);
+          }
+        }
       });
 
+      knex.transaction(function(transaction) {
+
+        Promise.each(actions, function(action) {
+          var model = action.model;
+          var table = 'current_' + model + 's';
+          var placeholderID = action.id;
+
+          sails.log('\n\n\n', action);
+
+          if ( model === 'node' || model === 'way' ) {
+
+            return transaction(table).insert(action.attributes).returning('id')
+              .then(function(id) {
+                // it's a way or node, and it has associations
+                if (map[model] && action.associated) {
+                  var accessor = model + '_id';
+                  _.each(action.associated, function(association) {
+                    association.attributes[accessor] = parseInt(id[0], 10);
+                  });
+                }
+                return action;
+              });
+
+          } else {
+            return transaction(table).insert(action.attributes);
+          }
+
+        }).then(transaction.commit)
+        .catch(transaction.rollback);
+      }).then(function() {
+
+        // If all goes well, update the changeset
+        var bbox = BoundingBox.fromScaledActions(actions).toScaled();
+        Changesets.update({ id: cs.id }, {
+          min_lon: bbox.minLon,
+          min_lat: bbox.minLat,
+          max_lon: bbox.maxLon,
+          max_lat: bbox.maxLat,
+          closed_at: new Date()
+        }).exec(function updateChangeset(err, changeset) {
+          if (err) {
+            sails.log(err);
+          }
+          res.set('Content-Type', 'text/xml');
+          return res.send('');
+        });
+
+      }).catch(function(err) {
+        sails.log(err);
+        Changesets.destroy({ id: cs.id }).then(function() {
+          return res.badRequest(err);
+        });
+      });
     });
   }
 }
