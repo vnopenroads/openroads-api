@@ -9,35 +9,26 @@
 
 module.exports = {
 
-  tableName: 'current_way_nodes',
+  tableName: 'way_nodes',
 
   attributes: {
     way_id: {
       type: 'integer',
       primaryKey: true,
-      index: true,
-      model: 'ways'
+      model: 'ways',
+    },
+    version: {
+      type: 'integer',
     },
     sequence_id: {
       type: 'integer',
     },
     node_id: {
       type: 'integer',
-      index: true
     },
   },
 
-   //Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entity) {
-    return {
-      way_id: parseInt(entity.way_id, 10),
-      node_id: parseInt(entity.ref, 10),
-      sequence_id: parseInt(entity.sequence_id)
-    }
-  },
-
-  configureIDs: function(id) {
-    console.log(id);
-  },
+  // TODO write from way node function
+  fromWayNode: function() {},
 };
 

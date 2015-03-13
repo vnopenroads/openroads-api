@@ -10,12 +10,15 @@
 
 module.exports = {
 
+  tableName: 'current_nodes',
+
   attributes: {
-    node_id: {
+    id: {
       type: 'integer',
       autoIncrement: true,
       unique: true,
       primaryKey: true,
+      index: true
     },
     latitude: {
       type: 'integer'
@@ -43,23 +46,23 @@ module.exports = {
   },
 
   //Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entityAttr) {
-    var ratioLat = Number(entityAttr.lat) * GeoInfo.ratio | 0;
-    var ratioLon = Number(entityAttr.lon) * GeoInfo.ratio | 0;
-    var tile = QuadTile.xy2tile(
-                QuadTile.lon2x(ratioLon),
-                QuadTile.lat2y(ratioLat)
-              )
-    return {
-      latitude: ratioLat,
-      longitude: ratioLon,
-      node_id: Number(entityAttr.id),
-      changeset_id: Number(entityAttr.changeset),
-      visible: (typeof entityAttr.visible === 'undefined') || (entityAttr.visible === 'true'),
-      tile: tile,
-      version: entityAttr.version || 0,
-      timestamp: new Date(),
-    }
-  }
-};
+  fromJXEntity: function(entity) {
+    var ratio = GeoInfo.ratio;
+    var lat = parseFloat(entity.lat);
+    var lon = parseFloat(entity.lon)
 
+    var model = {
+      latitude: lat * ratio | 0,
+      longitude: lon * ratio | 0,
+      tile: QuadTile.xy2tile(QuadTile.lon2x(lon), QuadTile.lat2y(lat)),
+      changeset_id: parseInt(entity.changeset, 10),
+      visible: (entity.visible !== 'false' && entity.visible !== false),
+      version: parseInt(entity.version, 10) || 0,
+      timestamp: new Date()
+    };
+    return model;
+  },
+
+  configureIDs: function(id) {
+  },
+};

@@ -9,42 +9,46 @@
 
 module.exports = {
 
+  tableName: 'current_ways',
+
   attributes: {
-    way_id: {
-        type: 'integer',
-        primaryKey: true,
-        autoIncrement: true
+    id: {
+      type: 'integer',
+      unique: true,
+      primaryKey: true,
+      autoIncrement: true,
+      index: true
     },
     changeset_id: {
-        type: 'integer',
-        model: 'changesets'
+      type: 'integer',
+      model: 'changesets'
     },
     timestamp: {
-        type: 'datetime'
+      type: 'datetime',
+      index: true
     },
     visible: {
-        type: 'boolean'
+      type: 'boolean'
     },
     version: {
-        type: 'integer'
+      type: 'integer'
     },
-
-    //Foreign Keys
-    // TODO this is the wrong column name, throws an error
-    //ways_changeset_id_fkey: {
-        //model: 'changesets'
-    //}
   },
 
+
   //Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entityAttr) {
-    return {
-      way_id: Number(entityAttr.id),
-      changeset_id: Number(entityAttr.changeset),
+  fromJXEntity: function(entity) {
+    var model = {
+      changeset_id: parseInt(entity.changeset, 10),
       timestamp: new Date(),
-      version: entityAttr.version || 0,
-      visible: (typeof entityAttr.visible === 'undefined') || (entityAttr.visible === 'true')
-    }
-  }
+      version: parseInt(entity.version, 10) || 0,
+      visible: (entity.visible !== 'false' && entity.visible !== false),
+    };
+    return model;
+  },
+
+  configureIDs: function(id) {
+    console.log(id);
+  },
 };
 
