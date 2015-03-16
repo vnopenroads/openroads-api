@@ -14,7 +14,7 @@ module.exports = {
   attributes: {
     way_id: {
       type: 'integer',
-      primaryKey: true,
+      primaryKey:true,
       index: true,
       model: 'ways'
     },
@@ -23,7 +23,8 @@ module.exports = {
     },
     node_id: {
       type: 'integer',
-      index: true
+      index: true,
+      model: 'nodes'
     },
   },
 
@@ -34,6 +35,9 @@ module.exports = {
       node_id: parseInt(entity.ref, 10),
       sequence_id: parseInt(entity.sequence_id)
     }
+  },
+  indexName: function() {
+    return 'node_id'
   },
 
   configureIDs: function(id) {

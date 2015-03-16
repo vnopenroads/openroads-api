@@ -36,5 +36,7 @@ module.exports = {
   },
 
   fromWay: function() {},
+  indexName: function() {
+    return 'way_id'
+  }
 };
-
