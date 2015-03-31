@@ -9,5 +9,5 @@ deploy:
   app: 
     develop: fast-dawn-4805
   on: 
-    repo: developmentseed/openroads
+    repo: developmentseed/openroads-api
     branch: develop
