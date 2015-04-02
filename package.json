@@ -1,0 +1,33 @@
+{
+  "name": "openroads-api",
+  "version": "0.0.1",
+  "description": "An API for the openroads project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/developmentseed/openroads-api.git"
+  },
+  "keywords": [
+    "OSM",
+    "openroads"
+  ],
+  "author": "Development Seed",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/developmentseed/openroads-api/issues"
+  },
+  "homepage": "https://github.com/developmentseed/openroads-api",
+  "dependencies": {
+    "hapi": "^8.4.0",
+    "hapi-router": "^3.0.1",
+    "knex": "^0.7.6"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.1",
+    "should": "^5.2.0"
+  }
+}
