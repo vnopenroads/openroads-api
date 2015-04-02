@@ -23,6 +23,7 @@
   "homepage": "https://github.com/developmentseed/openroads-api",
   "dependencies": {
     "bluebird": "^2.9.24",
+    "boom": "^2.7.0",
     "hapi": "^8.4.0",
     "hapi-router": "^3.0.1",
     "knex": "^0.7.6",
