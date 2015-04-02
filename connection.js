@@ -1,0 +1,1 @@
+module.exports = process.env.DATABASE_URL || require('./local').connection.url

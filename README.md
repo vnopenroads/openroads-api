@@ -14,17 +14,12 @@ npm install
 
 ### Local configuration
 
-Before running the server, you will need to create `local.js` in your root directory to include directions to the postgresql database. You'll want to include the following:
+Before running the server, you will need to add `local.js` in your root directory to include directions to the postgresql database. Add your own values to the url where you're hosting the OSM databse.
 
 
 ```javascript
-module.exports.connections = {
-  osmPostgreSQL: {
-    adapter: 'sails-postgresql',
+module.exports.connection = {
     url: 'postgres://USER:PASSWORD@HOST:POST/DATABASE',
-    pool: false,
-    ssl: false
-  }
 }
 ```
 

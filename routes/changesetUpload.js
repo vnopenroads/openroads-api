@@ -2,7 +2,7 @@ var _ = require('lodash')
 var Boom = require('boom')
 var knex = require('knex')({
   client: 'pg',
-  connection: require('../local').connections.osmPostgreSQL.url,
+  connection: require('../connection'),
   debug: true
 });
 var Promise = require('bluebird');
