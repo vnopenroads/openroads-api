@@ -22,9 +22,12 @@
   },
   "homepage": "https://github.com/developmentseed/openroads-api",
   "dependencies": {
+    "bluebird": "^2.9.24",
     "hapi": "^8.4.0",
     "hapi-router": "^3.0.1",
-    "knex": "^0.7.6"
+    "knex": "^0.7.6",
+    "libxmljs": "^0.13.0",
+    "lodash": "^3.6.0"
   },
   "devDependencies": {
     "mocha": "^2.2.1",

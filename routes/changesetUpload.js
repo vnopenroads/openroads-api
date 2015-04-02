@@ -1,4 +1,6 @@
 var knex = require('knex');
+var XML = require('../services/XML');
+
 
 module.exports = {
     method: 'POST',
