@@ -13,6 +13,13 @@
   // Define globals exposed by Node.js.
   "node": true,
 
+  // Define globals exposed by Mocha
+  "mocha": true,
+  
+  "globals": {
+    "server": true
+  },
+
   /*
    * ENFORCING OPTIONS
    * =================
