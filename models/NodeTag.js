@@ -4,7 +4,6 @@
  */
 
 module.exports = {
-
   tableName: 'current_node_tags',
 
   attributes: {
@@ -25,10 +24,11 @@ module.exports = {
 
   //Translate the entity from the XML parser into a proper model
   fromJXEntity: function(entityAttr) {
+    'use strict';
     return {
       node_id: Number(entityAttr.id),
       k: entityAttr.k,
       v: entityAttr.v,
-    }
+    };
   }
 };
