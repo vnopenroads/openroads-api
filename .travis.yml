@@ -5,9 +5,9 @@ script: npm test
 deploy:
   provider: heroku
   api_key:
-    secure: ZodfDxc254WgY8e/X+Y9N8xK7pV9RZMQgsgr/sJkhzw8gglGmuQnDPvFPkbmHJEP2iFsJPlmexFHCtw3wXCszQv0dmSLf/sAIEjCuuXPKrsXk1MFS87PxiAaS1tTnkgPvr8VgO7MzCBqJLEBHl7oxXOWdf1lXvvoZZHgvMUIzUo=
-  app: 
+    secure: jreYc4JYiTme4eKk+o/NEJn4OfaKOyJw5KvAbKb0k0pZ5mzL0lfnAT6bpUZ9DoWNNj1SRm99Uu5hnztNWDCeMpBNgKM88cCO68+yvDAFjZIipkrdPGU4OzFvFTmtk6b5cqXv1CYiuR20CN2HtodZVt5CmOWCaHXXZaq9iEYG20c=
+  app:
     develop: fast-dawn-4805
-  on: 
+  on:
     repo: developmentseed/openroads-api
     branch: develop

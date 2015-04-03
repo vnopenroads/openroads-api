@@ -12,31 +12,20 @@ cd openroads
 npm install
 ```
 
-Install sails globally:
-
-```sh
-sudo npm install -g sails
-```
-
 ### Local configuration
 
-Before running the server, you will need to modify `config/local.js` to include directions to the postgresql database. You'll want to include the following:
+Before running the server, you will need to add `local.js` in your root directory to include directions to the postgresql database. Add your own values to the url where you're hosting the OSM databse.
 
 
 ```javascript
-module.exports.connections = {
-  osmPostgreSQL: {
-    adapter: 'sails-postgresql',
+module.exports.connection = {
     url: 'postgres://USER:PASSWORD@HOST:POST/DATABASE',
-    pool: false,
-    ssl: false
-  }
 }
 ```
 
 ### Installing a database with docker
 
-The `db-server` directory contains instructions on running your own postgresql database with the appropriate table schema using Docker. For Mac OS X users you might need [boot2docker](https://docs.docker.com/installation/mac/)
+The `db-server` directory contains instructions on running your own postgresql database with the appropriate table schema using Docker. For Mac OS X users you might need [docker-machine](https://github.com/docker/machine) or [Kitematic](https://kitematic.com/)
 
 
 ### Running
@@ -44,7 +33,7 @@ The `db-server` directory contains instructions on running your own postgresql d
 To run the server, run the following command:
 
 ```sh
-sails lift
+npm start
 ```
 
 To test the bounding box query:
