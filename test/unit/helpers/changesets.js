@@ -32,5 +32,5 @@ module.exports.deleteNode = function(id) {
   '<delete if-unused="true">' +
       '<node id="'+ id + '" lon="123.81275264816284" lat="9.626730050553016" version="0" changeset="1"/>' +
   '</delete>' +
-'</osmChange>'
+  '</osmChange>'
 };

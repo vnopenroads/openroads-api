@@ -14,7 +14,7 @@ server.register({
 
 
 server.start(function () {
-    console.log('Server running at:', server.info.uri);
+  console.log('Server running at:', server.info.uri);
 });
 
 module.exports = server

@@ -28,24 +28,24 @@ describe('XML', function() {
         .uniq().value()
         .should.be.eql([mode])
         .and.have.lengthOf(1)
-    }}
+      }}
 
-    it('Should translate a creation changeset', simpleChangeset('create')),
-    it('Should translate a modification changeset', simpleChangeset('modify')),
-    it('Should translate a deletion changeset', simpleChangeset('delete'))
+      it('Should translate a creation changeset', simpleChangeset('create')),
+      it('Should translate a modification changeset', simpleChangeset('modify')),
+      it('Should translate a deletion changeset', simpleChangeset('delete'))
 
-    // -----------
-    // Exactly translated
-    // -----------
+      // -----------
+      // Exactly translated
+      // -----------
 
-    it('Should translate a single node modify', function() {
-      rmTimestamps(XML.readChanges(mock.modify.xml))
+      it('Should translate a single node modify', function() {
+        rmTimestamps(XML.readChanges(mock.modify.xml))
         .should.be.eql(rmTimestamps(mock.modify.json))
-    }),
-    it('Should translate a way creation', function() {
-      rmTimestamps(XML.readChanges(mock.create.xml))
+      }),
+      it('Should translate a way creation', function() {
+        rmTimestamps(XML.readChanges(mock.create.xml))
         .should.be.eql(rmTimestamps(mock.create.json))
-    })
+      })
   });
 
   describe('#write', function() {
