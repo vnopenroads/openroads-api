@@ -1,13 +1,20 @@
-
+'use strict';
 /**
 * Nodes.js
 *
 * @description :: Represents nodes.
-* Schema : : http://chrisnatali.github.io/osm_notes/osm_schema.html#current_nodes
+* Schema: http://chrisnatali.github.io/osm_notes/osm_schema.html#current_nodes
 *
 */
 var RATIO = require('../services/Ratio');
 var QuadTile = require('../services/QuadTile');
+var knex = require('knex')({ 
+    client: 'pg', 
+    connection: require('../connection'),
+    debug: false
+  });
+var _ = require('lodash');
+
 
 module.exports = {
 
@@ -62,7 +69,7 @@ module.exports = {
   //Translate the entity from the XML parser into a proper model
   fromJXEntity: function(entity) {
     var lat = parseFloat(entity.lat);
-    var lon = parseFloat(entity.lon)
+    var lon = parseFloat(entity.lon);
 
     var model = {
       latitude: lat * RATIO | 0,
@@ -76,29 +83,30 @@ module.exports = {
     return model;
   },
 
-  canBeDeleted: function(node_id) {
+  canBeDeleted: function(nodeId) {
     // No need to call parseInt on node_id, as that's already handled upstream.
-    return Way_Nodes.find({ node_id: node_id })
+    return knex('current_way_nodes')
+    .where('node_id', nodeId)
     .then(function wayNodeResp(wayNodes) {
       // If this node belongs to a way, check to see if
       // any of those ways are visible, aka not deleted yet.
       // Return false if this node is still part of an existing way.
       if (wayNodes) {
-        return Ways.find({id: _.pluck(wayNodes, 'way_id')})
+        return knex('current_ways').whereIn('id',_.pluck(wayNodes, 'way_id'))
         .then(function(ways) {
           var visible = _.chain(ways)
           .pluck('visible')
-          .reduce(function(curr, val) { return curr && val}, true)
+          .reduce(function(curr, val) { return curr && val; }, true)
           .value();
           return visible;
-        })
+        });
       } else {
         return true;
       }
     })
     .catch(function(err) {
       throw new Error(err);
-    })
+    });
   },
 
   // Attach a list of tags to a list of entities

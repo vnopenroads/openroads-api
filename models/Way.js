@@ -66,7 +66,8 @@ module.exports = {
   },
 
   attachNodeIDs: function(ways, wayNodes) {
-    // For each way, attach every node it contains using the wayNodes server response.
+    // For each way, attach every node it contains using the wayNodes server 
+    //response.
     for (var j = 0, jj = ways.length; j < jj; ++j) {
       var way = ways[j];
       var nodesInWay = [];

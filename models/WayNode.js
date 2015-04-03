@@ -1,3 +1,4 @@
+'use strict';
 /**
 * WayNode.js
 *
@@ -35,6 +36,6 @@ module.exports = {
       way_id: parseInt(entity.way_id, 10),
       node_id: parseInt(entity.ref, 10),
       sequence_id: parseInt(entity.sequence_id)
-    }
+    };
   }
 };
