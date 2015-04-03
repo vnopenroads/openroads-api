@@ -1,4 +1,4 @@
-'use strict'; 
+'use strict';
 
 var _ = require('lodash');
 var Boom = require('boom');
@@ -45,7 +45,7 @@ function upload(req, res) {
     res(Boom.badRequest('Changeset ID must be a non-zero number'));
   }
 
-    // Look for changeset in database
+  // Look for changeset in database
   knex('changesets')
   .where('id', changesetID)
   .then(function(changesets) {
@@ -63,7 +63,7 @@ function upload(req, res) {
       return res(Boom.badRequest('Could not parse changeset'));
     }
     var transactionError = false;
-    
+
     // --------------------
     // Create a mapping of nodes and ways to their associated way_node and tags.
     // First group by type.
@@ -108,9 +108,9 @@ function upload(req, res) {
     // TODO: How to deal with history?
     _.each(actions, function(action) {
       if ((action.model === 'node_tag' ||
-          action.model === 'way_tag' ||
-          action.model === 'way_node') &&
-          action.action === 'modify') {
+           action.model === 'way_tag' ||
+             action.model === 'way_node') &&
+               action.action === 'modify') {
         action.action = 'create';
       }
     });
@@ -130,7 +130,7 @@ function upload(req, res) {
 
         numChanges += 1;
 
-        
+
         // sails.log.verbose('\n\n\n', action);
         if (action.action === 'create' ) {
 
@@ -181,47 +181,47 @@ function upload(req, res) {
 
           // Create the old entity, if it fails, throw an error
           var updateTable = function() { return transaction(oldTable)
-          .insert(oldEntity)
-          .then(function() {
-            console.log('in update');
-            return transaction(currentTable)
-                    .where(action.key, '=', action.id)
-                    .update(attributes)
+            .insert(oldEntity)
+            .then(function() {
+              console.log('in update');
+              return transaction(currentTable)
+              .where(action.key, '=', action.id)
+              .update(attributes)
 
+              .catch(function(err) {
+                console.log(err);
+              });
+            })
             .catch(function(err) {
               console.log(err);
-            });
-          })
-          .catch(function(err) {
-            console.log(err);
-            throw new Error(err);
-          }); };
+              throw new Error(err);
+            }); };
 
-          if (model === 'node' || model === 'way') {
-            return transaction('current_' + model + '_tags')
-                    .where(model + '_id', '=', action.id)
-                    .delete()
-                    .then(function() {
-                      if (model === 'way') {
-                      
-                        //Delete way_nodes 
-                        return transaction('current_way_nodes')
-                                .where('way_id', '=', action.id)
-                                .delete()
-                                .then(function() { 
-                                  return transaction(currentTable)
-                                          .where(action.key, '=', action.id)
-                                          .update(attributes); 
-                                        });
+            if (model === 'node' || model === 'way') {
+              return transaction('current_' + model + '_tags')
+              .where(model + '_id', '=', action.id)
+              .delete()
+              .then(function() {
+                if (model === 'way') {
+
+                  //Delete way_nodes
+                  return transaction('current_way_nodes')
+                  .where('way_id', '=', action.id)
+                  .delete()
+                  .then(function() {
+                    return transaction(currentTable)
+                    .where(action.key, '=', action.id)
+                    .update(attributes);
+                  });
                 } else {
                   return transaction(currentTable)
-                          .where(action.key, '=', action.id)
-                          .update(attributes);
+                  .where(action.key, '=', action.id)
+                  .update(attributes);
                 }
               });
-          } else {
-            return updateTable;
-          }
+            } else {
+              return updateTable;
+            }
         }
 
         else if (action.action === 'delete') {
@@ -231,30 +231,30 @@ function upload(req, res) {
             .then(function(yes) {
               if (yes) {
                 attributes.visible = false;
-                //We need to delete all associations 
+                //We need to delete all associations
                 // Put in history
 
                 // Delete tags
                 return transaction('current_' + model + '_tags')
-                        .where(model + '_id', '=', action.id)
-                        .delete()
-                        .then(function() {
-                          if (model === 'way') {
+                .where(model + '_id', '=', action.id)
+                .delete()
+                .then(function() {
+                  if (model === 'way') {
 
-                            //Delete way_nodes 
-                            return transaction('current_way_nodes')
-                                    .where('way_id', '=', action.id)
-                                    .delete()
-                                    .then(function() { 
-                                      return transaction(currentTable)
-                                            .where(action.key, '=', action.id)
-                                            .update(attributes);
-                                          });
-                          } else {
-                            return transaction(currentTable)
-                                    .where(action.key, '=', action.id)
-                                    .update(attributes);
-                          }
+                    //Delete way_nodes
+                    return transaction('current_way_nodes')
+                    .where('way_id', '=', action.id)
+                    .delete()
+                    .then(function() {
+                      return transaction(currentTable)
+                      .where(action.key, '=', action.id)
+                      .update(attributes);
+                    });
+                  } else {
+                    return transaction(currentTable)
+                    .where(action.key, '=', action.id)
+                    .update(attributes);
+                  }
                 });
               }
 
@@ -280,28 +280,28 @@ function upload(req, res) {
       // If all goes well, update the changeset
       var bbox = BoundingBox.fromScaledActions(actions).toScaled();
       var updatedChangeset = {
-          min_lon: bbox.minLon,
-          min_lat: bbox.minLat,
-          max_lon: bbox.maxLon,
-          max_lat: bbox.maxLat,
-          closed_at: new Date(),
-          num_changes: numChanges
+        min_lon: bbox.minLon,
+        min_lat: bbox.minLat,
+        max_lon: bbox.maxLon,
+        max_lat: bbox.maxLat,
+        closed_at: new Date(),
+        num_changes: numChanges
       };
       knex('changesets')
-        .where('id', cs.id)
-        .update(updatedChangeset)
-        .then(function() {
-          return res({
-            changeset: _.extend(cs, updatedChangeset),
-            actions: actions
-          });
-        })
-        .catch(function(err) {
-          if (err) {
-            console.log(err);
-            return res(Boom.badImplementation('Could not update changeset'));
-          }
+      .where('id', cs.id)
+      .update(updatedChangeset)
+      .then(function() {
+        return res({
+          changeset: _.extend(cs, updatedChangeset),
+          actions: actions
         });
+      })
+      .catch(function(err) {
+        if (err) {
+          console.log(err);
+          return res(Boom.badImplementation('Could not update changeset'));
+        }
+      });
     })
     .catch(function(err) {
       console.log(err);
@@ -315,7 +315,7 @@ function upload(req, res) {
     console.log(err);
     return res(Boom.badRequest('Could not find changeset'));
   });
-  
+
 }
 
 module.exports = {
