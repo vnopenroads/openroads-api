@@ -1,1 +1,3 @@
-module.exports = 0.25;
+module.exports = {
+  area: .25,
+}

@@ -5,20 +5,30 @@ var fs = require('fs');
 function request (bbox) {
   return {
     method: 'GET',
-    url: '/xml/map' + bbox ? '?bbox='+bbox : ''
+    url: '/xml/map?bbox='+bbox
   };
 }
-
 
 describe('map endpoint', function () {
   
   it('fails without valid bbox parameter', function (done) {
-
-    server.injectThen(request())
+    server.injectThen(request('0,0,1'))
     .then(function (res) {
-
       res.statusCode.should.not.eql(200);
-
+      var result = JSON.parse(res.payload);
+      result.message.should
+        .equal('Latitude/longitude bounds must be valid coordinates.');
+      done();
+    })
+    .catch(function (err) {
+      return done(err);
+    });
+  });
+  
+  it('succeeds with valid bbox parameter', function (done) {
+    server.injectThen(request('0,0,0.1,0.1'))
+    .then(function (res) {
+      res.statusCode.should.equal(200);
       done();
     })
     .catch(function (err) {
@@ -32,8 +42,7 @@ describe('map endpoint', function () {
 
     server.injectThen(request('-0.1,-0.1,0.1,0.1'))
     .then(function (res) {
-
-      res.statusCode.should.eql(200);
+      res.statusCode.should.equal(200);
       res.payload.should.equal(expected);
 
       done();
