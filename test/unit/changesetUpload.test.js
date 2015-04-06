@@ -1,13 +1,15 @@
 'use strict';
 var mocks = require('./helpers/changesets');
-var knex = require('knex')({ 
-  client: 'pg', 
+var knex = require('knex')({
+  client: 'pg',
   connection: require('../../connection'),
   debug: false
 });
 
+var _ = require('lodash');
+
 var serverShouldOk = function(mock, done) {
-  var options = { 
+  var options = {
     method: 'POST',
     url: '/changeset/1/upload',
     payload: {
@@ -15,17 +17,17 @@ var serverShouldOk = function(mock, done) {
     }
   };
   server.injectThen(options)
-    .then(function(res) {
-      res.statusCode.should.eql(200);
-      return done();
-    }).catch(function(err) {
-      return done(err);
-    });
+  .then(function(res) {
+    res.statusCode.should.eql(200);
+    return done();
+  }).catch(function(err) {
+    return done(err);
+  });
 };
 
 describe('ChangesetsController', function() {
   describe('#upload',function() {
-    it('Creates a node', function(done) { 
+    it('Creates a node', function(done) {
       serverShouldOk(mocks.createNode(-1), done);
     });
 
@@ -36,7 +38,7 @@ describe('ChangesetsController', function() {
       });
     });
 
-    it('Deletes a node', function(done) { 
+    it('Deletes a node', function(done) {
       knex('current_nodes').where('changeset_id', 1)
       .then(function(nodes) {
         serverShouldOk(mocks.deleteNode(nodes[0].id), done);
@@ -52,8 +54,24 @@ describe('ChangesetsController', function() {
       .then(function(nodes) {
         knex('current_ways').where('changeset_id', 1)
         .then(function(ways) {
-          serverShouldOk(mocks.modifyWay(nodes[1].id, 
+          serverShouldOk(mocks.modifyWay(nodes[1].id,
             nodes[2].id, nodes[3].id, ways[0].id), done);
+        });
+      });
+    });
+
+    it('Creates a long way', function(done) {
+      serverShouldOk(mocks.createLongWay(), done);
+    });
+
+    it('Modifies a long way', function(done) {
+      knex('current_nodes').where('changeset_id', 1)
+      .then(function(nodes) {
+        knex('current_ways').where('changeset_id', 1)
+        .then(function(ways) {
+          serverShouldOk(
+            mocks.modifyLongWay(_.pluck(nodes.slice(4), 'id'), ways[1].id),
+            done);
         });
       });
     });
