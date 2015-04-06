@@ -13,7 +13,7 @@ var Promise = require('bluebird');
 var knex = require('knex')({
   client: 'pg',
   connection: require('../connection'),
-  debug: true
+  debug: false
 });
 
 var RATIO = require('../services/Ratio');
@@ -294,8 +294,21 @@ var Node = {
         return [];
       }
       var ids = _.pluck(destroys, 'id');
-      var query = transaction(Node.tableName).whereIn('id', ids).update({ visible: false }).returning('id').then(function(ids) {
-        console.log('Nodes set invisible', ids.join(', '));
+      var query = transaction(Node.tableName).whereIn('id', ids).update({
+        visible: false,
+        changeset_id: meta.id
+      }).returning('id').then(function(invisibleNodes) {
+        return transaction(NodeTag.tableName).whereIn('node_id', invisibleNodes).del().returning('ids').then(function(deleted) {
+          // console.log('Nodes set invisible', invisibleNodes.join(', '));
+          // console.log('Node tags deleted', deleted.join(', '));
+        }).catch(function(err) {
+          console.log('err: deleting node tags');
+          console.log(err);
+        });
+      });
+      .catch(function(err) {
+        console.log('err: deleting nodes');
+        console.log(err);
       });
       return query;
     }

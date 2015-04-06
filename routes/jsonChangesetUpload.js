@@ -56,7 +56,6 @@ function upload(req, res) {
       }).catch(transaction.rollback);
     })
     .then(function(queries) {
-      console.log('in complete', queries);
 
       // If all goes well, update the changeset
       var nodes = [];
@@ -117,7 +116,6 @@ function query(entity, changeset, meta, map, transaction) {
   });
   return Promise.all(actions);
 }
-
 
 module.exports = {
   method: 'POST',

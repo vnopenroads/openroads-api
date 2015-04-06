@@ -14,7 +14,7 @@ var Promise = require('bluebird');
 var knex = require('knex')({
   client: 'pg',
   connection: require('../connection'),
-  debug: true
+  debug: false
 });
 
 var Node = require('./Node');
@@ -280,8 +280,23 @@ var Way = {
         return [];
       }
       var ids = _.pluck(destroys, 'id');
-      var query = transaction(Way.tableName).whereIn('id', ids).update({ visible: false }).returning('id').then(function(ids) {
-        console.log('Ways set invisible', ids.join(', '));
+      var query = transaction(Way.tableName).whereIn('id', ids).update({
+        visible: false,
+        changeset_id: meta.id
+      }).returning('id').then(function(invisibleWays) {
+        return Promise.all([
+          transaction(WayTag.tableName).whereIn('way_id', invisibleWays).del(),
+          transaction(WayNode.tableName).whereIn('way_id', invisibleWays).del()
+        ]).then(function() {
+          // console.log('Ways set invisible', invisibleWays.join(', '));
+        }).catch(function(err) {
+          console.log('err: deleting way nodes and tags');
+          console.log(err);
+        });
+      })
+      .catch(function(err) {
+        console.log('err: deleting ways');
+        console.log(err);
       });
       return query;
     }
