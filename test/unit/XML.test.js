@@ -36,19 +36,19 @@ describe('XML', function() {
     it('Should translate a modification changeset', simpleChangeset('modify'));
     it('Should translate a deletion changeset', simpleChangeset('delete'));
 
-      // -----------
-      // Exactly translated
-      // -----------
+    // -----------
+    // Exactly translated
+    // -----------
 
-      it('Should translate a single node modify', function() {
-        rmTimestamps(XML.readChanges(mock.modify.xml))
-        .should.be.eql(rmTimestamps(mock.modify.json));
-      });
-      
-      it('Should translate a way creation', function() {
-        rmTimestamps(XML.readChanges(mock.create.xml))
-        .should.be.eql(rmTimestamps(mock.create.json));
-      });
+    it('Should translate a single node modify', function() {
+      rmTimestamps(XML.readChanges(mock.modify.xml))
+      .should.be.eql(rmTimestamps(mock.modify.json));
+    });
+
+    it('Should translate a way creation', function() {
+      rmTimestamps(XML.readChanges(mock.create.xml))
+      .should.be.eql(rmTimestamps(mock.create.json));
+    });
   });
 
   describe('#write', function() {
