@@ -1,7 +1,8 @@
+'use strict';
 var libxml = require('libxmljs');
 var mock = require('./helpers/XML.readChanges');
 var _ = require('lodash');
-var XML = require('../../services/XML')
+var XML = require('../../services/XML');
 
 function rmTimestamps(actionArray) {
   return actionArray.map(function(action) {
@@ -12,7 +13,7 @@ function rmTimestamps(actionArray) {
       }
     });
     return action;
-  })
+  });
 }
 
 describe('XML', function() {
@@ -27,12 +28,13 @@ describe('XML', function() {
         .pluck('action')
         .uniq().value()
         .should.be.eql([mode])
-        .and.have.lengthOf(1)
-      }}
+        .and.have.lengthOf(1);
+      };
+    }
 
-      it('Should translate a creation changeset', simpleChangeset('create')),
-      it('Should translate a modification changeset', simpleChangeset('modify')),
-      it('Should translate a deletion changeset', simpleChangeset('delete'))
+    it('Should translate a creation changeset', simpleChangeset('create'));
+    it('Should translate a modification changeset', simpleChangeset('modify'));
+    it('Should translate a deletion changeset', simpleChangeset('delete'));
 
       // -----------
       // Exactly translated
@@ -40,12 +42,17 @@ describe('XML', function() {
 
       it('Should translate a single node modify', function() {
         rmTimestamps(XML.readChanges(mock.modify.xml))
-        .should.be.eql(rmTimestamps(mock.modify.json))
-      }),
+        .should.be.eql(rmTimestamps(mock.modify.json));
+      });
+      
       it('Should translate a way creation', function() {
         rmTimestamps(XML.readChanges(mock.create.xml))
-        .should.be.eql(rmTimestamps(mock.create.json))
-      })
+        .should.be.eql(rmTimestamps(mock.create.json));
+      });
+
+      it('Should translate a long way', function() {
+        console.log(XML.readChanges(require('./helpers/changesets').modifyLongWay(_.range(-1,-100,-1), -1)));
+      });
   });
 
   describe('#write', function() {

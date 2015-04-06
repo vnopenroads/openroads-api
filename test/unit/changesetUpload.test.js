@@ -1,10 +1,12 @@
 'use strict';
 var mocks = require('./helpers/changesets');
 var knex = require('knex')({ 
-  client: 'pg', 
+  client: 'pg',
   connection: require('../../connection'),
   debug: false
 });
+
+var _ = require('lodash');
 
 var serverShouldOk = function(mock, done) {
   var options = { 
@@ -54,6 +56,22 @@ describe('ChangesetsController', function() {
         .then(function(ways) {
           serverShouldOk(mocks.modifyWay(nodes[1].id, 
             nodes[2].id, nodes[3].id, ways[0].id), done);
+        });
+      });
+    });
+
+    it('Creates a long way', function(done) {
+      serverShouldOk(mocks.createLongWay(), done);
+    });
+
+    it('Modifes a long way', function(done) {
+      knex('current_nodes').where('changeset_id', 1)
+      .then(function(nodes) {
+        knex('current_ways').where('changeset_id', 1)
+        .then(function(ways) {
+          serverShouldOk(
+            mocks.modifyLongWay(_.pluck(nodes.slice(4), 'id'), ways[1].id),
+            done);
         });
       });
     });
