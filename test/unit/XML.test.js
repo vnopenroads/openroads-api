@@ -49,7 +49,6 @@ describe('XML', function() {
         rmTimestamps(XML.readChanges(mock.create.xml))
         .should.be.eql(rmTimestamps(mock.create.json));
       });
-
   });
 
   describe('#write', function() {

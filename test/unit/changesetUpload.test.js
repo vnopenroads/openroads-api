@@ -64,7 +64,7 @@ describe('ChangesetsController', function() {
       serverShouldOk(mocks.createLongWay(), done);
     });
 
-    it('Modifes a long way', function(done) {
+    it('Modifies a long way', function(done) {
       knex('current_nodes').where('changeset_id', 1)
       .then(function(nodes) {
         knex('current_ways').where('changeset_id', 1)

@@ -25,8 +25,8 @@ module.exports.createLongWay = function() {
   
   s += '<way id="-1" version="0" changeset="1">';
   
-  for ( var i = -1; i >= -100; i-- ) {
-    s += '<nd ref="'+ -1  +'"/>';
+  for ( i = -1; i >= -100; i-- ) {
+    s += '<nd ref="'+ i  +'"/>';
   }
   
   s = s + '<tag k="highway" v="tertiary"/>' +
