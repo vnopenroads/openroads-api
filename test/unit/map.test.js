@@ -61,6 +61,12 @@ describe('map endpoint', function () {
     server.injectThen(request('123.81042480468751,9.584500864717155,123.81591796875,9.58991730708743'))
     .then(function (res) {
 
+      // strip timestamps because differing test machine timezones plus
+      // our timezone-agnostic db schema makes tests fail.
+      var timestampAttr = /timestamp\="[^"]*"/g;
+      res.payload = res.payload.replace(timestampAttr, '');
+      expected = expected.replace(timestampAttr, '');
+
       res.statusCode.should.eql(200);
       res.payload.should.equal(expected);
 
