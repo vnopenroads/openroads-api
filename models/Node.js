@@ -22,8 +22,6 @@ var NodeTag = require('./NodeTag');
 var WayNode = require('./WayNode');
 var Way = require('./Way');
 
-module.exports = Node;
-
 var Node = {
 
   tableName: 'current_nodes',
@@ -298,5 +296,7 @@ var Node = {
       return query;
     }
   },
-
 };
+
+module.exports = Node;
+

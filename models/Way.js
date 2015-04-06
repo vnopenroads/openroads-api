@@ -21,8 +21,6 @@ var Node = require('./Node');
 var WayNode = require('./WayNode');
 var WayTag = require('./WayTag');
 
-module.exports = Way;
-
 var Way = {
   tableName: 'current_ways',
 
@@ -276,3 +274,6 @@ var Way = {
     }
   }
 };
+
+module.exports = Way;
+
