@@ -289,14 +289,13 @@ var Node = {
     },
 
     destroy: function(changeset, meta, map, transaction) {
-      console.log('in node delete');
       var destroys = changeset.delete.node;
       if (!destroys) {
         return [];
       }
       var ids = _.pluck(destroys, 'id');
-      var query = transaction(Node.tableName).whereIn('id', ids).update({ visible: false }).returning('*').then(function(models) {
-        console.log('\n\n', 'deleted', models);
+      var query = transaction(Node.tableName).whereIn('id', ids).update({ visible: false }).returning('id').then(function(ids) {
+        console.log('Nodes set invisible', ids.join(', '));
       });
       return query;
     }

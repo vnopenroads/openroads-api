@@ -275,14 +275,13 @@ var Way = {
     },
 
     destroy: function(changeset, meta, map, transaction) {
-      console.log('in way destroy');
       var destroys = changeset.delete.way;
       if (!destroys) {
         return [];
       }
       var ids = _.pluck(destroys, 'id');
-      var query = transaction(Way.tableName).whereIn('id', ids).update({ visible: false }).returning('*').then(function(models) {
-        console.log('\n\n', 'deleted', models);
+      var query = transaction(Way.tableName).whereIn('id', ids).update({ visible: false }).returning('id').then(function(ids) {
+        console.log('Ways set invisible', ids.join(', '));
       });
       return query;
     }
