@@ -290,12 +290,12 @@ var Way = {
         ]).then(function() {
           // console.log('Ways set invisible', invisibleWays.join(', '));
         }).catch(function(err) {
-          console.log('err: deleting way nodes and tags');
+          console.log('err: deleting way nodes and tags in delete');
           console.log(err);
         });
       })
       .catch(function(err) {
-        console.log('err: deleting ways');
+        console.log('err: deleting ways in delete');
         console.log(err);
       });
       return query;

@@ -298,16 +298,16 @@ var Node = {
         visible: false,
         changeset_id: meta.id
       }).returning('id').then(function(invisibleNodes) {
-        return transaction(NodeTag.tableName).whereIn('node_id', invisibleNodes).del().returning('ids').then(function(deleted) {
+        return transaction(NodeTag.tableName).whereIn('node_id', invisibleNodes).del().returning('node_id').then(function(deleted) {
           // console.log('Nodes set invisible', invisibleNodes.join(', '));
           // console.log('Node tags deleted', deleted.join(', '));
         }).catch(function(err) {
-          console.log('err: deleting node tags');
+          console.log('err: deleting node tags in delete');
           console.log(err);
         });
       })
       .catch(function(err) {
-        console.log('err: deleting nodes');
+        console.log('err: deleting nodes in delete');
         console.log(err);
       });
       return query;
