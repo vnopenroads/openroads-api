@@ -1,6 +1,12 @@
 'use strict';
 var Hapi = require('hapi');
-var server = new Hapi.Server();
+var server = new Hapi.Server({
+  connections: {
+    routes: {
+      cors: true
+    }
+  }
+});
 server.connection({ port: process.env.PORT || 4000 });
 
 // Register routes
