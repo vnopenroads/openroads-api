@@ -305,7 +305,7 @@ var Node = {
           console.log('err: deleting node tags');
           console.log(err);
         });
-      });
+      })
       .catch(function(err) {
         console.log('err: deleting nodes');
         console.log(err);
