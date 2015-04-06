@@ -50,9 +50,6 @@ describe('XML', function() {
         .should.be.eql(rmTimestamps(mock.create.json));
       });
 
-      it('Should translate a long way', function() {
-        console.log(XML.readChanges(require('./helpers/changesets').modifyLongWay(_.range(-1,-100,-1), -1)));
-      });
   });
 
   describe('#write', function() {
