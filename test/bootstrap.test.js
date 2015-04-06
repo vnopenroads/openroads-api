@@ -26,6 +26,9 @@ after(function (done) {
     .then(function() { return transaction('current_ways').where('changeset_id', 1).del(); } )
     .then(function() { return transaction('current_nodes').where('changeset_id', 1).del(); } );
   })
+  .then(function () {
+    knex('users').where({id: 1337}).delete();
+  })
   .then(function() {
     console.log('Cleaned up tests');
     return done();

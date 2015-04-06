@@ -6,6 +6,8 @@ var knex = require('knex')({
 });
 var mocks = require('./helpers/changesets');
 
+var _ = require('lodash');
+
 var serverShouldOk = function(mock, done) {
   var options = {
     method: 'POST',
@@ -54,6 +56,22 @@ describe('ChangesetsController', function() {
         .then(function(ways) {
           serverShouldOk(mocks.modifyWay(nodes[1].id,
             nodes[2].id, nodes[3].id, ways[0].id), done);
+        });
+      });
+    });
+
+    it('Creates a long way', function(done) {
+      serverShouldOk(mocks.createLongWay(), done);
+    });
+
+    it('Modifies a long way', function(done) {
+      knex('current_nodes').where('changeset_id', 1)
+      .then(function(nodes) {
+        knex('current_ways').where('changeset_id', 1)
+        .then(function(ways) {
+          serverShouldOk(
+            mocks.modifyLongWay(_.pluck(nodes.slice(4), 'id'), ways[1].id),
+            done);
         });
       });
     });

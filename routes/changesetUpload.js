@@ -280,10 +280,10 @@ function upload(req, res) {
       // If all goes well, update the changeset
       var bbox = BoundingBox.fromScaledActions(actions).toScaled();
       var updatedChangeset = {
-        min_lon: bbox.minLon,
-        min_lat: bbox.minLat,
-        max_lon: bbox.maxLon,
-        max_lat: bbox.maxLat,
+        min_lon: Math.round(bbox.minLon),
+        min_lat: Math.round(bbox.minLat),
+        max_lon: Math.round(bbox.maxLon),
+        max_lat: Math.round(bbox.maxLat),
         closed_at: new Date(),
         num_changes: numChanges
       };
