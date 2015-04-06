@@ -43,12 +43,12 @@ function upload(req, res) {
       }
 
       // TODO increment numChanges.
-      query('node', changeset, meta, map).then(function() {
-        query('way', changeset, meta, map).then(function() {
+      query('node', changeset, meta, map, transaction).then(function() {
+        query('way', changeset, meta, map, transaction).then(function() {
           transaction.commit();
           /*
            * Not gonna worry about relations atm.
-          query('relation', changeset, meta, map)
+          query('relation', changeset, meta, map, transaction)
             .then(transaction.commit)
             .catch(transaction.rollback);
           */
@@ -79,7 +79,7 @@ function upload(req, res) {
       .update(changesetUpdate)
       .then(function() {
         return res({
-          changeset: _.extend(meta, updatedChangeset),
+          changeset: _.extend(meta, changesetUpdate),
         });
       })
       .catch(function(err) {
@@ -106,14 +106,14 @@ function valToArray(val) {
   return [val];
 }
 
-function query(entity, changeset, meta, map) {
+function query(entity, changeset, meta, map, transaction) {
   var model = models[entity];
   if (!model) {
     return;
   }
   var actions = [];
   ['create', 'modify', 'destroy'].forEach(function(action) {
-    actions.concat(valToArray(model.queryGenerator[action](changeset, meta, map)));
+    actions.concat(valToArray(model.queryGenerator[action](changeset, meta, map, transaction)));
   });
   return Promise.all(actions);
 }

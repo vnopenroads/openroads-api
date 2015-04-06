@@ -14,7 +14,7 @@ var Promise = require('bluebird');
 var knex = require('knex')({
   client: 'pg',
   connection: require('../connection'),
-  debug: false
+  debug: true
 });
 
 var Node = require('./Node');
@@ -73,7 +73,7 @@ var Way = {
     var model = {};
     model.visible = (entity.visible !== 'false' && entity.visible !== false);
     model.version = parseInt(entity.version, 10) || 1;
-    model.timeStamp = new Date();
+    model.timestamp = new Date();
     if (entity.id && entity.id > 0) {
       model.id = entity.id;
     }
@@ -111,7 +111,7 @@ var Way = {
   },
 
   queryGenerator: {
-    create: function(changeset, meta, map) {
+    create: function(changeset, meta, map, transaction) {
       var creates = changeset.create.way;
       if (!creates) {
         return [];
@@ -124,7 +124,7 @@ var Way = {
 
       // Bundle all the way insertions, bundle all the way nodes,
       // then bundle all the tag insertions if any.
-      var query = knex(Way.tableName).insert(models).returning('id').then(function(ids) {
+      var query = transaction(Way.tableName).insert(models).returning('id').then(function(ids) {
         var tags = [];
         var wayNodes = [];
         for (var i = 0, ii = creates.length; i < ii; ++i) {
@@ -142,16 +142,20 @@ var Way = {
 
           // Safe to assume ways will have way nodes.
           // Use the map#node mapping to get the new Node ids.
-          wayNodes.concat(change.nd.map(function(wayNode, i) {
+          wayNodes.push(change.nd.map(function(wayNode, i) {
+
+            // Take the node ID from the attached nd, unless it's less than zero;
+            // In which case, use the value saved in map#node
+            var nodeId = parseInt(wayNode.ref, 10) > 0 ? wayNode.ref : map.node[wayNode.ref];
             return {
               way_id: change.id,
               sequence_id: i,
-              node_id: map.node[wayNode.ref]
+              node_id: nodeId
             };
           }));
 
           if (change.tag && change.tag.length) {
-            tags.concat(change.tag.map(function(tag) {
+            tags.push(change.tag.map(function(tag) {
               return {
                 k: tag.k,
                 v: tag.v,
@@ -164,13 +168,14 @@ var Way = {
         // The dependents array will always contain a way node insertion query.
         // If there are way tags, it will include those too.
         var dependents = [];
-        dependents.push(knex(WayNode.tableName).insert(wayNodes).catch(function(err) {
+        wayNodes = [].concat.apply([], wayNodes);
+        dependents.push(transaction(WayNode.tableName).insert(wayNodes).returning('node_id').catch(function(err) {
           console.log('err: creating way nodes in create');
           console.log(err);
         }));
         if (tags.length) {
           tags = [].concat.apply([], tags);
-          dependents.push(knex(WayTag.tableName).insert(tags).catch(function(err) {
+          dependents.push(transaction(WayTag.tableName).insert(tags).catch(function(err) {
             console.log('err: creating way tags in create');
             console.log(err);
           }));
@@ -184,7 +189,7 @@ var Way = {
       return query;
     },
 
-    modify: function(changeset, meta, map) {
+    modify: function(changeset, meta, map, transaction) {
       var modifies = changeset.modify.way;
       if (!modifies) {
         return [];
@@ -193,7 +198,7 @@ var Way = {
       // Create a list of modify queries, since we can't do them all in a single query.
       var wayChanges = modifies.map(function(entity) {
         var model = Way.fromEntity(entity, meta);
-        var query = knex(Way.tableName).where({ id: entity.id }).update(model).catch(function(err) {
+        var query = transaction(Way.tableName).where({ id: entity.id }).update(model).catch(function(err) {
           console.log('err: modify single way');
           console.log(err);
         });
@@ -208,15 +213,19 @@ var Way = {
       for(var i = 0, ii = modifies.length; i < ii; ++i) {
         var modify = modifies[i];
         ids.push(parseInt(modify.id, 10));
-        wayNodes.concat(modify.nd.map(function(wayNode, i) {
+        wayNodes.push(modify.nd.map(function(wayNode, i) {
+
+          // Take the node ID from the attached nd, unless it's less than zero;
+          // In which case, use the value saved in map#node
+          var nodeId = parseInt(wayNode.ref, 10) > 0 ? wayNode.ref : map.node[wayNode.ref];
           return {
             way_id: modify.id,
             sequence_id: i,
-            node_id: map.node[wayNode.ref]
+            node_id: nodeId
           }
         }));
         if (modify.tag && modify.tag.length) {
-          tags.concat(modify.tag.map(function(tag) {
+          tags.push(modify.tag.map(function(tag) {
             return {
               k: tag.k,
               v: tag.v,
@@ -232,8 +241,9 @@ var Way = {
         // It will contain way nodes for certain. It will also contain a delete for tags.
         // If there are new tags, then it will also insert those tags.
         var dependents = [];
-        dependents.push(knex(WayNode.tableName).whereIn('way_id', ids).del().then(function() {
-          return knex(WayNode.tableName).insert(wayNodes).catch(function(err) {
+        dependents.push(transaction(WayNode.tableName).whereIn('way_id', ids).del().then(function() {
+          wayNodes = [].concat.apply([], wayNodes);
+          return transaction(WayNode.tableName).insert(wayNodes).catch(function(err) {
             console.log('err: creating way nodes in modify');
             console.log(err);
           });
@@ -244,9 +254,10 @@ var Way = {
         }));
 
         // Again, we always delete old way tags, even if we don't have new ones to add.
-        dependents.push(knex(WayTag.tableName).whereIn('way_id', ids).del().then(function() {
+        dependents.push(transaction(WayTag.tableName).whereIn('way_id', ids).del().then(function() {
           if (tags.length) {
-            return knex(WayTag.tableName).insert(tags).catch(function(err) {
+            tags = [].concat.apply([], tags);
+            return transaction(WayTag.tableName).insert(tags).catch(function(err) {
               console.log('err: creating way tags in modify');
               console.log(err);
             });
@@ -263,13 +274,16 @@ var Way = {
       return query;
     },
 
-    destroy: function(changeset, meta, map) {
+    destroy: function(changeset, meta, map, transaction) {
+      console.log('in way destroy');
       var destroys = changeset.delete.way;
       if (!destroys) {
         return [];
       }
       var ids = _.pluck(destroys, 'id');
-      var query = knex(Way.tableName).whereI('id', ids).update({ visible: false });
+      var query = transaction(Way.tableName).whereIn('id', ids).update({ visible: false }).returning('*').then(function(models) {
+        console.log('\n\n', 'deleted', models);
+      });
       return query;
     }
   }

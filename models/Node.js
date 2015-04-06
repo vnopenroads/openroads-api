@@ -13,7 +13,7 @@ var Promise = require('bluebird');
 var knex = require('knex')({
   client: 'pg',
   connection: require('../connection'),
-  debug: false
+  debug: true
 });
 
 var RATIO = require('../services/Ratio');
@@ -169,7 +169,7 @@ var Node = {
   // Generate create, modify, and destroy queries.
   // Using as few connections as possible.
   queryGenerator: {
-    create: function(changeset, meta, map) {
+    create: function(changeset, meta, map, transaction) {
       var creates = changeset.create.node;
       if (!creates) {
         return [];
@@ -181,7 +181,7 @@ var Node = {
       });
 
       // Insert all node models, then use returned ids to insert all tags.
-      var query = knex(Node.tableName).insert(models).returning('id').then(function(ids) {
+      var query = transaction(Node.tableName).insert(models).returning('id').then(function(ids) {
         var tags = [];
         for (var i = 0, ii = creates.length; i < ii; ++i) {
 
@@ -199,7 +199,7 @@ var Node = {
 
           // Check for Node tags. If they exist, they will be in the form of an array.
           if (change.tag && change.tag.length) {
-            tags.concat(change.tag.map(function(tag) {
+            tags.push(change.tag.map(function(tag) {
               return {
                 k: tag.k,
                 v: tag.v,
@@ -211,7 +211,8 @@ var Node = {
 
         // Only save tags if there are any.
         if (tags.length) {
-          return knex(NodeTag.tableName).insert(tags).catch(function(err) {
+          tags = [].concat.apply([], tags);
+          return transaction(NodeTag.tableName).insert(tags).catch(function(err) {
             console.log('err: creating node tags in create');
             console.log(err);
           });
@@ -225,7 +226,7 @@ var Node = {
       return query;
     },
 
-    modify: function(changeset, meta, map) {
+    modify: function(changeset, meta, map, transaction) {
       var modifies = changeset.modify.node;
       if (!modifies) {
         return [];
@@ -238,7 +239,7 @@ var Node = {
 
         // Create a new model object with the proper attributes.
         var model = Node.fromEntity(entity, meta);
-        var query = knex(Node.tableName).where({id: entity.id}).update(model).catch(function(err) {
+        var query = transaction(Node.tableName).where({id: entity.id}).update(model).catch(function(err) {
           console.log('err: modify single node');
           console.log(err);
         });
@@ -254,7 +255,7 @@ var Node = {
         var change = modifies[i];
         ids.push(parseInt(change.id, 10));
         if (change.tag && change.tag.length) {
-          tags.concat(change.tag.map(function(tag) {
+          tags.push(change.tag.map(function(tag) {
             return {
               k: tag.k,
               v: tag.v,
@@ -267,9 +268,10 @@ var Node = {
       // Call Promise.all() on the modifications.
       // After that's done, we can safely delete node tags and insert new ones.
       var query = Promise.all(nodeChanges).then(function() {
-        return knex(NodeTag.tableName).whereIn('node_id', ids).del().then(function() {
+        return transaction(NodeTag.tableName).whereIn('node_id', ids).del().then(function() {
           if (tags.length) {
-            return knex(NodeTag.tableName).insert(tags).catch(function(err) {
+            tags = [].concat.apply([], tags);
+            return transaction(NodeTag.tableName).insert(tags).catch(function(err) {
               console.log('err: creating node tags in modify');
               console.log(err);
             });
@@ -286,13 +288,16 @@ var Node = {
       return query;
     },
 
-    destroy: function(changeset, meta, map) {
+    destroy: function(changeset, meta, map, transaction) {
+      console.log('in node delete');
       var destroys = changeset.delete.node;
       if (!destroys) {
         return [];
       }
       var ids = _.pluck(destroys, 'id');
-      var query = knex(Node.tableName).whereIn('id', ids).update({ visible: false });
+      var query = transaction(Node.tableName).whereIn('id', ids).update({ visible: false }).returning('*').then(function(models) {
+        console.log('\n\n', 'deleted', models);
+      });
       return query;
     }
   },
