@@ -1,4 +1,5 @@
 'use strict';
+
 var _ = require('lodash');
 var geoRatio = require('./Ratio');
 var maxArea = require('./MaxArea');
@@ -7,24 +8,11 @@ var nullLatLon = [null,null,null,null];
 var lonLimit = 180.0;
 var latLimit = 90.0;
 
-
-
 // In OSM, the order goes min_lon, min_lat, max_lon, max_lat.
 // All bounding box checks assume the input is unscaled.
 function Bbox(minMaxLatLon) {
-    function isValidBounds(bounds) {
-    for(var i = 0; i < 4; ++i) {
-      var coord = bounds[i];
-      if (!coord || isNaN(coord)) {
-        return false;
-      }
-    }
-    return true;
-  }
 
-  var bounds = _.map(minMaxLatLon, function(coord) {
-    return parseFloat(coord);
-  });
+  var bounds = _.map(minMaxLatLon, parseFloat);
 
   // Check that coordinates exist and are numbers
   // Check that the min/max makes sense
@@ -63,35 +51,35 @@ function Bbox(minMaxLatLon) {
 
 Bbox.prototype.logError = function(msg) {
   this.error = msg;
-};
+}
 
 Bbox.prototype.area = function() {
   return (this.maxLon - this.minLon) * (this.maxLat - this.minLat);
-};
+}
 
 Bbox.prototype.centerLon = function() {
   return (this.minLon + this.maxLon) / 2.0;
-};
+}
 
 Bbox.prototype.centerLat = function() {
   return (this.minLat + this.maxLat) / 2.0;
-};
+}
 
 Bbox.prototype.width = function() {
   return this.maxLon - this.minLon;
-};
+}
 
 Bbox.prototype.height = function() {
   return this.maxLat - this.minLat;
-};
+}
 
 Bbox.prototype.toArray = function() {
   return [this.minLon, this.minLat, this.maxLon, this.maxLat];
-};
+}
 
 Bbox.prototype.toString = function() {
   return this.toArray().join(',');
-};
+}
 
 Bbox.prototype.toScaled = function() {
   this.minLon *= geoRatio;
@@ -99,8 +87,18 @@ Bbox.prototype.toScaled = function() {
   this.maxLon *= geoRatio;
   this.maxLat *= geoRatio;
   return this;
-};
+}
 
+function isValidBounds(bounds) {
+  if(bounds.length !== 4) return false;
+  for(var i = 0; i < 4; ++i) {
+    var coord = bounds[i];
+    if (typeof coord === 'undefined' || isNaN(coord)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 var getBbox = {
   fromCoordinates: function(coordinates) {
