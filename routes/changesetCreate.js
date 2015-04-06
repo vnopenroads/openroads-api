@@ -15,6 +15,10 @@ module.exports = {
     var uid = req.payload.uid;
     var userName = req.payload.user;
 
+    if (!uid || !userName) {
+      return res(Boom.badRequest('A new changeset must include a user id.'));
+    }
+
     knex('users')
     .where('id', uid)
     .then(function (users) {
