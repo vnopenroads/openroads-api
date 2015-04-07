@@ -27,7 +27,7 @@ module.exports = {
     .then(function (result) {
 
       var nodes = result[2];
-      //var waytags = result[3];
+      var waytags = result[3];
       //var nodetags = result[4];
 
       // attach associated nodes to ways
@@ -36,17 +36,28 @@ module.exports = {
         way.nodes = result[1].filter(function(waynode) {
           return waynode.way_id === way.id;
         });
+        way.tags = waytags.filter(function(tag) {
+          return tag.way_id === way.id;
+        });
       });
 
+
+      var idToNode = {}; // TODO:this should be a real hashmap
+      nodes.forEach(function (n) { idToNode[n.id] = n; });
+
       var wayFeatures = ways.map(function (way) {
-        var nodeCoordinates = result[1].map(function (waynode) {
-          var node = _.find(nodes, { 'id': waynode.node_id })
+        var nodeCoordinates = way.nodes.map(function (waynode) {
+          var node = idToNode[waynode.node_id];
           return [node.longitude / ratio, node.latitude / ratio];
         });
 
+        var properties = _.zipObject(way.tags.map(function (t) {
+          return [t.k, t.v];
+        }));
+
         return {
           type: 'Feature',
-          properties: {}, // <-- TODO: add tags?
+          properties: properties,
           geometry: {
             type: 'LineString',
             coordinates: nodeCoordinates
