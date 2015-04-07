@@ -17,6 +17,7 @@ var knex = require('knex')({
   debug: false
 });
 
+var log = require('../services/Logger');
 var Node = require('./Node');
 var WayNode = require('./WayNode');
 var WayTag = require('./WayTag');
@@ -171,21 +172,20 @@ var Way = {
         var dependents = [];
         wayNodes = [].concat.apply([], wayNodes);
         dependents.push(transaction(WayNode.tableName).insert(wayNodes).returning('node_id').catch(function(err) {
-          console.log('err: creating way nodes in create');
-          console.log(err);
+          log.error('Creating way nodes in create', err);
+          throw new Error(err);
         }));
         if (tags.length) {
           tags = [].concat.apply([], tags);
           dependents.push(transaction(WayTag.tableName).insert(tags).catch(function(err) {
-            console.log('err: creating way tags in create');
-            console.log(err);
+            log.error('Creating way tags in create', err);
+            throw new Error(err);
           }));
         }
         return Promise.all(dependents);
       })
       .catch(function(err) {
-        console.log('err: inserting new ways');
-        console.log(err);
+        log.error('Inserting new ways', err);
         throw new Error(err);
       });
       return query;
@@ -201,8 +201,8 @@ var Way = {
       var wayChanges = modifies.map(function(entity) {
         var model = Way.fromEntity(entity, meta);
         var query = transaction(Way.tableName).where({ id: entity.id }).update(model).catch(function(err) {
-          console.log('err: modify single way');
-          console.log(err);
+          log.error('Modify single way', err);
+          throw new Error(err);
         });
         return query;
       });
@@ -246,13 +246,13 @@ var Way = {
         dependents.push(transaction(WayNode.tableName).whereIn('way_id', ids).del().then(function() {
           wayNodes = [].concat.apply([], wayNodes);
           return transaction(WayNode.tableName).insert(wayNodes).catch(function(err) {
-            console.log('err: creating way nodes in modify');
-            console.log(err);
+            log.error('Creating way nodes in modify', err);
+            throw new Error(err);
           });
         })
         .catch(function(err) {
-          console.log('err: deleting way nodes in modify');
-          console.log(err);
+          log.error('Deleting way nodes in modify', err);
+          throw new Error(err);
         }));
 
         // Again, we always delete old way tags, even if we don't have new ones to add.
@@ -260,15 +260,15 @@ var Way = {
           if (tags.length) {
             tags = [].concat.apply([], tags);
             return transaction(WayTag.tableName).insert(tags).catch(function(err) {
-              console.log('err: creating way tags in modify');
-              console.log(err);
+              log.error('Creating way tags in modify', err);
+              throw new Error(err);
             });
           }
           else return
         })
         .catch(function(err) {
-          console.log('err: deleting way tags in modify');
-          console.log(err);
+          log.error('Deleting way tags in modify', err);
+          throw new Error(err);
         }));
         return Promise.all(dependents);
       });
@@ -290,15 +290,15 @@ var Way = {
           transaction(WayTag.tableName).whereIn('way_id', invisibleWays).del(),
           transaction(WayNode.tableName).whereIn('way_id', invisibleWays).del()
         ]).then(function() {
-          // console.log('Ways set invisible', invisibleWays.join(', '));
+          // log.info('Ways set invisible', invisibleWays.join(', '));
         }).catch(function(err) {
-          console.log('err: deleting way nodes and tags in delete');
-          console.log(err);
+          log.error('Deleting way nodes and tags in delete', err);
+          throw new Error(err);
         });
       })
       .catch(function(err) {
-        console.log('err: deleting ways in delete');
-        console.log(err);
+        log.error('Deleting ways in delete', err);
+        throw new Error(err);
       });
       return query;
     }

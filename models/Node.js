@@ -16,6 +16,7 @@ var knex = require('knex')({
   debug: false
 });
 
+var log = require('../services/Logger');
 var RATIO = require('../services/Ratio');
 var QuadTile = require('../services/QuadTile');
 var NodeTag = require('./NodeTag');
@@ -213,15 +214,15 @@ var Node = {
         if (tags.length) {
           tags = [].concat.apply([], tags);
           return transaction(NodeTag.tableName).insert(tags).catch(function(err) {
-            console.log('err: creating node tags in create');
-            console.log(err);
+            log.error('Creating node tags in create', err);
+            throw new Error(err);
           });
         }
         else return
       })
       .catch(function(err) {
-        console.log('err: inserting new nodes');
-        console.log(err);
+        log.error('Inserting new nodes in create', err);
+        throw new Error(err);
       });
       return query;
     },
@@ -240,8 +241,8 @@ var Node = {
         // Create a new model object with the proper attributes.
         var model = Node.fromEntity(entity, meta);
         var query = transaction(Node.tableName).where({id: entity.id}).update(model).catch(function(err) {
-          console.log('err: modify single node');
-          console.log(err);
+          log.error('Modify single node', err);
+          throw new Error(err);
         });
         return query;
       });
@@ -272,18 +273,18 @@ var Node = {
           if (tags.length) {
             tags = [].concat.apply([], tags);
             return transaction(NodeTag.tableName).insert(tags).catch(function(err) {
-              console.log('err: creating node tags in modify');
-              console.log(err);
+              log.error('Creating node tags in modify', err);
+              throw new Error(err);
             });
           }
           else return
         }).catch(function(err) {
-          console.log('err: deleting node tags in modify.');
-          console.log(err);
+          log.error('Deleting node tags in modify.', err);
+          throw new Error(err);
         });
       }).catch(function(err) {
-        console.log('err: modifying all nodes.');
-        console.log(err);
+        log.error('Modifying all nodes.', err);
+        throw new Error(err);
       });
       return query;
     },
@@ -299,16 +300,16 @@ var Node = {
         changeset_id: meta.id
       }).returning('id').then(function(invisibleNodes) {
         return transaction(NodeTag.tableName).whereIn('node_id', invisibleNodes).del().returning('node_id').then(function(deleted) {
-          // console.log('Nodes set invisible', invisibleNodes.join(', '));
-          // console.log('Node tags deleted', deleted.join(', '));
+          // log.info('Nodes set invisible', invisibleNodes.join(', '));
+          // log.info('Node tags deleted', deleted.join(', '));
         }).catch(function(err) {
-          console.log('err: deleting node tags in delete');
-          console.log(err);
+          log.error('Deleting node tags in delete', err);
+          throw new Error(err);
         });
       })
       .catch(function(err) {
-        console.log('err: deleting nodes in delete');
-        console.log(err);
+        log.error('Deleting nodes in delete', err);
+        throw new Error(err);
       });
       return query;
     }
