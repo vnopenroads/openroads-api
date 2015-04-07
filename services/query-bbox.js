@@ -8,27 +8,16 @@ module.exports = function queryBbox(knex, bbox) {
   // See services/QuadTile.js.
   var tiles = QuadTile.tilesForArea(bbox);
 
-  return knex('current_nodes')
-
   // Find the nodes in the bounding box using the quadtile index.
+  var containedNodes = knex('current_nodes')
+    .whereIn('tile', tiles)
+    .where('visible',true)
+    .select('id');
 
-  .where(function () {
-    this
-      .where('visible', true)
-      .whereIn('tile', tiles);
-  })
-  .select('id')
-  .then(function (nodes) {
-
-    // Get all way_nodes in the bounding box.
-
-    var nodeIds = _.pluck(nodes, 'id');
-    return (nodes.length === 0) ? [] : knex('current_way_nodes')
-      .whereIn('node_id', nodeIds)
-      .select();
-  })
-  .then(function (waynodes) {
-
+  var containedWayIds = knex('current_way_nodes')
+    .whereIn('node_id', containedNodes)
+    .select('way_id');
+  
     // Grab the unique ways associated with these way_nodes.  This is a
     // list of ways that intersect the bounding box by at least 1 node.
     // (note that `ways` is still an array of waynode objects.)
@@ -36,16 +25,12 @@ module.exports = function queryBbox(knex, bbox) {
     // Also query any additional way_nodes that are in those ways, which gets us
     // the way_nodes that we need from outside the bounding box.
 
-    var wayIds = _(waynodes)
-      .unique('way_id')
-      .pluck('way_id')
-      .value();
-
-    return Promise.all([
-      knex('current_ways').whereIn('id', wayIds),
-      knex('current_way_nodes').whereIn('way_id', wayIds),
-    ]);
-  })
+  return Promise.all([
+    knex('current_ways').whereIn('id', containedWayIds),
+    knex('current_way_nodes')
+      .orderBy('sequence_id', 'asc')
+      .whereIn('way_id', containedWayIds),
+  ])
   .then(function (result) {
 
     // Now we have all the ways and nodes that we need, so fetch
