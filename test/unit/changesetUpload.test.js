@@ -75,10 +75,5 @@ describe('ChangesetsController', function() {
         });
       });
     });
-
-    it('Modifies a long way in xml', function(done) {
-      serverShouldOk(mocks.json.xml, done);
-    });
-
   });
 });
