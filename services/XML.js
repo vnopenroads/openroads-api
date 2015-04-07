@@ -2,7 +2,64 @@ var libxml = require('libxmljs');
 var _ = require('lodash');
 var RATIO = require('./Ratio');
 
+var log = require('../services/Logger');
+var Node = require('../models/Node');
+var Way = require('../models/Way');
+
 module.exports = {
+
+  parseDoc: function(xmlString) {
+
+    var result = {
+      create: {},
+      modify: {},
+      delete: {}
+    };
+
+    var models = {
+      node: Node,
+      way: Way
+    };
+
+    try {
+      var doc = libxml.parseXmlString(xmlString);
+    }
+    catch (err) {
+      log.error('XML fails to parse', err);
+      return result;
+    }
+
+    // insert, modify, destroy
+    var actions = doc.childNodes();
+
+    actions.forEach(function(action) {
+      var name = action.name();
+      var entityResult = result[name];
+
+      if (!entityResult) {
+        return;
+      }
+
+      var entities = action.childNodes();
+      for (var i = 0, ii = entities.length; i < ii; ++i) {
+        var entity = entities[i];
+
+        // node, way, creation
+        var type = entity.name();
+        if (!entityResult[type]) {
+          entityResult[type] = [];
+        }
+
+        var model = models[type];
+        if (model) {
+          entityResult[type].push(model.fromOSM(entity));
+        }
+      }
+    });
+
+    return result;
+  },
+
   readChanges: function(xmlString) {
     var entities = [];
     var entity = {};

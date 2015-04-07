@@ -75,8 +75,11 @@ var Way = {
     model.visible = (entity.visible !== 'false' && entity.visible !== false);
     model.version = parseInt(entity.version, 10) || 1;
     model.timestamp = new Date();
-    if (entity.id && entity.id > 0) {
-      model.id = entity.id;
+
+    // Parse int on entity.id, so we can see if it's a negative id.
+    var id = parseInt(entity.id, 10);
+    if (id && id > 0) {
+      model.id = id;
     }
     if (entity.changeset) {
       model.changeset_id = parseInt(entity.changeset, 10);
@@ -84,6 +87,40 @@ var Way = {
     else if (meta && meta.id) {
       model.changeset_id = parseInt(meta.id);
     }
+    return model;
+  },
+
+  fromOSM: function(xml) {
+
+    // Transfer all attributes.
+    var model = {};
+    var attributes = xml.attrs();
+    for (var i = 0, ii = attributes.length; i < ii; ++i) {
+      var attr = attributes[i];
+      model[attr.name()] = attr.value();
+    }
+
+    // Transfer tags and way nodes.
+    var children = xml.childNodes();
+    var tags = [];
+    var nd = [];
+    for (var i = 0, ii = children.length; i < ii; ++i) {
+      var child = children[i];
+      var type = child.name();
+      if (type === 'tag') {
+        tags.push({
+          k: child.attr('k').value(),
+          v: child.attr('v').value()
+        });
+      }
+      else if (type === 'nd') {
+        nd.push({
+          ref: child.attr('ref').value()
+        });
+      }
+    }
+    model.tag = tags;
+    model.nd = nd;
     return model;
   },
 

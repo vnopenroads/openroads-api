@@ -105,8 +105,11 @@ var Node = {
       model.longitude = entity.lon * ratio | 0;
       model.tile = QuadTile.xy2tile(QuadTile.lon2x(entity.lon), QuadTile.lat2y(entity.lat));
     }
-    if (entity.id && entity.id > 0) {
-      model.id = entity.id;
+
+    // Parse int on entity.id, so we can see if it's a negative id.
+    var id = parseInt(entity.id, 10);
+    if (id && id > 0) {
+      model.id = id;
     }
     if (entity.changeset) {
       model.changeset_id = parseInt(entity.changeset, 10);
@@ -115,6 +118,33 @@ var Node = {
       model.changeset_id = parseInt(meta.id);
     }
     return model;
+  },
+
+  // Return an entity from a JSON node.
+  fromOSM: function(xml) {
+
+    // Transfer all attributes.
+    var model = {};
+    var attributes = xml.attrs();
+    for (var i = 0, ii = attributes.length; i < ii; ++i) {
+      var attr = attributes[i];
+      model[attr.name()] = attr.value();
+    }
+
+    // Transfer tags.
+    var children = xml.childNodes();
+    var tags = [];
+    for (var i = 0, ii = children.length; i < ii; ++i) {
+      var t = children[i];
+      if (t.name() === 'tag') {
+        tags.push({
+          k: t.attr('k'),
+          v: t.attr('v')
+        });
+      }
+    }
+    model.tag = tags;
+    return model
   },
 
   canBeDeleted: function(nodeId) {
