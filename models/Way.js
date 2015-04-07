@@ -110,7 +110,7 @@ var Way = {
     return ways;
   },
 
-  queryGenerator: {
+  query: {
     create: function(changeset, meta, map, transaction) {
       var creates = changeset.create.way;
       if (!creates) {
@@ -125,6 +125,7 @@ var Way = {
       // Bundle all the way insertions, bundle all the way nodes,
       // then bundle all the tag insertions if any.
       var query = transaction(Way.tableName).insert(models).returning('id').then(function(ids) {
+
         var tags = [];
         var wayNodes = [];
         for (var i = 0, ii = creates.length; i < ii; ++i) {
@@ -185,6 +186,7 @@ var Way = {
       .catch(function(err) {
         console.log('err: inserting new ways');
         console.log(err);
+        throw new Error(err);
       });
       return query;
     },

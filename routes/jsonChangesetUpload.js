@@ -5,7 +5,7 @@ var Boom = require('boom');
 var knex = require('knex')({
   client: 'pg',
   connection: require('../connection'),
-  debug: false
+  debug: true
 });
 var Promise = require('bluebird');
 var BoundingBox = require('../services/BoundingBox');
@@ -43,8 +43,8 @@ function upload(req, res) {
       }
 
       // TODO increment numChanges.
-      query('node', changeset, meta, map, transaction).then(function() {
-        query('way', changeset, meta, map, transaction).then(function() {
+      Promise.all(query('node', changeset, meta, map, transaction)).then(function() {
+        Promise.all(query('way', changeset, meta, map, transaction)).then(function() {
           transaction.commit();
           /*
            * Not gonna worry about relations atm.
@@ -52,8 +52,16 @@ function upload(req, res) {
             .then(transaction.commit)
             .catch(transaction.rollback);
           */
-        }).catch(transaction.rollback);
-      }).catch(transaction.rollback);
+        }).catch(function(err) {
+          console.log('in way error');
+          transaction.rollback();
+          throw new Error(err);
+        });
+      }).catch(function(err) {
+        console.log('in node error');
+        transaction.rollback();
+        throw new Error(err);
+      });
     })
     .then(function(queries) {
 
@@ -98,23 +106,22 @@ var models = {
   way: Way
 };
 
-function valToArray(val) {
-  if (_.isArray(val)) {
-    return val;
-  }
-  return [val];
-}
-
 function query(entity, changeset, meta, map, transaction) {
   var model = models[entity];
   if (!model) {
     return;
   }
-  var actions = [];
-  ['create', 'modify', 'destroy'].forEach(function(action) {
-    actions.concat(valToArray(model.queryGenerator[action](changeset, meta, map, transaction)));
+  var actions = ['create', 'modify', 'destroy'].map(function(action) {
+    return toArray(model.query[action](changeset, meta, map, transaction));
   });
-  return Promise.all(actions);
+  return _.flatten(actions)
+}
+
+function toArray(val) {
+  if (_.isArray(val)) {
+    return val;
+  }
+  return [val];
 }
 
 module.exports = {

@@ -168,7 +168,7 @@ var Node = {
 
   // Generate create, modify, and destroy queries.
   // Using as few connections as possible.
-  queryGenerator: {
+  query: {
     create: function(changeset, meta, map, transaction) {
       var creates = changeset.create.node;
       if (!creates) {
