@@ -22,6 +22,7 @@ module.exports = function(boundary) {
   .then(function (result) {
     var roads = toGeoJSON(result[0], result[1], result[2], result[3]);
     roads.features = clip(roads.features, boundary);
+    roads.properties = boundary.properties;
     return roads;
   });
 };
