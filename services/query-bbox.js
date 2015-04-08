@@ -8,6 +8,8 @@ module.exports = function queryBbox(knex, bbox) {
   // helper to make raw queries, because knex version of these
   // simple selects was MUCH slower
   function select(table, key, ids) {
+    if(ids.length === 0)
+      return Promise.resolve([]);
     return knex.raw('select * from '+table +
       ' where '+key+' in ('+ ids.join(',') + ')')
       .then(function (resp) {
