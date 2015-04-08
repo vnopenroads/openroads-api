@@ -30,6 +30,10 @@
     "libxmljs": "^0.13.0",
     "lodash": "^3.6.0",
     "pg": "^4.3.0",
+    "turf-extent": "^1.0.4",
+    "turf-inside": "^1.1.4",
+    "turf-linestring": "^1.0.2",
+    "turf-point": "^2.0.1",
     "winston": "^0.9.0"
   },
   "devDependencies": {
