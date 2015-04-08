@@ -18,7 +18,7 @@ var BoundingBox = require('../services/BoundingBox.js');
 module.exports = function(boundary) {
   var bbox = new BoundingBox.fromCoordinates(extent(boundary));
 
-  queryBbox(knex, bbox)
+  return queryBbox(knex, bbox)
   .then(function (result) {
     var roads = toGeoJSON(result[0], result[1], result[2], result[3]);
     roads.features = clip(roads.features, boundary);
