@@ -1,19 +1,18 @@
 'use strict';
 var Boom = require('boom');
+var _ = require('lodash');
 var knex = require('knex')({
   client: 'pg',
   connection: require('../connection'),
   debug: false
 });
 var queryBbox = require('../services/query-bbox.js');
-
-var XML = require('../services/XML.js');
-var Node = require('../models/Node.js');
 var BoundingBox = require('../services/BoundingBox.js');
+var ratio = require('../services/Ratio.js');
 
 module.exports = {
   method: 'GET',
-  path: '/xml/map',
+  path: '/map',
   handler: function (req, res) {
     // parse and validate bbox parameter from query
     // See services/BoundingBox.js.
@@ -29,7 +28,7 @@ module.exports = {
 
       var nodes = result[2];
       var waytags = result[3];
-      var nodetags = result[4];
+      //var nodetags = result[4];
 
       // attach associated nodes to ways
       var ways = result[0];
@@ -37,16 +36,41 @@ module.exports = {
         way.nodes = result[1].filter(function(waynode) {
           return waynode.way_id === way.id;
         });
+        way.tags = waytags.filter(function(tag) {
+          return tag.way_id === way.id;
+        });
       });
 
-      var xmlDoc = XML.write({
-        bbox: bbox,
-        nodes: Node.withTags(nodes, nodetags, 'node_id'),
-        ways: Node.withTags(ways, waytags, 'way_id')
+
+      var idToNode = {}; // TODO:this should be a real hashmap
+      nodes.forEach(function (n) { idToNode[n.id] = n; });
+
+      var wayFeatures = ways.map(function (way) {
+        var nodeCoordinates = way.nodes.map(function (waynode) {
+          var node = idToNode[waynode.node_id];
+          return [node.longitude / ratio, node.latitude / ratio];
+        });
+
+        var properties = _.zipObject(way.tags.map(function (t) {
+          return [t.k, t.v];
+        }));
+
+        return {
+          type: 'Feature',
+          properties: properties,
+          geometry: {
+            type: 'LineString',
+            coordinates: nodeCoordinates
+          }
+        };
       });
 
-      var response = res(xmlDoc.toString());
-      response.type('text/xml');
+      res({
+        type: 'FeatureCollection',
+        properties: {},
+        features: wayFeatures
+      });
+
     })
     .catch(function (err) {
       console.log(err);

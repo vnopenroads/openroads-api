@@ -76,5 +76,28 @@ describe('map endpoint', function () {
       return done(err);
     });
   });
+});
 
+describe('geojson map endpoint', function() {
+  it('returns the complete way when part lies outside bbox',
+  function (done) {
+    var bbox = '123.81042480468751,9.584500864717155,123.81591796875,9.58991730708743';
+    var file = './fixtures/bbox-response-oneWay.json';
+    var expected = fs.readFileSync(require.resolve(file), 'utf-8');
+
+    server.injectThen({
+      method: 'GET',
+      url: '/map?bbox=' + bbox
+    })
+    .then(function (res) {
+
+      res.statusCode.should.eql(200);
+      res.payload.should.equal(expected);
+
+      done();
+    })
+    .catch(function (err) {
+      return done(err);
+    });
+  });
 });
