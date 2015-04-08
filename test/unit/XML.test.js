@@ -28,7 +28,7 @@ function jsonRmTimes(entity) {
   return entity;
 }
 
-describe.only('XML', function() {
+describe('XML', function() {
   describe('#parseDoc', function() {
 
     it('Encodes the right number of way nodes', function() {
