@@ -8,6 +8,7 @@ var knex = require('knex')({
 var toGeoJSON = require('../services/osm-data-to-geojson.js');
 var queryBbox = require('../services/query-bbox.js');
 var BoundingBox = require('../services/BoundingBox.js');
+var log = require('../services/Logger.js');
 
 module.exports = {
   method: 'GET',
@@ -18,12 +19,13 @@ module.exports = {
     var paramString = req.query.bbox || '';
     var bbox = new BoundingBox.fromCoordinates(paramString.split(','));
     if (bbox.error) {
-      // TODO: log error on server
+      log.error('Could not create bounding box for map-json', bbox);
       return res(Boom.badRequest(bbox.error));
     }
-    
+
     queryBbox(knex, bbox)
     .then(function (result) {
+      // result = [ways, waynodes, nodes, waytags, nodetags]
       res(toGeoJSON(result[0], result[1], result[2], result[3]));
     })
     .catch(function (err) {
