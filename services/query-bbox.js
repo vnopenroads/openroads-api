@@ -53,8 +53,6 @@ module.exports = function queryBbox(knex, bbox) {
       .pluck('node_id')
       .value();
 
-    require('fs').writeFileSync('/Users/anand/Desktop/nodes.txt',
-      nodeIds.join(','));
     // pass along [ways, waynodes, nodes, waytags, nodetags], the last
     // three of which are promises.
     return Promise.all(result.concat([
