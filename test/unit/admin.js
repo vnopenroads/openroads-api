@@ -3,7 +3,7 @@
 var getAdminBoundary = require('../../services/admin-boundary.js');
 var queryPolygon = require('../../services/query-polygon.js');
 
-describe.only('admin endpoint', function() {
+describe('admin endpoint', function() {
   it('fetches a boundary for a given municipality id', function(done) {
     getAdminBoundary('municipality', [177,15,216])
     .then(function (boundary) {
