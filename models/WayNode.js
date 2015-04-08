@@ -16,7 +16,6 @@ module.exports = {
       type: 'integer',
       primaryKey: true,
       numeric: true,
-      index: true,
       model: 'ways'
     },
     sequence_id: {
@@ -24,7 +23,6 @@ module.exports = {
     },
     node_id: {
       type: 'integer',
-      index: true,
       numeric: true,
       model: 'nodes'
     },

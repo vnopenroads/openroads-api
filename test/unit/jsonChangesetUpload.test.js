@@ -5,15 +5,15 @@ var knex = require('knex')({
   debug: false
 });
 var mocks = require('./helpers/changesets');
-
+var XML = require('../../services/XML');
 var _ = require('lodash');
 
 var serverShouldOk = function(mock, done) {
   var options = {
     method: 'POST',
-    url: '/changeset/1/upload',
+    url: '/changeset/json/1/upload',
     payload: {
-      xmlString: mock
+      osmChange: XML.parseDoc(mock)
     }
   };
   server.injectThen(options)
@@ -25,8 +25,8 @@ var serverShouldOk = function(mock, done) {
   });
 };
 
-describe('ChangesetsController', function() {
-  describe('#upload',function() {
+describe('jsonChangesetsController', function() {
+  describe('#upload', function() {
     it('Creates a node', function(done) {
       serverShouldOk(mocks.createNode(-1), done);
     });

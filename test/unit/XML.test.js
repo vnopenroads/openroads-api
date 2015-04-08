@@ -4,6 +4,13 @@ var mock = require('./helpers/XML.readChanges');
 var _ = require('lodash');
 var XML = require('../../services/XML');
 
+var log = require('../../services/Logger');
+var docJson = require('./helpers/changesets').json.json.osmChange;
+var docXml = require('./helpers/changesets').json.xml;
+
+var Node = require('../../models/Node');
+var Way = require('../../models/Way');
+
 function rmTimestamps(actionArray) {
   return actionArray.map(function(action) {
     var timestamps = ['timestamp', 'created_at', 'closed_at'];
@@ -17,6 +24,33 @@ function rmTimestamps(actionArray) {
 }
 
 describe('XML', function() {
+  describe('#parseDoc', function() {
+
+    it('Encodes the right number of way nodes', function() {
+      var parsed = XML.parseDoc(docXml);
+      (parsed.modify.way[0].nd.length).should.eql(docJson.modify.way[0].nd.length);
+    });
+
+    it('Encodes the right number of tags', function() {
+      var parsed = XML.parseDoc(docXml);
+      (parsed.modify.way[0].tag.length).should.eql(docJson.modify.way[0].tag.length);
+    });
+
+    it('Creates comparable nodes using Node#fromEntity', function() {
+      var parsed = XML.parseDoc(docXml);
+      var parsedNode = parsed.modify.node[0];
+      var entity = Node.fromEntity(parsedNode);
+      (entity).should.eql(Node.fromEntity(docJson.modify.node[0]));
+    });
+
+    it('Creates comparable ways using Way#fromEntity', function() {
+      var parsed = XML.parseDoc(docXml);
+      var parsedWay = parsed.modify.way[0];
+      var entity = Way.fromEntity(parsedWay);
+      (entity).should.eql(Way.fromEntity(docJson.modify.way[0]));
+    });
+  });
+
   describe('#readChanges', function() {
 
     // -----------
@@ -72,5 +106,4 @@ describe('XML', function() {
       doc.get('//tag').toString().should.eql('<tag k="1" v="1"/>');
     });
   });
-
 });

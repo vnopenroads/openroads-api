@@ -129,6 +129,16 @@ var getBbox = {
       _.max(lat) / geoRatio
     ]);
   },
+  fromNodes: function(nodes) {
+    var lat = [];
+    var lon = [];
+    for(var i = 0, ii = nodes.length; i < ii; ++i) {
+      var node = nodes[i];
+      lon.push(parseFloat(node.lon));
+      lat.push(parseFloat(node.lat));
+    }
+    return new Bbox([ _.min(lon), _.min(lat), _.max(lon), _.max(lat) ]);
+  }
 };
 
 module.exports = getBbox;
