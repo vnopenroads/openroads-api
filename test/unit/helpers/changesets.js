@@ -19,13 +19,13 @@ module.exports.createWay = '<osmChange version="0.3" generator="iD">' +
 module.exports.createLongWay = function() {
   var s = '<osmChange version="0.3" generator="iD"><create>';
 
-  for ( var i = -1; i >= -100; i--) {
+  for ( var i = -1; i >= -10; i--) {
     s += '<node id="'+ i +'" lon="'+ (124.15472633706449 - i * 0.1) +' " lat="10.151493406454932" version="0" changeset="1"/>';
   }
 
   s += '<way id="-1" version="0" changeset="1">';
 
-  for ( i = -1; i >= -100; i-- ) {
+  for ( i = -1; i >= -10; i-- ) {
     s += '<nd ref="'+ i  +'"/>';
   }
 
@@ -67,7 +67,7 @@ module.exports.modifyLongWay = function(nodes, way) {
     '<node id="'+ nodes[2] +'" lon="124.15747513734223" lat="10.153431321701245" version="0" changeset="1"/>' +
     '<way id="' + way + '" version="0" changeset="1">' +
       '<nd ref="'+ nodes[0] +'"/>';
-      for (var i = 2; i < 100; i++) {
+      for (var i = 2; i < 10; i++) {
         xml += '<nd ref="'+ nodes[i] +'"/>';
       }
   xml += '<tag k="highway" v="tertiary"/>' +

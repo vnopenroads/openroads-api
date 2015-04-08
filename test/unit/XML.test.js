@@ -23,7 +23,12 @@ function rmTimestamps(actionArray) {
   });
 }
 
-describe('XML', function() {
+function jsonRmTimes(entity) {
+  entity.timestamp = ''
+  return entity;
+}
+
+describe.only('XML', function() {
   describe('#parseDoc', function() {
 
     it('Encodes the right number of way nodes', function() {
@@ -40,14 +45,20 @@ describe('XML', function() {
       var parsed = XML.parseDoc(docXml);
       var parsedNode = parsed.modify.node[0];
       var entity = Node.fromEntity(parsedNode);
-      (entity).should.eql(Node.fromEntity(docJson.modify.node[0]));
+
+      (jsonRmTimes(entity)).should.eql(
+        jsonRmTimes(Node.fromEntity(docJson.modify.node[0])));
     });
 
     it('Creates comparable ways using Way#fromEntity', function() {
       var parsed = XML.parseDoc(docXml);
       var parsedWay = parsed.modify.way[0];
       var entity = Way.fromEntity(parsedWay);
-      (entity).should.eql(Way.fromEntity(docJson.modify.way[0]));
+      // console.log(entity)
+      // console.log(parsed)
+      // console.log(parsedWay)
+      (jsonRmTimes (entity)).should.eql(
+        jsonRmTimes(Way.fromEntity(docJson.modify.way[0])));
     });
   });
 
