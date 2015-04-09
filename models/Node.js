@@ -12,16 +12,16 @@ var Boom = require('boom');
 var Promise = require('bluebird');
 var knex = require('knex')({
   client: 'pg',
-  connection: require('../connection'),
+  connection: require('../connection.js'),
   debug: false
 });
 
-var log = require('../services/log');
-var RATIO = require('../services/ratio');
-var QuadTile = require('../services/quad-tile');
-var NodeTag = require('./node-tag');
-var WayNode = require('./way-node');
-var Way = require('./way');
+var log = require('../services/log.js');
+var RATIO = require('../services/ratio.js');
+var QuadTile = require('../services/quad-tile.js');
+var NodeTag = require('./node-tag.js');
+var WayNode = require('./way-node.js');
+var Way = require('./way.js');
 
 var Node = {
 

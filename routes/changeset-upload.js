@@ -4,15 +4,15 @@ var _ = require('lodash');
 var Boom = require('boom');
 var knex = require('knex')({
   client: 'pg',
-  connection: require('../connection'),
+  connection: require('../connection.js'),
   debug: false
 });
 var Promise = require('bluebird');
 
-var BoundingBox = require('../services/bounding-box');
-var log = require('../services/log');
-var Node = require('../models/node');
-var Way = require('../models/way');
+var BoundingBox = require('../services/bounding-box.js');
+var log = require('../services/log.js');
+var Node = require('../models/node.js');
+var Way = require('../models/way.js');
 
 function upload(req, res) {
   var changesetID = req.params.changesetID;

@@ -13,14 +13,14 @@ var Boom = require('boom');
 var Promise = require('bluebird');
 var knex = require('knex')({
   client: 'pg',
-  connection: require('../connection'),
+  connection: require('../connection.js'),
   debug: false
 });
 
-var log = require('../services/log');
-var Node = require('./node');
-var WayNode = require('./way-node');
-var WayTag = require('./way-tag');
+var log = require('../services/log.js');
+var Node = require('./node.js');
+var WayNode = require('./way-node.js');
+var WayTag = require('./way-tag.js');
 
 var Way = {
   tableName: 'current_ways',

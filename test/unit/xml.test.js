@@ -1,15 +1,15 @@
 'use strict';
 var libxml = require('libxmljs');
-var mock = require('./helpers/xml.readChanges');
 var _ = require('lodash');
-var XML = require('../../services/xml');
+var mock = require('./helpers/xml.readChanges.js');
+var XML = require('../../services/xml.js');
 
-var log = require('../../services/log');
-var docJson = require('./helpers/changesets').json.json.osmChange;
-var docXml = require('./helpers/changesets').json.xml;
+var log = require('../../services/log.js');
+var docJson = require('./helpers/changesets.js').json.json.osmChange;
+var docXml = require('./helpers/changesets.js').json.xml;
 
-var Node = require('../../models/node');
-var Way = require('../../models/way');
+var Node = require('../../models/node.js');
+var Way = require('../../models/way.js');
 
 function rmTimestamps(actionArray) {
   return actionArray.map(function(action) {

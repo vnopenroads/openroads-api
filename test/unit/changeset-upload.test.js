@@ -1,12 +1,12 @@
 'use strict';
+var _ = require('lodash');
 var knex = require('knex')({
   client: 'pg',
-  connection: require('../../connection'),
+  connection: require('../../connection.js'),
   debug: false
 });
-var mocks = require('./helpers/changesets');
-var XML = require('../../services/xml');
-var _ = require('lodash');
+var mocks = require('./helpers/changesets.js');
+var XML = require('../../services/xml.js');
 
 var serverShouldOk = function(mock, done) {
   var options = {

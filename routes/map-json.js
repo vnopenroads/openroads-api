@@ -2,7 +2,7 @@
 var Boom = require('boom');
 var knex = require('knex')({
   client: 'pg',
-  connection: require('../connection'),
+  connection: require('../connection.js'),
   debug: false
 });
 var toGeoJSON = require('../services/osm-data-to-geojson.js');
