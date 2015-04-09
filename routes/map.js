@@ -29,7 +29,8 @@ module.exports = {
       var xmlDoc = XML.write({
         bbox: bbox,
         nodes: Node.withTags(result.nodes, result.nodetags, 'node_id'),
-        ways: Node.withTags(result.ways, result.waytags, 'way_id')
+        ways: Node.withTags(result.ways, result.waytags, 'way_id'),
+        relations: result.relations
       });
       var response = res(xmlDoc.toString());
       response.type('text/xml');

@@ -205,7 +205,7 @@ var xml = {
       }
 
       // Attach relation tags.
-      var tags = member.tags;
+      var tags = relation.tags;
       if (tags && _.isArray(tags) && tags.length) {
         for (var m = 0, mm = tags.length; m < mm; ++m) {
           var tag = tags[m];
