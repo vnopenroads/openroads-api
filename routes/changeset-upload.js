@@ -9,10 +9,10 @@ var knex = require('knex')({
 });
 var Promise = require('bluebird');
 
-var BoundingBox = require('../services/BoundingBox');
-var log = require('../services/Logger');
-var Node = require('../models/Node');
-var Way = require('../models/Way');
+var BoundingBox = require('../services/bounding-box');
+var log = require('../services/log');
+var Node = require('../models/node');
+var Way = require('../models/way');
 
 function upload(req, res) {
   var changesetID = req.params.changesetID;
@@ -134,6 +134,6 @@ function updateChangeset(changeset, meta, numChanges) {
 
 module.exports = {
   method: 'POST',
-  path: '/changeset/json/{changesetID}/upload',
+  path: '/changeset/{changesetID}/upload',
   handler: upload
 };

@@ -16,12 +16,12 @@ var knex = require('knex')({
   debug: false
 });
 
-var log = require('../services/Logger');
-var RATIO = require('../services/Ratio');
-var QuadTile = require('../services/QuadTile');
-var NodeTag = require('./NodeTag');
-var WayNode = require('./WayNode');
-var Way = require('./Way');
+var log = require('../services/log');
+var RATIO = require('../services/ratio');
+var QuadTile = require('../services/quad-tile');
+var NodeTag = require('./node-tag');
+var WayNode = require('./way-node');
+var Way = require('./way');
 
 var Node = {
 
@@ -73,25 +73,6 @@ var Node = {
     },
   },
 
-  //Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entity) {
-    var lat = parseFloat(entity.lat);
-    var lon = parseFloat(entity.lon);
-
-    var model = {
-      latitude: lat * RATIO | 0,
-      longitude: lon * RATIO | 0,
-      tile: QuadTile.xy2tile(QuadTile.lon2x(lon), QuadTile.lat2y(lat)),
-      changeset_id: parseInt(entity.changeset, 10),
-      visible: (entity.visible !== 'false' && entity.visible !== false),
-      version: parseInt(entity.version, 10) || 1,
-      timestamp: new Date()
-    };
-    return model;
-  },
-
-  // TODO this function should also handle node#fromJXEntity.
-  // Test and replace to avoid duplication.
   fromEntity: function(entity, meta) {
     var ratio = RATIO;
     var model = {};

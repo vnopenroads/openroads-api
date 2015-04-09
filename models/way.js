@@ -17,10 +17,10 @@ var knex = require('knex')({
   debug: false
 });
 
-var log = require('../services/Logger');
-var Node = require('./Node');
-var WayNode = require('./WayNode');
-var WayTag = require('./WayTag');
+var log = require('../services/log');
+var Node = require('./node');
+var WayNode = require('./way-node');
+var WayTag = require('./way-tag');
 
 var Way = {
   tableName: 'current_ways',
@@ -56,20 +56,6 @@ var Way = {
     },
   },
 
-
-  // Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entity) {
-    var model = {
-      changeset_id: parseInt(entity.changeset, 10),
-      timestamp: new Date(),
-      version: parseInt(entity.version, 10) || 1,
-      visible: (entity.visible !== 'false' && entity.visible !== false),
-    };
-    return model;
-  },
-
-  // TODO this function should also handle node#fromJXEntity.
-  // Test and replace to avoid duplication.
   fromEntity: function(entity, meta) {
     var model = {};
     model.visible = (entity.visible !== 'false' && entity.visible !== false);

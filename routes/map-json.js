@@ -7,8 +7,8 @@ var knex = require('knex')({
 });
 var toGeoJSON = require('../services/osm-data-to-geojson.js');
 var queryBbox = require('../services/query-bbox.js');
-var BoundingBox = require('../services/BoundingBox.js');
-var log = require('../services/Logger.js');
+var BoundingBox = require('../services/bounding-box.js');
+var log = require('../services/log.js');
 
 module.exports = {
   method: 'GET',

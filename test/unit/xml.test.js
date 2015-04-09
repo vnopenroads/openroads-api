@@ -1,15 +1,15 @@
 'use strict';
 var libxml = require('libxmljs');
-var mock = require('./helpers/XML.readChanges');
+var mock = require('./helpers/xml.readChanges');
 var _ = require('lodash');
-var XML = require('../../services/XML');
+var XML = require('../../services/xml');
 
-var log = require('../../services/Logger');
+var log = require('../../services/log');
 var docJson = require('./helpers/changesets').json.json.osmChange;
 var docXml = require('./helpers/changesets').json.xml;
 
-var Node = require('../../models/Node');
-var Way = require('../../models/Way');
+var Node = require('../../models/node');
+var Way = require('../../models/way');
 
 function rmTimestamps(actionArray) {
   return actionArray.map(function(action) {
@@ -24,64 +24,30 @@ function rmTimestamps(actionArray) {
 }
 
 describe('XML', function() {
-  describe('#parseDoc', function() {
+  describe('#read', function() {
 
     it('Encodes the right number of way nodes', function() {
-      var parsed = XML.parseDoc(docXml);
+      var parsed = XML.read(docXml);
       (parsed.modify.way[0].nd.length).should.eql(docJson.modify.way[0].nd.length);
     });
 
     it('Encodes the right number of tags', function() {
-      var parsed = XML.parseDoc(docXml);
+      var parsed = XML.read(docXml);
       (parsed.modify.way[0].tag.length).should.eql(docJson.modify.way[0].tag.length);
     });
 
     it('Creates comparable nodes using Node#fromEntity', function() {
-      var parsed = XML.parseDoc(docXml);
+      var parsed = XML.read(docXml);
       var parsedNode = parsed.modify.node[0];
       var entity = Node.fromEntity(parsedNode);
       (entity).should.eql(Node.fromEntity(docJson.modify.node[0]));
     });
 
     it('Creates comparable ways using Way#fromEntity', function() {
-      var parsed = XML.parseDoc(docXml);
+      var parsed = XML.read(docXml);
       var parsedWay = parsed.modify.way[0];
       var entity = Way.fromEntity(parsedWay);
       (entity).should.eql(Way.fromEntity(docJson.modify.way[0]));
-    });
-  });
-
-  describe('#readChanges', function() {
-
-    // -----------
-    // Simple strings
-    // ------------
-    function simpleChangeset(mode) {
-      return function() {
-        return _.chain(XML.readChanges(mock.simple[mode]))
-        .pluck('action')
-        .uniq().value()
-        .should.be.eql([mode])
-        .and.have.lengthOf(1);
-      };
-    }
-
-    it('Should translate a creation changeset', simpleChangeset('create'));
-    it('Should translate a modification changeset', simpleChangeset('modify'));
-    it('Should translate a deletion changeset', simpleChangeset('delete'));
-
-    // -----------
-    // Exactly translated
-    // -----------
-
-    it('Should translate a single node modify', function() {
-      rmTimestamps(XML.readChanges(mock.modify.xml))
-      .should.be.eql(rmTimestamps(mock.modify.json));
-    });
-
-    it('Should translate a way creation', function() {
-      rmTimestamps(XML.readChanges(mock.create.xml))
-      .should.be.eql(rmTimestamps(mock.create.json));
     });
   });
 

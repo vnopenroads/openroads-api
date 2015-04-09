@@ -1,14 +1,14 @@
 var libxml = require('libxmljs');
 var _ = require('lodash');
-var RATIO = require('./Ratio');
+var RATIO = require('./ratio');
 
-var log = require('../services/Logger');
-var Node = require('../models/Node');
-var Way = require('../models/Way');
+var log = require('../services/log');
+var Node = require('../models/node');
+var Way = require('../models/way');
 
 module.exports = {
 
-  parseDoc: function(xmlString) {
+  read: function(xmlString) {
 
     var result = {
       create: {},
@@ -58,108 +58,6 @@ module.exports = {
     });
 
     return result;
-  },
-
-  readChanges: function(xmlString) {
-    var entities = [];
-    var entity = {};
-    var sequenceID = 0;
-    var entityID = 0;
-    var parent;
-    var mode;
-
-    var modelMap = {
-      node: require('../models/Node'),
-      node_tag: require('../models/NodeTag'),
-      way: require('../models/Way'),
-      way_tag: require('../models/WayTag'),
-      way_node: require('../models/WayNode')
-    };
-
-    var keyNames = {
-      node: 'id',
-      node_tag: 'node_id',
-      way: 'id',
-      way_tag: 'way_id',
-      way_node: 'node_id'
-    };
-
-    // Start a streaming parser. On each tag, we check what it is and create entities
-    var parser = new libxml.SaxParser();
-
-    // On every starting tag
-    parser.on('startElementNS', function(elem, attrs, prefix, uri, namespace) {
-
-      // Set the mode
-      if (elem === 'create' || elem === 'modify' || elem === 'delete') {
-        mode = elem;
-        return
-      }
-
-      // Check if we're processing an entity
-      if (elem === 'node' || elem === 'way' || elem === 'nd' || elem === 'tag')
-      {
-        entity = {
-          action: mode,
-          model: elem,
-
-          //Grab all the attributes and zip them into one attribute object
-          attributes: _(attrs)
-            .map(function (kvArray) { return [kvArray[0], kvArray[3]] })
-            .zipObject()
-            .value()
-        }
-      }
-
-      // If we're going to process a way_node or a tag, we need to save the parent ID
-      if (elem === 'node' || elem === 'way') {
-        parent = elem;
-        entityID = entity.attributes.id;
-      }
-
-      // To enter into the db, we need to do some modifications to the attributes according to the model
-      if (elem === 'nd') {
-        entity.model = 'way_node';
-        entity.attributes.id = entity.attributes.ref;
-        entity.attributes.node_id = entity.attributes.ref;
-        entity.attributes.way_id = entityID;
-        entity.attributes.sequence_id = sequenceID;
-        sequenceID += 1;
-      }
-
-      // For tags, we have to add the parent's id
-      if (elem === 'tag') {
-        entity.model = parent + '_tag';
-        entity.attributes['id'] = entityID;
-      }
-
-      // If the entity is "not empty", then we can push it to the array
-      if (_.has(entity, 'model')) {
-
-        // Set id on entity and not attributes.
-        // This is because there's a lot of logic around whether to use the ID,
-        // or whether we let the database create one.
-        entity.id = parseInt(entity.attributes.id, 10);
-        entity.key = keyNames[entity.model];
-
-        // Rename the data attributes according to the model
-        entity.attributes = modelMap[entity.model].fromJXEntity(entity.attributes);
-        entities.push(entity);
-        entity = {};
-      }
-    });
-
-    // On every closing tags, we are closing parent ways
-    parser.on('endElementNS', function(elem, attrs, prefix, uri, namespace) {
-      if (elem === 'way') {
-        //reset the counter
-        sequenceID = 0;
-      }
-    })
-
-    // Pass in the XML string
-    parser.parseString(xmlString);
-    return entities
   },
 
   write: function(obj) {

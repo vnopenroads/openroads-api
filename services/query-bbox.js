@@ -1,7 +1,7 @@
 'use strict';
 var _ = require('lodash');
 var Promise = require('bluebird');
-var QuadTile = require('../services/QuadTile.js');
+var QuadTile = require('../services/quad-tile.js');
 
 module.exports = function queryBbox(knex, bbox) {
 

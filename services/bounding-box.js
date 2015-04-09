@@ -1,8 +1,8 @@
 'use strict';
 
 var _ = require('lodash');
-var geoRatio = require('./Ratio');
-var maxArea = require('./MaxArea');
+var geoRatio = require('./ratio');
+var maxArea = require('./max-area');
 
 var nullLatLon = [null,null,null,null];
 var lonLimit = 180.0;
