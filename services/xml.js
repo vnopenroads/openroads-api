@@ -1,3 +1,4 @@
+'use strict';
 var libxml = require('libxmljs');
 var _ = require('lodash');
 var RATIO = require('./ratio');
@@ -25,8 +26,7 @@ module.exports = {
       var doc = libxml.parseXmlString(xmlString);
     }
     catch (err) {
-      log.error('XML fails to parse', err);
-      return result;
+      throw new Error(err) ;
     }
 
     // insert, modify, destroy
