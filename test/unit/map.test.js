@@ -53,7 +53,7 @@ describe('map endpoint', function () {
   });
 
 
-  it.only('returns the complete way when part lies outside bbox',
+  it('returns the complete way when part lies outside bbox',
   function (done) {
     var file = './fixtures/bbox-response-oneWay.xml';
     var expected = fs.readFileSync(require.resolve(file), 'utf-8');
