@@ -13,9 +13,9 @@ var Node = require('../models/node-model.js');
 
 module.exports = {
   method: 'GET',
-  path: '/xml/node',
+  path: '/xml/node/{nodeId}',
   handler: function (req, res) {
-    var nodeId = parseInt(req.query.way_id || '', 10);
+    var nodeId = parseInt(req.params.nodeId || '', 10);
     if (!nodeId || isNaN(nodeId)) {
       return res(Boom.badRequest('Node ID must be a non-zero number'));
     }
