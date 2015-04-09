@@ -26,25 +26,11 @@ module.exports = {
 
     queryBbox(knex, bbox)
     .then(function (result) {
-
-      var nodes = result[2];
-      var waytags = result[3];
-      var nodetags = result[4];
-
-      // attach associated nodes to ways
-      var ways = result[0];
-      ways.forEach(function (way) {
-        way.nodes = result[1].filter(function(waynode) {
-          return waynode.way_id === way.id;
-        });
-      });
-
       var xmlDoc = XML.write({
         bbox: bbox,
-        nodes: Node.withTags(nodes, nodetags, 'node_id'),
-        ways: Node.withTags(ways, waytags, 'way_id')
+        nodes: Node.withTags(result.nodes, result.nodetags, 'node_id'),
+        ways: Node.withTags(result.ways, result.waytags, 'way_id')
       });
-
       var response = res(xmlDoc.toString());
       response.type('text/xml');
     })

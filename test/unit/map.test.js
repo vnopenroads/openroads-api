@@ -53,12 +53,12 @@ describe('map endpoint', function () {
   });
 
 
-  it('returns the complete way when part lies outside bbox',
+  it.only('returns the complete way when part lies outside bbox',
   function (done) {
     var file = './fixtures/bbox-response-oneWay.xml';
     var expected = fs.readFileSync(require.resolve(file), 'utf-8');
 
-    server.injectThen(request('123.81042480468751,9.584500864717155,123.81591796875,9.58991730708743'))
+    server.injectThen(request('124.7445, 9.5261, 124.765, 9.5411'))
     .then(function (res) {
 
       // strip timestamps because differing test machine timezones plus

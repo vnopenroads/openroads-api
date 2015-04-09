@@ -20,7 +20,7 @@ module.exports = function(boundary) {
 
   return queryBbox(knex, bbox)
   .then(function (result) {
-    var roads = toGeoJSON(result[0], result[1], result[2], result[3]);
+    var roads = toGeoJSON(result);
     roads.features = clip(roads.features, boundary);
     roads.properties = boundary.properties;
     return roads;
