@@ -18,7 +18,7 @@ var knex = require('knex')({
 });
 
 var log = require('../services/log.js');
-var Node = require('./node.js');
+var Node = require('./node-model.js');
 var WayNode = require('./way-node.js');
 var WayTag = require('./way-tag.js');
 

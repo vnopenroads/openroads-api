@@ -8,7 +8,7 @@ var knex = require('knex')({
 var queryBbox = require('../services/query-bbox.js');
 
 var XML = require('../services/xml.js');
-var Node = require('../models/node.js');
+var Node = require('../models/node-model.js');
 var BoundingBox = require('../services/bounding-box.js');
 
 module.exports = {

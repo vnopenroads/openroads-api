@@ -8,7 +8,7 @@ var log = require('../../services/log.js');
 var docJson = require('./helpers/changesets.js').json.json.osmChange;
 var docXml = require('./helpers/changesets.js').json.xml;
 
-var Node = require('../../models/node.js');
+var Node = require('../../models/node-model.js');
 var Way = require('../../models/way.js');
 
 function rmTimestamps(actionArray) {

@@ -2,9 +2,9 @@ var libxml = require('libxmljs');
 var _ = require('lodash');
 var RATIO = require('./ratio');
 
-var log = require('../services/log');
-var Node = require('../models/node');
-var Way = require('../models/way');
+var log = require('../services/log.js');
+var Node = require('../models/node-model.js');
+var Way = require('../models/way.js');
 
 module.exports = {
 

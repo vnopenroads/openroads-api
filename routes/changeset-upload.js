@@ -11,7 +11,7 @@ var Promise = require('bluebird');
 
 var BoundingBox = require('../services/bounding-box.js');
 var log = require('../services/log.js');
-var Node = require('../models/node.js');
+var Node = require('../models/node-model.js');
 var Way = require('../models/way.js');
 
 function upload(req, res) {
