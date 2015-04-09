@@ -7,10 +7,10 @@ var knex = require('knex')({
 });
 
 var extent = require('turf-extent');
-var clip = require('../services/clip.js');
-var toGeoJSON = require('../services/osm-data-to-geojson.js');
-var queryBbox = require('../services/query-bbox.js');
-var BoundingBox = require('../services/BoundingBox.js');
+var clip = require('./clip.js');
+var toGeoJSON = require('./osm-data-to-geojson.js');
+var queryBbox = require('./query-bbox.js');
+var BoundingBox = require('./bounding-box.js');
 
 // Query the given GeoJSON Polygon Feature, returning a promise to be
 // fulfilled with a GeoJSON FeatureCollection representing the (clipped)

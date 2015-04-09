@@ -2,14 +2,14 @@
 var Boom = require('boom');
 var knex = require('knex')({
   client: 'pg',
-  connection: require('../connection'),
+  connection: require('../connection.js'),
   debug: false
 });
 var queryBbox = require('../services/query-bbox.js');
 
-var XML = require('../services/XML.js');
-var Node = require('../models/Node.js');
-var BoundingBox = require('../services/BoundingBox.js');
+var XML = require('../services/xml.js');
+var Node = require('../models/node-model.js');
+var BoundingBox = require('../services/bounding-box.js');
 
 module.exports = {
   method: 'GET',
@@ -23,7 +23,7 @@ module.exports = {
       // TODO: log error on server
       return res(Boom.badRequest(bbox.error));
     }
-    
+
     queryBbox(knex, bbox)
     .then(function (result) {
 

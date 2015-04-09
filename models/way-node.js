@@ -26,14 +26,5 @@ module.exports = {
       numeric: true,
       model: 'nodes'
     },
-  },
-
-   //Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entity) {
-    return {
-      way_id: parseInt(entity.way_id, 10),
-      node_id: parseInt(entity.ref, 10),
-      sequence_id: parseInt(entity.sequence_id)
-    };
   }
 };
