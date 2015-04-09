@@ -5,7 +5,7 @@ var knex = require('knex')({
   connection: require('../../connection.js'),
   debug: false
 });
-var mocks = require('./helpers/changesets.js');
+var mocks = require('./fixtures/changesets.js');
 var XML = require('../../services/xml.js');
 
 var serverShouldOk = function(mock, done) {

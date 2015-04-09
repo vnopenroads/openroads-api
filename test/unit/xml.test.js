@@ -1,27 +1,13 @@
 'use strict';
 var libxml = require('libxmljs');
 var _ = require('lodash');
-var mock = require('./helpers/xml.readChanges.js');
 var XML = require('../../services/xml.js');
 
-var log = require('../../services/log.js');
-var docJson = require('./helpers/changesets.js').json.json.osmChange;
-var docXml = require('./helpers/changesets.js').json.xml;
+var jsonChangeset = require('./fixtures/xml-read.js').osmChange;
+var xmlChangeset = require('./fixtures/xml-read.xml');
 
 var Node = require('../../models/node-model.js');
 var Way = require('../../models/way.js');
-
-function rmTimestamps(actionArray) {
-  return actionArray.map(function(action) {
-    var timestamps = ['timestamp', 'created_at', 'closed_at'];
-    _.each(timestamps, function(attribute) {
-      if (_.has(action.attributes, attribute) ) {
-        action.attributes = _.omit(action.attributes, attribute);
-      }
-    });
-    return action;
-  });
-}
 
 function jsonRmTimes(entity) {
   entity.timestamp = ''
@@ -32,33 +18,30 @@ describe('XML', function() {
   describe('#read', function() {
 
     it('Encodes the right number of way nodes', function() {
-      var parsed = XML.read(docXml);
-      (parsed.modify.way[0].nd.length).should.eql(docJson.modify.way[0].nd.length);
+      var parsed = XML.read(xmlChangeset);
+      (parsed.modify.way[0].nd.length).should.eql(jsonChangeset.modify.way[0].nd.length);
     });
 
     it('Encodes the right number of tags', function() {
-      var parsed = XML.read(docXml);
-      (parsed.modify.way[0].tag.length).should.eql(docJson.modify.way[0].tag.length);
+      var parsed = XML.read(xmlChangeset);
+      (parsed.modify.way[0].tag.length).should.eql(jsonChangeset.modify.way[0].tag.length);
     });
 
     it('Creates comparable nodes using Node#fromEntity', function() {
-      var parsed = XML.read(docXml);
+      var parsed = XML.read(xmlChangeset);
       var parsedNode = parsed.modify.node[0];
       var entity = Node.fromEntity(parsedNode);
 
       (jsonRmTimes(entity)).should.eql(
-        jsonRmTimes(Node.fromEntity(docJson.modify.node[0])));
+        jsonRmTimes(Node.fromEntity(jsonChangeset.modify.node[0])));
     });
 
     it('Creates comparable ways using Way#fromEntity', function() {
-      var parsed = XML.read(docXml);
+      var parsed = XML.read(xmlChangeset);
       var parsedWay = parsed.modify.way[0];
       var entity = Way.fromEntity(parsedWay);
-      // console.log(entity)
-      // console.log(parsed)
-      // console.log(parsedWay)
       (jsonRmTimes (entity)).should.eql(
-        jsonRmTimes(Way.fromEntity(docJson.modify.way[0])));
+        jsonRmTimes(Way.fromEntity(jsonChangeset.modify.way[0])));
     });
   });
 
