@@ -22,14 +22,5 @@ module.exports = {
       type: 'string',
       truthy: true
     },
-  },
-
-  //Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entityAttr) {
-    return {
-      way_id: Number(entityAttr.id),
-      k: entityAttr.k,
-      v: entityAttr.v,
-    }
-  },
+  }
 };

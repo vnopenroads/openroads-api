@@ -13,14 +13,14 @@ var Boom = require('boom');
 var Promise = require('bluebird');
 var knex = require('knex')({
   client: 'pg',
-  connection: require('../connection'),
+  connection: require('../connection.js'),
   debug: false
 });
 
-var log = require('../services/Logger');
-var Node = require('./Node');
-var WayNode = require('./WayNode');
-var WayTag = require('./WayTag');
+var log = require('../services/log.js');
+var Node = require('./node-model.js');
+var WayNode = require('./way-node.js');
+var WayTag = require('./way-tag.js');
 
 var Way = {
   tableName: 'current_ways',
@@ -56,20 +56,6 @@ var Way = {
     },
   },
 
-
-  // Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entity) {
-    var model = {
-      changeset_id: parseInt(entity.changeset, 10),
-      timestamp: new Date(),
-      version: parseInt(entity.version, 10) || 1,
-      visible: (entity.visible !== 'false' && entity.visible !== false),
-    };
-    return model;
-  },
-
-  // TODO this function should also handle node#fromJXEntity.
-  // Test and replace to avoid duplication.
   fromEntity: function(entity, meta) {
     var model = {};
     model.visible = (entity.visible !== 'false' && entity.visible !== false);

@@ -2,7 +2,7 @@
 /* jshint camelcase: false */
 
 var _ = require('lodash');
-var ratio = require('../services/Ratio.js');
+var ratio = require('../services/ratio.js');
 
 /*
  * Takes the given way/waynode/node models and returns a FeatureCollection

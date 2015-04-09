@@ -1,9 +1,22 @@
 'use strict';
 var _ = require('lodash');
 var Promise = require('bluebird');
-var QuadTile = require('../services/QuadTile.js');
+var QuadTile = require('../services/quad-tile.js');
 
 module.exports = function queryBbox(knex, bbox) {
+
+  // helper to make raw queries, because knex version of these
+  // simple selects was MUCH slower
+  function select(table, key, ids) {
+    if(ids.length === 0)
+      return Promise.resolve([]);
+    return knex.raw('select * from '+table +
+      ' where '+key+' in ('+ ids.join(',') + ')')
+      .then(function (resp) {
+        return resp.rows;
+      });
+  }
+
   // Calculate the tiles within this bounding box.
   // See services/QuadTile.js.
   var tiles = QuadTile.tilesForArea(bbox);
@@ -17,7 +30,7 @@ module.exports = function queryBbox(knex, bbox) {
   var containedWayIds = knex('current_way_nodes')
     .whereIn('node_id', containedNodes)
     .select('way_id');
-  
+
     // Grab the unique ways associated with these way_nodes.  This is a
     // list of ways that intersect the bounding box by at least 1 node.
     // (note that `ways` is still an array of waynode objects.)
@@ -45,9 +58,11 @@ module.exports = function queryBbox(knex, bbox) {
     // pass along [ways, waynodes, nodes, waytags, nodetags], the last
     // three of which are promises.
     return Promise.all(result.concat([
-      knex('current_nodes').whereIn('id', nodeIds),
-      knex('current_way_tags').whereIn('way_id', wayIds),
-      knex('current_node_tags').whereIn('node_id', nodeIds)
+      select('current_nodes', 'id', nodeIds),
+      select('current_way_tags', 'way_id', wayIds),
+      select('current_node_tags', 'node_id', nodeIds)
     ]));
   });
+
 };
+

@@ -1,6 +1,5 @@
 'use strict';
 
-
 describe('changeset create endpoint', function () {
 
   it('returns a numerical changeset id.', function (done) {

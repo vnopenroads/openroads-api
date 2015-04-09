@@ -20,15 +20,5 @@ module.exports = {
       type: 'string',
       truthy: true
     },
-  },
-
-  //Translate the entity from the XML parser into a proper model
-  fromJXEntity: function(entityAttr) {
-    'use strict';
-    return {
-      node_id: Number(entityAttr.id),
-      k: entityAttr.k,
-      v: entityAttr.v,
-    };
   }
 };

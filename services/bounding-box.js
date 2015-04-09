@@ -1,8 +1,8 @@
 'use strict';
 
 var _ = require('lodash');
-var geoRatio = require('./Ratio');
-var maxArea = require('./MaxArea');
+var ratio = require('./ratio.js');
+var maxArea = require('./max-area.js');
 
 var nullLatLon = [null,null,null,null];
 var lonLimit = 180.0;
@@ -82,10 +82,10 @@ Bbox.prototype.toString = function() {
 }
 
 Bbox.prototype.toScaled = function() {
-  this.minLon *= geoRatio;
-  this.minLat *= geoRatio;
-  this.maxLon *= geoRatio;
-  this.maxLat *= geoRatio;
+  this.minLon *= ratio;
+  this.minLat *= ratio;
+  this.maxLon *= ratio;
+  this.maxLat *= ratio;
   return this;
 }
 
@@ -123,10 +123,10 @@ var getBbox = {
       lat.push(parseFloat(attributes.latitude));
     }
     return new Bbox([
-      _.min(lon) / geoRatio,
-      _.min(lat) / geoRatio,
-      _.max(lon) / geoRatio,
-      _.max(lat) / geoRatio
+      _.min(lon) / ratio,
+      _.min(lat) / ratio,
+      _.max(lon) / ratio,
+      _.max(lat) / ratio
     ]);
   },
   fromNodes: function(nodes) {

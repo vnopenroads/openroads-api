@@ -1,19 +1,19 @@
 'use strict';
+var _ = require('lodash');
 var knex = require('knex')({
   client: 'pg',
-  connection: require('../../connection'),
+  connection: require('../../connection.js'),
   debug: false
 });
-var mocks = require('./helpers/changesets');
-var XML = require('../../services/XML');
-var _ = require('lodash');
+var mocks = require('./helpers/changesets.js');
+var XML = require('../../services/xml.js');
 
 var serverShouldOk = function(mock, done) {
   var options = {
     method: 'POST',
-    url: '/changeset/json/1/upload',
+    url: '/changeset/1/upload',
     payload: {
-      osmChange: XML.parseDoc(mock)
+      osmChange: XML.read(mock)
     }
   };
   server.injectThen(options)
