@@ -4,13 +4,13 @@ var Promise = require('bluebird');
 var readFile = Promise.promisify(require('fs').readFile);
 var files = {
   municipality: require.resolve('../data/municipality.json')
-}; 
+};
 
 module.exports = function getAdminBoundary(type, ids) {
   // TODO: could switch this to use JSONStream if the data files are big.
   return readFile(files[type], {encoding: 'utf-8'})
   .then(function (data) {
-    var featureCollection = JSON.parse(data);      
+    var featureCollection = JSON.parse(data);
 
     var boundary = _.find(featureCollection.features, {
       properties: {
@@ -22,7 +22,7 @@ module.exports = function getAdminBoundary(type, ids) {
 
     if(!boundary) {
       throw new Error('Could not find ' + type +
-          ' with id ' + ids.join(':')); 
+          ' with id ' + ids.join(':'));
     }
     return boundary;
   });
