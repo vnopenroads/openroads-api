@@ -7,7 +7,7 @@ var log = require('../services/log.js');
 var Node = require('../models/node-model.js');
 var Way = require('../models/way.js');
 
-module.exports = {
+var xml = {
 
   read: function(xmlString) {
 
@@ -64,91 +64,157 @@ module.exports = {
     var obj = obj || {},
       nodes = obj.nodes,
       ways = obj.ways,
+      relations = obj.relations,
       bbox = obj.bbox;
 
-    var doc = new libxml.Document();
-    doc.node('osm').attr({ version: 6, generator: 'DevelopmentSeed' });
+    var doc = xml.writeDoc();
     var root = doc.root();
 
     if (bbox) {
-      root.node('bounds').attr({
-        minlat: bbox.minLat,
-        minlon: bbox.minLon,
-        maxlat: bbox.maxLat,
-        maxlon: bbox.maxLon
-      });
+      xml.writebbox(bbox, root);
     }
 
     if (nodes) {
-      for (var i = 0, ii = nodes.length; i < ii; ++i) {
-        var node = nodes[i];
-        var nodeEl = root.node('node').attr({
-          id: node.id,
-          visible: node.visible,
-          version: node.version,
-          changeset: node.changeset_id,
-          timestamp: node.timestamp,
-          user: 'DevelopmentSeed',
-          uid: 1,
-          lat: node.latitude / RATIO,
-          lon: node.longitude / RATIO
-        });
-
-        // attach tags
-        var tags = node.tags;
-        if (tags && _.isArray(tags) && tags.length) {
-          for (var m = 0, mm = tags.length; m < mm; ++m) {
-            var tag = tags[m];
-            if (tag.k && tag.v) {
-              nodeEl.node('tag').attr({ k: tag.k, v: tag.v });
-            }
-          }
-        }
-      }
+      xml.writeNodes(nodes, root);
     }
 
     if (ways) {
-      for (var i = 0, ii = ways.length; i < ii; ++i) {
-        var way = ways[i];
-        var wayEl = root.node('way').attr({
-          id: way.id,
-          visible: way.visible,
-          version: way.version,
-          changeset: way.changeset_id,
-          timestamp: way.timestamp,
-          user: 'DevelopmentSeed',
-          uid: 1
-        });
+      xml.writeWays(ways, root);
+    }
 
-        // Use the sequence ID to make sure nodes are ordered correctly.
-        var wayNodes = way.nodes;
-        var orderedNodes = [];
-        for (var j = 0, jj = wayNodes.length; j < jj; ++j) {
-          var wayNode = wayNodes[j];
-          orderedNodes[parseInt(wayNode.sequence_id, 10)] = wayNode.node_id;
-        }
-
-        // Attach a node ref for each node, as long as it exists and it's id isn't '0'.
-        for (var k = 0, kk = orderedNodes.length; k < kk; ++k) {
-          var wayNode = orderedNodes[k];
-          if (wayNode && wayNode !== '0') {
-            wayEl.node('nd').attr({ ref: wayNode });
-          }
-        }
-
-        // Attach way tags
-        var tags = way.tags;
-        if (tags && _.isArray(tags) && tags.length) {
-          for (var m = 0, mm = tags.length; m < mm; ++m) {
-            var tag = tags[m];
-            if (tag.k && tag.v) {
-              wayEl.node('tag').attr({ k: tag.k, v: tag.v });
-            }
-          }
-        }
-      }
+    if (relations) {
+      xml.writeRelations(relations, root);
     }
 
     return doc;
+  },
+
+  writeDoc: function() {
+    var doc = new libxml.Document();
+    doc.node('osm').attr({ version: 6, generator: 'DevelopmentSeed' });
+    return doc;
+  },
+
+  writebbox: function(bbox, root) {
+    root.node('bounds').attr({
+      minlat: bbox.minLat,
+      minlon: bbox.minLon,
+      maxlat: bbox.maxLat,
+      maxlon: bbox.maxLon
+    });
+  },
+
+  writeNodes: function(nodes, root) {
+
+    for (var i = 0, ii = nodes.length; i < ii; ++i) {
+      var node = nodes[i];
+      var nodeEl = root.node('node').attr({
+        id: node.id,
+        visible: node.visible,
+        version: node.version,
+        changeset: node.changeset_id,
+        timestamp: node.timestamp,
+        user: 'DevelopmentSeed',
+        uid: 1,
+        lat: node.latitude / RATIO,
+        lon: node.longitude / RATIO
+      });
+
+      // attach tags
+      var tags = node.tags;
+      if (tags && _.isArray(tags) && tags.length) {
+        for (var m = 0, mm = tags.length; m < mm; ++m) {
+          var tag = tags[m];
+          nodeEl.node('tag').attr({ k: tag.k, v: tag.v });
+        }
+      }
+    }
+  },
+
+  writeWays: function(ways, root) {
+    for (var i = 0, ii = ways.length; i < ii; ++i) {
+      var way = ways[i];
+      var wayEl = root.node('way').attr({
+        id: way.id,
+        visible: way.visible,
+        version: way.version,
+        changeset: way.changeset_id,
+        timestamp: way.timestamp,
+        user: 'DevelopmentSeed',
+        uid: 1
+      });
+
+      // Use the sequence ID to make sure nodes are ordered correctly.
+      var wayNodes = way.nodes;
+      var ordered = [];
+      for (var j = 0, jj = wayNodes.length; j < jj; ++j) {
+        var wayNode = wayNodes[j];
+        ordered[parseInt(wayNode.sequence_id, 10)] = wayNode.node_id;
+      }
+
+      // Attach a node ref for each node, as long as it exists and it's id isn't '0'.
+      for (var k = 0, kk = ordered.length; k < kk; ++k) {
+        var wayNode = ordered[k];
+        if (wayNode && wayNode !== '0') {
+          wayEl.node('nd').attr({ ref: wayNode });
+        }
+      }
+
+      // Attach way tags
+      var tags = way.tags;
+      if (tags && _.isArray(tags) && tags.length) {
+        for (var m = 0, mm = tags.length; m < mm; ++m) {
+          var tag = tags[m];
+          wayEl.node('tag').attr({ k: tag.k, v: tag.v });
+        }
+      }
+    }
+  },
+
+  writeRelations: function(relations, root) {
+    for (var i = 0, ii = relations.length; i < ii; ++i) {
+      var relation = relations[i];
+      var relationEl = root.node('relation').attr({
+        id: relation.id,
+        visible: relation.visible,
+        version: relation.version,
+        changeset: relation.changeset_id,
+        timestamp: relation.timestamp,
+        user: 'DevelopmentSeed',
+        uid: 1
+      });
+
+      // Use the sequence ID to make sure members are ordered correctly.
+      var members = relation.members;
+      var ordered = [];
+      for (var j = 0, jj = members.length; j < jj; ++j) {
+        var member = members[j];
+        ordered[parseInt(member.sequence_id, 10)] = member;
+      }
+
+      // Attach members that exist.
+      for (var k = 0, kk = ordered.length; k < kk; ++k) {
+        var member = ordered[k];
+        if (member) {
+          relationEl.node('member').attr({
+            type: member.member_type.toLowerCase(),
+            ref: member.member_id,
+            role: member.member_role
+          });
+        }
+      }
+
+      // Attach relation tags.
+      var tags = relation.tags;
+      if (tags && _.isArray(tags) && tags.length) {
+        for (var m = 0, mm = tags.length; m < mm; ++m) {
+          var tag = tags[m];
+          relationEl.node('tag').attr({ k: tag.k, v: tag.v });
+        }
+      }
+    }
   }
 };
+
+module.exports = xml;
+
