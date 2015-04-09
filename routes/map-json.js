@@ -25,8 +25,7 @@ module.exports = {
 
     queryBbox(knex, bbox)
     .then(function (result) {
-      // result = [ways, waynodes, nodes, waytags, nodetags]
-      res(toGeoJSON(result[0], result[1], result[2], result[3]));
+      res(toGeoJSON(result));
     })
     .catch(function (err) {
       console.log(err);
