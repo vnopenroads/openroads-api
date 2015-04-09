@@ -1,5 +1,5 @@
 'use strict';
-var XML = require('../services/XML');
+var XML = require('../services/xml');
 var create = require('./changeset-create').handler;
 var upload = require('./changeset-upload').handler;
 var Boom = require('boom');
