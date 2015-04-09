@@ -15,9 +15,9 @@ var knex = require('knex')({
   debug: false
 });
 
-var Member = require('./RelationMember');
-var RelationTag = require('./RelationTag');
-var log = require('../services/Logger');
+var Member = require('./relation-member.js');
+var RelationTag = require('./relation-tag.js');
+var log = require('../services/log');
 
 var Relation = {
 
