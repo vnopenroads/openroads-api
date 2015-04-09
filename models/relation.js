@@ -24,7 +24,7 @@ var Relation = {
   tableName: 'current_relations',
 
   attributes: {
-    relation_id: {
+    id: {
       type: 'integer',
       autoIncrement: true,
       unique: true,
@@ -64,7 +64,7 @@ var Relation = {
 
     var id = parseInt(entity.id, 10);
     if (id && id > 0) {
-      model.relation_id = id;
+      model.id = id;
     }
     if (entity.changeset) {
       model.changeset_id = parseInt(entity.changeset, 10);
@@ -155,7 +155,7 @@ var Relation = {
       // Then do both the members and tags together.
       var query = transaction(Relation.tableName)
       .insert(models)
-      .returning('relation_id')
+      .returning('id')
       .then(function(ids) {
 
         // Use the changeset and new IDs to retrieve the members and tags.
@@ -185,7 +185,7 @@ var Relation = {
       var relationChanges = modifies.map(function(entity) {
         var model = Relation.fromEntity(entity, meta);
         return transaction(Relation.tableName)
-        .where({ relation_id: entity.relation_id })
+        .where({ id: entity.id })
         .update(model)
         .catch(function(err) {
           log.error('Modify single relation', err);
@@ -214,10 +214,10 @@ var Relation = {
         return [];
       }
       var ids = _.pluck(destroys, 'id');
-      var query = transaction(Relation.tableName).whereIn('relation_id', ids).update({
+      var query = transaction(Relation.tableName).whereIn('id', ids).update({
         visible: false,
         changeset_id: meta.id
-      }).returning('relation_id').then(function(removed) {
+      }).returning('id').then(function(removed) {
         return Relation.destroyDependents(transaction, removed).then(function() {
           // log.info('Relations set invisible', removed.join(', '));
         });

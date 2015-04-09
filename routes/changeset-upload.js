@@ -13,6 +13,7 @@ var BoundingBox = require('../services/bounding-box.js');
 var log = require('../services/log.js');
 var Node = require('../models/node-model.js');
 var Way = require('../models/way.js');
+var Relation = require('../models/relation.js');
 
 function upload(req, res) {
   var changesetID = req.params.changesetID;
@@ -80,7 +81,8 @@ function upload(req, res) {
 
 var models = {
   node: Node,
-  way: Way
+  way: Way,
+  relation: Relation
 };
 
 function query(entity, changeset, meta, map, transaction) {

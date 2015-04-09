@@ -14,9 +14,6 @@ var RelationTag = {
       type: 'integer',
       model: 'Relation'
     },
-    version: {
-      type: 'integer',
-    },
     k: {
       type: 'string',
       truthy: true

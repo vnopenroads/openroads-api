@@ -13,9 +13,6 @@ var RelationMember = {
       type: 'integer',
       model: 'Relation'
     },
-    version: {
-      type: 'integer'
-    },
     member_type: {
       type: 'string'
     },
@@ -33,11 +30,10 @@ var RelationMember = {
   fromEntity: function(entity) {
     var model = {};
     model.relation_id = entity.relation;
-    model.version = parseInt(entity.version, 10) || 1;
-    model.member_type = entity.type;
+    model.member_type = entity.type.slice(0,1).toUpperCase() + entity.type.slice(1);
     model.member_id = parseInt(entity.ref, 10);
-    model.member_role = entity.role;
-    model.sequence_id = entity.sequence;
+    model.member_role = entity.role || ' ';
+    model.sequence_id = entity.i;
     return model;
   },
 };
