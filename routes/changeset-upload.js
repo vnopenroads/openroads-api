@@ -45,40 +45,28 @@ function upload(req, res) {
       }
 
       // TODO increment numChanges.
-      Promise.all(query('node', changeset, meta, map, transaction)).then(function() {
-        Promise.all(query('way', changeset, meta, map, transaction)).then(function() {
-          // Update changeset with new bounding box.
-          var updated = updateChangeset(changeset, meta, numChanges);
-          knex('changesets')
-          .where('id', meta.id)
-          .update(updated)
-          .then(function() {
-            transaction.commit();
-            return res({ changeset: _.extend({}, meta, updated) });
-          })
-          .catch(function(err) {
-            log.error('Changeset update fails', err);
-            transaction.rollback();
-            return res(Boom.badImplementation('Could not update changeset'));
+      query('node', changeset, meta, map, transaction).then(function() {
+        query('way', changeset, meta, map, transaction).then(function() {
+          query('relation', changeset, meta, map, transaction).then(function() {
+
+            // Update changeset with new bounding box.
+            var updated = updateChangeset(changeset, meta, numChanges);
+            knex('changesets')
+            .where('id', meta.id)
+            .update(updated)
+            .then(function() {
+              transaction.commit();
+              return res({ changeset: _.extend({}, meta, updated) });
+            })
+            .catch(function(err) {
+              log.error('Changeset update fails', err);
+              transaction.rollback();
+              return res(Boom.badImplementation('Could not update changeset'));
+            });
           });
-
-          /*
-           * Not gonna worry about relations atm.
-          query('relation', changeset, meta, map, transaction)
-            .then(transaction.commit)
-            .catch(transaction.rollback);
-          */
-
-        }).catch(function(err) {
-          log.error('Way changeset fails', err);
-          transaction.rollback();
-          throw new Error(err);
         });
-      }).catch(function(err) {
-        log.error('Node changeset fails', err);
-        transaction.rollback();
-        throw new Error(err);
       });
+
     }).catch(function(err) {
       log.error('Changeset transaction fails', err);
       return res(Boom.badImplementation('Could not complete changeset actions'));
@@ -103,7 +91,11 @@ function query(entity, changeset, meta, map, transaction) {
   var actions = ['create', 'modify', 'destroy'].map(function(action) {
     return toArray(model.query[action](changeset, meta, map, transaction));
   });
-  return _.flatten(actions)
+  return Promise.all(_.flatten(actions)).catch(function(err) {
+    log.error(entity + ' changeset fails', err);
+    transaction.rollback();
+    throw new Error(err);
+  });
 }
 
 function toArray(val) {
