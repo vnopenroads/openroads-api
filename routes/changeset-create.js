@@ -16,7 +16,7 @@ module.exports = {
     var userName = req.payload.user;
 
     if (!uid || !userName) {
-      return res(Boom.badRequest('A new changeset must include a user id.'));
+      return res(Boom.badRequest('A new changeset must include a user id and a username.'));
     }
 
     knex('users')
