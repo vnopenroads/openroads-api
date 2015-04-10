@@ -1,29 +1,27 @@
 'use strict';
 var _ = require('lodash');
 var Promise = require('bluebird');
-var readFile = Promise.promisify(require('fs').readFile);
-var files = {
-  municipality: require.resolve('../data/municipality.json')
-};
+var knex = require('knex')({
+  client: 'pg',
+  connection: require('../connection.js'),
+  debug: false
+});
 
-module.exports = function getAdminBoundary(type, ids) {
-  // TODO: could switch this to use JSONStream if the data files are big.
-  return readFile(files[type], {encoding: 'utf-8'})
+module.exports = function getAdminBoundary(id) {
+  return knex('admin_boundaries')
+  .where('id', id)
   .then(function (data) {
-    var featureCollection = JSON.parse(data);
-
-    var boundary = _.find(featureCollection.features, {
-      properties: {
-        ID_0: ids[0],
-        ID_1: ids[1],
-        ID_2: ids[2]
-      }
-    });
-
-    if(!boundary) {
-      throw new Error('Could not find ' + type +
-          ' with id ' + ids.join(':'));
+    var boundary;
+    if(data.length > 0) {
+      boundary = data[0].geo;
     }
+    if(!boundary) {
+      throw new Error('Coule not find admin region with id '+id);
+    }
+    // Tack on the id because it's otherwise buried in some
+    // property, with different keys for different admin levels
+    // (ID_1_OR, ID_2_OR, etc.)
+    boundary.id = id;
     return boundary;
   });
 };
