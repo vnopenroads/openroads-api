@@ -14,7 +14,13 @@ describe('to-fix endpoints', function() {
     })
     .then(function (res) {
       res.statusCode.should.eql(200);
-      // jshint maxlen: false
+
+      // strip timestamps because differing test machine timezones plus
+      // our timezone-agnostic db schema makes tests fail.
+      var timestampAttr = /timestamp\="[^"]*"/g;
+      res.payload = res.payload.replace(timestampAttr, '');
+      expected = expected.replace(timestampAttr, '');
+
       res.payload.should.eql(expected);
     done();
     })
@@ -32,6 +38,13 @@ describe('to-fix endpoints', function() {
     })
     .then(function (res) {
       res.statusCode.should.eql(200);
+
+      // strip timestamps because differing test machine timezones plus
+      // our timezone-agnostic db schema makes tests fail.
+      var timestampAttr = /timestamp\="[^"]*"/g;
+      res.payload = res.payload.replace(timestampAttr, '');
+      expected = expected.replace(timestampAttr, '');
+
       res.payload.should.eql(expected);
       done();
     })
