@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="6" generator="DevelopmentSeed">
+  <node id="175255" visible="true" version="1" changeset="494" timestamp="Wed Apr 08 2015 10:34:33 GMT-0400 (EDT)" user="DevelopmentSeed" uid="1" lat="9.5306962" lon="124.7463826"/>
+  <node id="175256" visible="true" version="1" changeset="494" timestamp="Wed Apr 08 2015 10:34:33 GMT-0400 (EDT)" user="DevelopmentSeed" uid="1" lat="9.5306539" lon="124.7589139"/>
+  <node id="175257" visible="true" version="1" changeset="494" timestamp="Wed Apr 08 2015 10:34:33 GMT-0400 (EDT)" user="DevelopmentSeed" uid="1" lat="9.537891" lon="124.7589139"/>
+  <way id="166015" visible="true" version="1" changeset="494" timestamp="Wed Apr 08 2015 10:34:33 GMT-0400 (EDT)" user="DevelopmentSeed" uid="1">
+    <nd ref="175255"/>
+    <nd ref="175256"/>
+    <nd ref="175257"/>
+    <tag k="or_condition" v="bad"/>
+    <tag k="highway" v="motorway"/>
+    <tag k="or_condition" v="bad"/>
+    <tag k="highway" v="motorway"/>
+  </way>
+</osm>
