@@ -3,7 +3,7 @@ var Boom = require('boom');
 var knex = require('knex')({
   client: 'pg',
   connection: require('../connection.js'),
-  debug: true
+  debug: false
 });
 var log = require('../services/log.js');
 
