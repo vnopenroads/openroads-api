@@ -10,7 +10,7 @@ describe('admin endpoint', function() {
   it('responds with the right schema', function(done) {
     server.injectThen({
       method: 'GET',
-      url: '/admin/municipality/177:15:216'
+      url: '/admin/7150216000'
     })
     .then(function (resp) {
       var obj = JSON.parse(resp.payload);
@@ -21,8 +21,10 @@ describe('admin endpoint', function() {
   });
 
   it('gets the barangays for a municipality', function (done) {
-    getAdminBoundary('municipality', [177, 15, 216])
-    .then(getSubregions)
+    getAdminBoundary(7150216000)
+    .then(function(admin) {
+      return getSubregions(admin.id, admin);
+    })
     .then(function (subregions) {
       subregions.features.should.have.length(15);
       done();
@@ -31,9 +33,9 @@ describe('admin endpoint', function() {
   });
 
   it('fetches a boundary for a given municipality id', function(done) {
-    getAdminBoundary('municipality', [177,15,216])
+    getAdminBoundary(7150216000)
     .then(function (boundary) {
-      boundary.properties.NAME_2.should.equal('Batuan');
+      boundary.properties.NAME_3.should.equal('Batuan');
       boundary.geometry.coordinates[0].should.have.length(311);
       done();
     })
