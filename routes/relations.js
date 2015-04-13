@@ -1,6 +1,5 @@
 'use strict';
 var Boom = require('boom');
-var _ = require('lodash');
 var knex = require('knex')({
   client: 'pg',
   connection: require('../connection.js'),
@@ -15,9 +14,15 @@ module.exports = {
 
     var query = req.query;
 
+    var q;
     // Query the relation by it's member iD.
     // This asks, what projects is this road a part of?
     if (query.member) {
+      q = knex('current_relation_members')
+        .where('member_type', 'Way')
+        .andWhere('member_id', +query.member)
+        .select('relation_id');
+
     }
 
     // Query the relation by the type of tag it has.
@@ -27,7 +32,7 @@ module.exports = {
         return res(Boom.badRequest('Relations endpoint needs member or tags.'));
       }
 
-      var q = knex('current_relation_tags');
+      q = knex('current_relation_tags');
       tagKeys.forEach(function(key) {
         q = q.where(function () {
           this
@@ -35,14 +40,9 @@ module.exports = {
             .andWhere('v', query[key]);
         });
       });
-      q.select('relation_id')
-      .then(function (rows) {
-        var ids = _.pluck(rows, 'relation_id');
-        console.log(ids)
-        return queryRelations(ids);
-      })
-      .then(res);
+      q = q.select('relation_id');
     }
+    queryRelations(q).then(res);
 
   }
 
