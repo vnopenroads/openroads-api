@@ -1,10 +1,6 @@
 'use strict';
 var _ = require('lodash');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../../connection.js'),
-  debug: false
-});
+var knex = require('../../connection.js');
 var mocks = require('./fixtures/changesets.js');
 var XML = require('../../services/xml.js');
 

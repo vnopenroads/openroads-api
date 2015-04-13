@@ -1,11 +1,7 @@
 'use strict';
 
 var Boom = require('boom');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection.js'),
-  debug: false
-});
+var knex = require('../connection.js');
 
 module.exports = {
   method: 'PUT',

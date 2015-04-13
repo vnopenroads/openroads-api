@@ -2,13 +2,9 @@
 
 var _ = require('lodash');
 var Boom = require('boom');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection.js'),
-  debug: false
-});
 var Promise = require('bluebird');
 
+var knex = require('../connection.js');
 var BoundingBox = require('../services/bounding-box.js');
 var log = require('../services/log.js');
 var Node = require('../models/node-model.js');

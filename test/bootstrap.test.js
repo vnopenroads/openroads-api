@@ -9,11 +9,7 @@ server.register(require('inject-then'), function (err) {
 
 after(function (done) {
   'use strict';
-  var knex = require('knex')({
-    client: 'pg',
-    connection: require('../connection'),
-    debug: false
-  });
+  var knex = require('../connection.js');
   knex.transaction(function(transaction) {
     var nodeIds = knex.select('id').from('current_nodes')
                       .where('changeset_id', 1);

@@ -6,8 +6,34 @@ var queryPolygon = require('../../services/query-polygon.js');
 
 describe('admin endpoint', function() {
 
+  it('responds with the right schema for the whole country', function(done) {
+    server.injectThen({
+      method: 'GET',
+      url: '/admin'
+    })
+    .then(function (resp) {
+      var obj = JSON.parse(resp.payload);
+      obj.should.have.keys('subregions');
+      obj.subregions.features[0].geometry.coordinates.should.have.length(0);
+      done();
+    })
+    .catch(done);
+  });
 
-  it('responds with the right schema', function(done) {
+  it('responds with the right schema for a province', function(done) {
+    server.injectThen({
+      method: 'GET',
+      url: '/admin/7150000000'
+    })
+    .then(function (resp) {
+      var obj = JSON.parse(resp.payload);
+      obj.should.have.keys('subregions');
+      done();
+    })
+    .catch(done);
+  });
+
+  it('responds with the right schema for a municipality', function(done) {
     server.injectThen({
       method: 'GET',
       url: '/admin/7150216000'
@@ -23,7 +49,7 @@ describe('admin endpoint', function() {
   it('gets the barangays for a municipality', function (done) {
     getAdminBoundary(7150216000)
     .then(function(admin) {
-      return getSubregions(admin.id, admin);
+      return getSubregions(3, admin.id, admin);
     })
     .then(function (subregions) {
       subregions.features.should.have.length(15);

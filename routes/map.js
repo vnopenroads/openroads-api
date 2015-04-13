@@ -1,12 +1,8 @@
 'use strict';
 var Boom = require('boom');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection.js'),
-  debug: false
-});
-var queryBbox = require('../services/query-bbox.js');
 
+var knex = require('../connection.js');
+var queryBbox = require('../services/query-bbox.js');
 var XML = require('../services/xml.js');
 var Node = require('../models/node-model.js');
 var BoundingBox = require('../services/bounding-box.js');

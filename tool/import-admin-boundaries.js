@@ -17,14 +17,10 @@
 // jshint maxlen: false
 var JSONStream = require('JSONStream');
 var through = require('through2');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection.js'),
-  debug: false
-});
+var knex = require('../connection.js');
 
 if (process.argv.length < 3) {
-  
+
   console.log('usage: cat file.json | ', process.argv[0], process.argv[1], 'ID_PROPERTY');
   process.exit();
 }

@@ -1,11 +1,7 @@
 'use strict';
 var _ = require('lodash');
 var Promise = require('bluebird');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection.js'),
-  debug: false
-});
+var knex = require('../connection');
 
 module.exports = function getAdminBoundary(id) {
   return knex('admin_boundaries')
@@ -22,6 +18,10 @@ module.exports = function getAdminBoundary(id) {
     // property, with different keys for different admin levels
     // (ID_1_OR, ID_2_OR, etc.)
     boundary.id = id;
+    if(boundary.properties.ID_4_OR) boundary.adminType = 4;
+    else if(boundary.properties.ID_3_OR) boundary.adminType = 3;
+    else if(boundary.properties.ID_2_OR) boundary.adminType = 2;
+    else if(boundary.properties.ID_1_OR) boundary.adminType = 1;
     return boundary;
   });
 };

@@ -30,7 +30,7 @@ The `db-server` directory contains instructions on running your own postgresql d
 
 ### Running
 
-To run the server, run the following command:
+To run the server, use the following command:
 
 ```sh
 npm start

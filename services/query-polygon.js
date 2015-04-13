@@ -1,11 +1,6 @@
 'use strict';
 
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection'),
-  debug: false
-});
-
+var knex = require('../connection.js');
 var extent = require('turf-extent');
 var clip = require('./clip.js');
 var toGeoJSON = require('./osm-data-to-geojson.js');
