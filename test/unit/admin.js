@@ -7,7 +7,33 @@ var queryPolygon = require('../../services/query-polygon.js');
 describe('admin endpoint', function() {
 
 
-  it('responds with the right schema', function(done) {
+  it('responds with the right schema for the whole country', function(done) {
+    server.injectThen({
+      method: 'GET',
+      url: '/admin'
+    })
+    .then(function (resp) {
+      var obj = JSON.parse(resp.payload);
+      obj.should.have.keys('subregions');
+      done();
+    })
+    .catch(done);
+  });
+
+  it('responds with the right schema for a province', function(done) {
+    server.injectThen({
+      method: 'GET',
+      url: '/admin/7150000000'
+    })
+    .then(function (resp) {
+      var obj = JSON.parse(resp.payload);
+      obj.should.have.keys('subregions');
+      done();
+    })
+    .catch(done);
+  });
+
+  it('responds with the right schema for a municipality', function(done) {
     server.injectThen({
       method: 'GET',
       url: '/admin/7150216000'
