@@ -1,10 +1,7 @@
 'use strict';
 var Boom = require('boom');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection.js'),
-  debug: false
-});
+
+var knex = require('../connection.js')
 var toGeoJSON = require('../services/osm-data-to-geojson.js');
 var queryBbox = require('../services/query-bbox.js');
 var BoundingBox = require('../services/bounding-box.js');

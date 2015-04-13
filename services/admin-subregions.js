@@ -1,10 +1,6 @@
 'use strict';
 var _ = require('lodash');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection.js'),
-  debug: false
-});
+var knex = require('../connection.js');
 
 /**
 For the OpenRoads project we constructed a custom ID of 10 or 11 characters.

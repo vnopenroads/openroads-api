@@ -1,11 +1,7 @@
 'use strict';
 var _ = require('lodash');
 var Promise = require('bluebird');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection.js'),
-  debug: false
-});
+var knex = require('../connection');
 
 module.exports = function getAdminBoundary(id) {
   return knex('admin_boundaries')

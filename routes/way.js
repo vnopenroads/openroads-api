@@ -1,12 +1,8 @@
 'use strict';
 var Boom = require('boom');
-var knex = require('knex')({
-  client: 'pg',
-  connection: require('../connection.js'),
-  debug: false
-});
-var queryWays = require('../services/query-ways.js');
 
+var knex = require('../connection.js');
+var queryWays = require('../services/query-ways.js');
 var XML = require('../services/xml.js');
 var Node = require('../models/node-model.js');
 
@@ -35,7 +31,7 @@ module.exports = [
   {
     method: 'GET',
     path: '/xml/way/{wayId}/full',
-    handler: serveSingleWay 
+    handler: serveSingleWay
   },
   {
     method: 'GET',
