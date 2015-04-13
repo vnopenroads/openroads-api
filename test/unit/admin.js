@@ -14,6 +14,7 @@ describe('admin endpoint', function() {
     .then(function (resp) {
       var obj = JSON.parse(resp.payload);
       obj.should.have.keys('subregions');
+      obj.subregions.features[0].geometry.coordinates.should.have.length(0);
       done();
     })
     .catch(done);

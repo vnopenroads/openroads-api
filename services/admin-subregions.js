@@ -20,6 +20,7 @@ var bys = [1e9, 1e7, 1e3, 1];
 module.exports = function getSubregions(parentType, parentId, parentRegion) {
   var low, high, by;
   if(!parentType) {
+    parentType = 0;
     low = 0;
     high = 1e11;
     by = bys[0];
