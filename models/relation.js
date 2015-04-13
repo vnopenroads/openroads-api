@@ -205,7 +205,7 @@ var Relation = {
     // TODO this destroy function does not implement a check
     // to see if any relation is a part of any other relation.
     destroy: function(changeset, meta, map, transaction) {
-      var destroys = changeset.delete.way;
+      var destroys = changeset.delete.relation;
       if (!destroys) {
         return [];
       }
