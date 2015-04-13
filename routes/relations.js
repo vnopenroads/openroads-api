@@ -52,11 +52,9 @@ function queryRelations(relationIds) {
   return knex('current_relations')
     .whereIn('id', relationIds)
     .then(function (rels) {
-      console.log('rels', rels)
-      knex('current_relation_tags')
+      return knex('current_relation_tags')
       .whereIn('relation_id', relationIds)
       .then(function (tags) {
-        console.log('tags', tags)
         rels.forEach(function (rel) {
           rel.tags = tags.filter(function (t) {
             return t.relation_id === rel.id;
