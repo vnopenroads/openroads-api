@@ -14,11 +14,6 @@ module.exports = [
     handler: function (req, res) {
       return getSubregions()
       .then(function (subregions) {
-        // HACK: strip actual boundary data for regions, because they're
-        // waaaaaay too big.
-        subregions.features.forEach(function (feat) {
-          feat.geometry.coordinates = [];
-        });
         res({subregions: subregions});
       })
       .catch(function(err) {

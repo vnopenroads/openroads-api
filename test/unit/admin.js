@@ -6,7 +6,6 @@ var queryPolygon = require('../../services/query-polygon.js');
 
 describe('admin endpoint', function() {
 
-
   it('responds with the right schema for the whole country', function(done) {
     server.injectThen({
       method: 'GET',
@@ -49,7 +48,7 @@ describe('admin endpoint', function() {
   it('gets the barangays for a municipality', function (done) {
     getAdminBoundary(7150216000)
     .then(function(admin) {
-      return getSubregions(admin.id, admin);
+      return getSubregions(3, admin.id, admin);
     })
     .then(function (subregions) {
       subregions.features.should.have.length(15);
