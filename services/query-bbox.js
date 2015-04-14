@@ -1,4 +1,6 @@
 'use strict';
+var Promise = require('bluebird');
+var Boom = require('boom');
 var QuadTile = require('../services/quad-tile.js');
 var queryWays = require('./query-ways.js');
 
@@ -6,6 +8,8 @@ module.exports = function queryBbox(knex, bbox) {
   // Calculate the tiles within this bounding box.
   // See services/QuadTile.js.
   var tiles = QuadTile.tilesForArea(bbox);
+
+  if(bbox.error) return Promise.reject(Boom.badRequest(bbox.error));
 
   // Find the nodes in the bounding box using the quadtile index.
   var containedNodes = knex('current_nodes')
