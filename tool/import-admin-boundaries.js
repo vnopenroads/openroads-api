@@ -19,29 +19,39 @@ var JSONStream = require('JSONStream');
 var through = require('through2');
 var knex = require('../connection.js');
 
-if (process.argv.length < 3) {
-
-  console.log('usage: cat file.json | ', process.argv[0], process.argv[1], 'ID_PROPERTY');
-  process.exit();
-}
-
-var idProp = process.argv[2];
 var count = 0;
 
-process.stdin
-.pipe(JSONStream.parse('features.*'))
-.pipe(through.obj(function write(feat, enc, next) {
+knex.transaction(function (trx) {
+  process.stdin
+  .pipe(JSONStream.parse('features.*'))
+  .pipe(through.obj(function write(feat, enc, next) {
 
-  console.log('inserting: ' + feat.properties[idProp]);
-  knex('admin_boundaries')
-    .insert({
-      id: +feat.properties[idProp],
-      geo: feat
-    })
-    .then(function() { count++; next(); })
-    .catch(next);
+    var props = feat.properties;
+    var id = props.ID_4_OR || props.ID_3_OR || props.ID_2_OR || props.ID_1_OR;
 
-}, function end() {
+    console.log('inserting: ' + id);
+    if(process.argv[2]) return next();
+    trx('admin_boundaries')
+      .insert({
+        id: id,
+        geo: feat
+      })
+      .then(function() { count++; next(); })
+      .catch(next);
+
+  }, function end() {
+    trx.commit();
+    this.push(null);
+  }))
+  .on('error', function (err) {
+    console.error(err);
+    trx.rollback(err);
+  });
+})
+.then(function (inserts) {
+  console.log(inserts);
   console.log('Inserted ' + count + ' features.');
-  this.push(null);
-}));
+})
+.catch(function (err) {
+  console.error(err);
+});
