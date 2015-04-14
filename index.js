@@ -5,8 +5,13 @@ var server = new Hapi.Server({
     routes: {
       cors: true
     }
-  }
+  },
+  debug: process.env.OR_DEBUG ? {
+    log: [ 'error' ],
+    request: [ 'error', 'received', 'response' ]
+  } : false
 });
+
 server.connection({ port: process.env.PORT || 4000 });
 
 // Register routes
