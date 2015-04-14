@@ -18,6 +18,7 @@ describe('Relations endpoint', function() {
 
   var lockCondition = false;
 
+  var offset = 0;
   var lock = function(done) {
     if (lockCondition) done();
     else setTimeout(function() {lock(done);}, 500);
@@ -25,6 +26,7 @@ describe('Relations endpoint', function() {
 
   before(function(done) {
 
+    
     //Create a way with a relation
     var cs = new Change();
     var nodes = makeNodes(5);
@@ -32,7 +34,7 @@ describe('Relations endpoint', function() {
     var relation = new Relation()
                           .members('node', nodes)
                           .members('way', way)
-                          .tags({k: 'test', v:'test'});
+                          .tags({k: 'test', v:'relation_endpoint'});
     cs.create('node', nodes)
       .create('way', way)
       .create('relation', relation);
@@ -46,7 +48,13 @@ describe('Relations endpoint', function() {
     };
     server.injectThen(options)
     .then(function() {
-      lockCondition = true;
+      knex('current_relations')
+        .where('changeset_id', 1)
+        .then(function(relations) {
+          offset = relations.length - 1;
+        }).then(function() {
+            lockCondition = true;
+        });
     });
     lock(done);
   });
@@ -54,7 +62,7 @@ describe('Relations endpoint', function() {
   it('Should return a valid relation, tag test', function(done) {
     server.injectThen({
       method: 'GET',
-      url: '/relations?test=test'
+      url: '/relations?test=relation_endpoint'
     }).then(function(res) {
       res.statusCode.should.eql(200);
       var payload = JSON.parse(res.payload);
@@ -72,7 +80,7 @@ describe('Relations endpoint', function() {
     knex('current_relations').where('changeset_id', 1)
     .then(function(relations) {
       knex('current_relation_members')
-        .where('relation_id', relations[0].id)
+        .where('relation_id', relations[offset].id)
         .andWhere('member_type', 'Way')
         .then(function(ways) {
           server.injectThen({
@@ -96,7 +104,7 @@ describe('Relations endpoint', function() {
     .then(function(relations) {
       server.injectThen({
         method: 'GET',
-        url: '/relations/'+relations[0].id
+        url: '/relations/'+relations[offset].id
       }).then(function(res) {
         res.statusCode.should.eql(200);
         var payload = JSON.parse(res.payload);
