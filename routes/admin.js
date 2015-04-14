@@ -88,7 +88,6 @@ module.exports = [
         });
       })
       .catch(function (err) {
-        console.error(err);
         res(Boom.wrap(err));
       });
     }
@@ -104,16 +103,13 @@ module.exports = [
       .then(function (boundary) {
         return getSubregionFeatures(boundary.adminType, id, boundary)
         .then(function (subregions) {
-          if(boundary.adminType <= 2)
-            res({ subregions: subregions });
-          else
-            return queryPolygon(boundary)
-            .then(function(roads) {
-              res({
-                subregions: subregions,
-                roads: roads
-              });
+          return queryPolygon(boundary)
+          .then(function(roads) {
+            res({
+              subregions: subregions,
+              roads: roads
             });
+          });
         });
       })
       .catch(function (err) {

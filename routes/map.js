@@ -16,7 +16,6 @@ module.exports = {
     var paramString = req.query.bbox || '';
     var bbox = new BoundingBox.fromCoordinates(paramString.split(','));
     if (bbox.error) {
-      // TODO: log error on server
       return res(Boom.badRequest(bbox.error));
     }
 
@@ -32,7 +31,6 @@ module.exports = {
       response.type('text/xml');
     })
     .catch(function (err) {
-      console.log(err);
       res(Boom.wrap(err));
     });
   }
