@@ -14,7 +14,7 @@ function makeNodes(ii) {
   return nodes;
 }
 
-describe.only('Relations endpoint', function() {
+describe('Relations endpoint', function() {
 
   var lockCondition = false;
 
