@@ -1,36 +1,85 @@
 'use strict';
 
 var getAdminBoundary = require('../../services/admin-boundary.js');
-var getSubregions = require('../../services/admin-subregions.js').getFeatures;
+var getSubregionFeatures = require('../../services/admin-subregions.js')
+  .getFeatures;
 var queryPolygon = require('../../services/query-polygon.js');
 
-describe('admin endpoint', function() {
 
-  it.skip('responds with the right schema for the whole country', function(done) {
+describe('subregions endpoint', function() {
+
+  it('responds with the right schema for the whole country', function(done) {
     server.injectThen({
       method: 'GET',
       url: '/subregions'
     })
     .then(function (resp) {
       var obj = JSON.parse(resp.payload);
-      obj.should.have.length(1337); // <-- TODO
+      obj.should.have.keys('adminAreas'); // <-- TODO
       done();
     })
     .catch(done);
   });
 
-  it('responds with the right schema for a province', function(done) {
+  it('responds with the right schema for a particular region', function(done) {
     server.injectThen({
       method: 'GET',
-      url: '/admin/7150000000'
+      url: '/subregions/7150000000'
     })
     .then(function (resp) {
       var obj = JSON.parse(resp.payload);
-      obj.should.have.keys('subregions');
+      obj.should.have.keys('meta', 'adminAreas');
       done();
     })
     .catch(done);
   });
+
+  it('yields provinces for a region', function(done) {
+    server.injectThen({
+      method: 'GET',
+      url: '/subregions/7000000000'
+    })
+    .then(function (resp) {
+      var obj = JSON.parse(resp.payload);
+      obj.meta.id.should.equal(7000000000);
+      obj.meta.type.should.equal(1);
+      obj.adminAreas.should.have.length(4);
+      done();
+    })
+    .catch(done);
+  });
+
+  it('yields municipalities for a province', function(done) {
+    server.injectThen({
+      method: 'GET',
+      url: '/subregions/7150000000'
+    })
+    .then(function (resp) {
+      var obj = JSON.parse(resp.payload);
+      obj.meta.id.should.equal(7150000000);
+      obj.adminAreas.should.have.length(48);
+      done();
+    })
+    .catch(done);
+  });
+
+  it('yields barangays for a municipality', function(done) {
+    server.injectThen({
+      method: 'GET',
+      url: '/subregions/7150210000'
+    })
+    .then(function (resp) {
+      var obj = JSON.parse(resp.payload);
+      obj.meta.id.should.equal(7150210000);
+      obj.meta.name.should.equal('Albuquerque');
+      obj.adminAreas.should.have.length(11);
+      done();
+    })
+    .catch(done);
+  });
+});
+
+describe('admin endpoint', function() {
 
   it('responds with the right schema for a municipality', function(done) {
     server.injectThen({
@@ -48,7 +97,7 @@ describe('admin endpoint', function() {
   it('gets the barangays for a municipality', function (done) {
     getAdminBoundary(7150216000)
     .then(function(admin) {
-      return getSubregions(3, admin.id, admin);
+      return getSubregionFeatures(3, admin.id, admin);
     })
     .then(function (subregions) {
       subregions.features.should.have.length(15);

@@ -1,6 +1,7 @@
 'use strict';
 
 var Boom = require('boom');
+var _ = require('lodash');
 
 var getAdminBoundary = require('../services/admin-boundary.js');
 var getSubregionFeatures = require('../services/admin-subregions.js').getFeatures;
@@ -13,9 +14,10 @@ module.exports = [
     path: '/subregions',
     handler: function (req, res) {
       return listSubregions()
-      .then(res)
+      .then(function (subregions) {
+        return res({ adminAreas: subregions });
+      })
       .catch(function(err) {
-        console.error(err);
         res(Boom.wrap(err));
       });
     }
@@ -30,7 +32,16 @@ module.exports = [
       getAdminBoundary(id)
       .then(function (boundary) {
         return listSubregions(boundary.adminType, id, boundary)
-        .then(res);
+        .then(function (subregions) {
+          return res({
+            meta: _.extend(boundary.properties, {
+              id: id,
+              name: boundary.name,
+              type: boundary.adminType
+            }),
+            adminAreas: subregions
+          });
+        });
       })
       .catch(function (err) {
         console.error(err);
