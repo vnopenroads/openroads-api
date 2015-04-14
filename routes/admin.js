@@ -1,22 +1,38 @@
 'use strict';
 
 var Boom = require('boom');
-var Promise = require('bluebird');
 
 var getAdminBoundary = require('../services/admin-boundary.js');
-var getSubregions = require('../services/admin-subregions.js');
+var getSubregionFeatures = require('../services/admin-subregions.js').getFeatures;
+var listSubregions = require('../services/admin-subregions.js').list;
 var queryPolygon = require('../services/query-polygon.js');
 
 module.exports = [
   {
     method: 'GET',
-    path: '/admin',
+    path: '/subregions',
     handler: function (req, res) {
-      return getSubregions()
-      .then(function (subregions) {
-        res({subregions: subregions});
-      })
+      return listSubregions()
+      .then(res)
       .catch(function(err) {
+        console.error(err);
+        res(Boom.wrap(err));
+      });
+    }
+  },
+  {
+    method: 'GET',
+    path: '/subregions/{id}',
+    handler: function (req, res) {
+
+      var id = +(req.params.id || '');
+
+      getAdminBoundary(id)
+      .then(function (boundary) {
+        return listSubregions(boundary.adminType, id, boundary)
+        .then(res);
+      })
+      .catch(function (err) {
         console.error(err);
         res(Boom.wrap(err));
       });
@@ -31,7 +47,7 @@ module.exports = [
 
       getAdminBoundary(id)
       .then(function (boundary) {
-        return getSubregions(boundary.adminType, id, boundary)
+        return getSubregionFeatures(boundary.adminType, id, boundary)
         .then(function (subregions) {
           if(boundary.adminType <= 2)
             res({ subregions: subregions });

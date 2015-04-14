@@ -13,7 +13,12 @@ For the OpenRoads project we constructed a custom ID of 10 or 11 characters.
 
 var bys = [1e9, 1e7, 1e3, 1];
 
-module.exports = function getSubregions(parentType, parentId, parentRegion) {
+module.exports = {
+  getFeatures: getFeatures,
+  list: list
+};
+
+function getIds(parentType, parentId) {
   var low, high, by;
   if(!parentType) {
     parentType = 0;
@@ -32,8 +37,20 @@ module.exports = function getSubregions(parentType, parentId, parentRegion) {
     ids.push(i);
   }
 
+  return ids;
+}
+
+function list(parentType, parentId) {
   return knex('admin_boundaries')
-  .whereIn('id', ids)
+    .whereIn('id', getIds(parentType, parentId))
+    .andWhere('type', (parentType || 0) + 1)
+    .select('name', 'id');
+}
+
+function getFeatures(parentType, parentId, parentRegion) {
+
+  return knex('admin_boundaries')
+  .whereIn('id', getIds(parentType, parentId))
   .then(function (data) {
     var subRegions = _.pluck(data, 'geo');
     // HACK: strip actual boundary data for larger regions, because they're
@@ -48,4 +65,4 @@ module.exports = function getSubregions(parentType, parentId, parentRegion) {
       features: subRegions
     };
   });
-};
+}
