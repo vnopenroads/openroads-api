@@ -43,7 +43,7 @@ function getIds(parentType, parentId) {
 function list(parentType, parentId) {
   return knex('admin_boundaries')
     .whereIn('id', getIds(parentType, parentId))
-    .andWhere('type', parentType + 1)
+    .andWhere('type', (parentType || 0) + 1)
     .select('name', 'id');
 }
 

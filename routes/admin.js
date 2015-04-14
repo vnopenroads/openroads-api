@@ -10,12 +10,10 @@ var queryPolygon = require('../services/query-polygon.js');
 module.exports = [
   {
     method: 'GET',
-    path: '/admin',
+    path: '/subregions',
     handler: function (req, res) {
-      return getSubregionFeatures()
-      .then(function (subregions) {
-        res({subregions: subregions});
-      })
+      return listSubregions()
+      .then(res)
       .catch(function(err) {
         console.error(err);
         res(Boom.wrap(err));
