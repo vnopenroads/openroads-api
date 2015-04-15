@@ -131,7 +131,6 @@ module.exports = [
         .orderBy('name')
         .limit(10)
         .then(function (data) {
-          console.log(data);
           res(data);
         });
     }
