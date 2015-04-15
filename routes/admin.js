@@ -7,6 +7,7 @@ var getAdminBoundary = require('../services/admin-boundary.js');
 var getSubregionFeatures = require('../services/admin-subregions.js').getFeatures;
 var listSubregions = require('../services/admin-subregions.js').list;
 var queryPolygon = require('../services/query-polygon.js');
+var knex = require('../connection');
 
 module.exports = [
   {
@@ -115,6 +116,23 @@ module.exports = [
       .catch(function (err) {
         res(Boom.wrap(err));
       });
+    }
+  },
+  {
+    method: 'GET',
+    path: '/admin/search/{name}',
+    handler: function (req, res) {
+
+      var name = '%' + req.params.name + '%';
+
+      knex.select('id', 'name', 'type')
+        .from('admin_boundaries')
+        .where('name', 'like', name)
+        .orderBy('name')
+        .limit(10)
+        .then(function (data) {
+          res(data);
+        });
     }
   }
 ];
