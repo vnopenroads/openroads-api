@@ -52,6 +52,10 @@ function getFeatures(parentType, parentId, parentRegion) {
   return knex('admin_boundaries')
   .whereIn('id', getIds(parentType, parentId))
   .then(function (data) {
+    data.forEach(function(d) {
+      d.geo.id = d.id;
+      d.geo.name = d.name;
+    });
     var subRegions = _.pluck(data, 'geo');
     // HACK: strip actual boundary data for larger regions, because they're
     // waaaaaay too big.
