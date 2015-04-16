@@ -1,10 +1,18 @@
 --
+-- Extension: citext
+--
+
+CREATE EXTENSION citext;
+
+--
 -- Name: admin_boundaries; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE admin_boundaries (
     id bigint NOT NULL,
-    geo json NOT NULL
+    geo json NOT NULL,
+    type integer NOT NULL,
+    name citext NOT NULL
 );
 
 ALTER TABLE ONLY admin_boundaries
