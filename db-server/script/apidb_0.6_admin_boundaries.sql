@@ -1,7 +1,8 @@
 --
---
+-- Extension: citext
 --
 
+CREATE EXTENSION citext;
 
 --
 -- Name: admin_boundaries; Type: TABLE; Schema: public; Owner: -; Tablespace:
