@@ -59,6 +59,219 @@
   },
   {
     "type": "get",
+    "url": "/relations/:id",
+    "title": "Get relation by ID",
+    "name": "GetRelation",
+    "group": "Analytics",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Relation ID.</p> "
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "relation",
+            "description": "<p>Relation</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "relation.id",
+            "description": "<p>Relation id.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "relation.timestamp",
+            "description": "<p>Relation creation date.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "relation.visible",
+            "description": "<p>Whether entity can be rendered.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "relation.tags",
+            "description": "<p>Tags associated to this relation.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "relation.members",
+            "description": "<p>List of members belonging to this relation</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "relation.members.relation_id",
+            "description": "<p>ID of relation</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "relation.members.relation_type",
+            "description": "<p>Type of member (Way or Node)</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "relation.members.member_id",
+            "description": "<p>ID of member</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "relation.members.member_role",
+            "description": "<p>Member role</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "relation.members.sequence_id",
+            "description": "<p>Order of member within relation</p> "
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "[\n  {\n  \"id\": \"260\",\n  \"changeset_id\": \"1\",\n  \"timestamp\": \"2015-04-21T17:31:51.105Z\",\n  \"visible\": true,\n  \"version\": \"1\",\n  \"tags\": [{\n    \"relation_id\": \"260\",\n    \"k\": \"test\",\n    \"v\": \"relation_endpoint\"\n    }],\n  \"members\": [\n  {\n    \"relation_id\": \"260\",\n    \"member_type\": \"Node\",\n    \"member_id\": \"698236\",\n    \"member_role\": \" \",\n    \"sequence_id\": 0\n   },\n  ...\n  ]\n}]",
+          "type": "json"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example Usage: ",
+        "content": "curl http://localhost:4000/relations/260",
+        "type": "curl"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "routes/relations.js",
+    "groupTitle": "Analytics"
+  },
+  {
+    "type": "get",
+    "url": "/relations?key1=value1&key2=value2",
+    "title": "Query relations by tag",
+    "name": "GetRelations",
+    "group": "Analytics",
+    "description": "<p>Get relations that either belong to a way, or are tagged with an attribute.</p> ",
+    "parameter": {
+      "fields": {
+        "Querying by way ID": [
+          {
+            "group": "Querying by way ID",
+            "type": "String",
+            "optional": false,
+            "field": "member",
+            "description": "<p>member=WayID eg. member=32</p> "
+          }
+        ],
+        "Querying by tag": [
+          {
+            "group": "Querying by tag",
+            "type": "String",
+            "optional": false,
+            "field": "tag_name",
+            "description": "<p>tag=value eg. road_condition=poor</p> "
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "relations",
+            "description": "<p>List of relations</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "relations.id",
+            "description": "<p>Relation id.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "relations.timestamp",
+            "description": "<p>Relation creation date.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "relations.visible",
+            "description": "<p>Whether entity can be rendered.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "relations.tags",
+            "description": "<p>Tags associated to this relation.</p> "
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "[\n  {\n    \"id\": \"260\",\n    \"changeset_id\": \"1\",\n    \"timestamp\": \"2015-04-21T17:31:51.105Z\",\n    \"visible\": true,\n    \"version\": \"1\",\n    \"tags\": [\n    {\n      \"relation_id\": \"260\",\n      \"k\": \"test\",\n      \"v\": \"relation_endpoint\"\n    }]\n  }\n]",
+          "type": "json"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Querying by member: ",
+        "content": "curl http://localhost:4000/relations?member=168329",
+        "type": "curl"
+      },
+      {
+        "title": "Querying by tag: ",
+        "content": "curl http://localhost:4000/relations?test=relation_endpoint",
+        "type": "curl"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "routes/relations.js",
+    "groupTitle": "Analytics"
+  },
+  {
+    "type": "get",
     "url": "/subregions/:id",
     "title": "Get list of subregions by region ID",
     "name": "GetSubregion",
@@ -524,8 +737,8 @@
   {
     "type": "POST",
     "url": "/upload/[changesetId]",
-    "title": "Upload changeset Data",
-    "name": "UploadChangeset",
+    "title": "Bulk Upload",
+    "name": "UploadBulk",
     "group": "Utility",
     "description": "<p>Upload OSM Changeset Data to given changeset return the changeset and a bounding box that covers the location of its  edits.</p> ",
     "parameter": {
@@ -536,7 +749,7 @@
             "type": "Number",
             "optional": true,
             "field": "changesetID",
-            "description": "<p>Optional changeset ID</p> "
+            "description": "<p>Changeset ID</p> "
           },
           {
             "group": "Parameter",
