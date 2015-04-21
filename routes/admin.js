@@ -14,6 +14,8 @@ module.exports = [
    * @api {get} /subregions/ Get list of regions
    * @apiName GetSubregions
    * @apiGroup Admin
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/subregions
    *
    * @apiSuccess {Object[]} adminAreas      List of regions
    * @apiSuccess {String} adminAreas.name   Region name.
@@ -63,6 +65,9 @@ module.exports = [
    * @apiSuccess {Object[]} adminAreas List of Subregions.
    * @apiSuccess {String} adminAreas.name   Subregion name.
    * @apiSuccess {String} adminAreas.id     Subregion ID.
+   *
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/subregions/2000000000
    *
    * @apiSuccessExample {json} Success-Response:
    *  {
