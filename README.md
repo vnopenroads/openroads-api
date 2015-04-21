@@ -45,5 +45,6 @@ curl http://localhost:1337/xml/map?bbox=123.81042480468751,9.584500864717155,123
 ### Building the documentation
 
 ```sh
+npm install -g apidoc
 npm run gendoc
 ```
