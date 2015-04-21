@@ -8,6 +8,44 @@ var BoundingBox = require('../services/bounding-box.js');
 var log = require('../services/log.js');
 
 module.exports = {
+  /**
+   * @api {get} /map GeoJSON - Get entities in bounding box
+   * @apiName Map
+   * 
+   * @apiParam {Number[4]} bbox [min_lon, min_lat, max_lon, max_lat]
+   *
+   * @apiGroup iD
+   * 
+   * @apiSuccess {GeoJSON} FeatureCollection List of OSM Roads
+   *
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/map?bbox=123.81042480468751,9.584500864717155,123.81591796875,9.58991730708743
+   *  
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *    "type": "FeatureCollection",
+   *    "properties": {},
+   *    "features": [
+   *      {
+   *        "type": "Feature",
+   *        "properties": {
+   *          "highway": "secondary",
+   *          "or_rdclass": "provincial",
+   *          "or_brgy": "Dao",
+   *          "name": "TINAGO_DAO ROAD",
+   *          "or_mun": "Dauis",
+   *          "rd_cond": "poor",
+   *          "source": "OpenRoads"
+   *         },
+   *        "geometry": {
+   *          "type": "LineString",
+   *          "coordinates": [[123.8149137,9.5920337],
+   *            ...
+   *          ]}
+   *      }, 
+   *    ...]
+   *  }
+   */
   method: 'GET',
   path: '/map',
   handler: function (req, res) {

@@ -14,12 +14,13 @@ module.exports = [
    * @api {get} /subregions/ Get list of regions
    * @apiName GetSubregions
    * @apiGroup Admin
-   * @apiExample {curl} Example Usage: 
-   *    curl http://localhost:4000/subregions
-   *
    * @apiSuccess {Object[]} adminAreas      List of regions
    * @apiSuccess {String} adminAreas.name   Region name.
    * @apiSuccess {String} adminAreas.id     Region ID.
+   *
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/subregions
+   *  
    * @apiSuccessExample {json} Success-Response:
    *  {
    *    "adminAreas": [
@@ -49,7 +50,7 @@ module.exports = [
     }
   },
   /**
-   * @api {get} /subregions/:id Get subregions by region ID
+   * @api {get} /subregions/:id Get list of subregions by region ID
    * @apiName GetSubregion
    * @apiGroup Admin
    *
@@ -159,7 +160,7 @@ module.exports = [
     }
   },
   /**
-   * @api {get} /admin/:id Get subregions geojson by Region ID
+   * @api {get} /admin/:id Get subregions geojson by region ID
    * @apiName GetAdmin
    * @apiGroup Admin
    * @apiDescription This endpoint returns the boundaries of the subregions
@@ -168,8 +169,8 @@ module.exports = [
    *
    * @apiParam {Number} id Municipality or Barangay ID.
    * 
-   * @apiSuccess {Object} subregions Subregion boundaries GeoJSON
-   * @apiSuccess {Object} roads  Roads in Subregion GeoJSON
+   * @apiSuccess {GeoJSON} subregions List of subregion boundaries
+   * @apiSuccess {GeoJSON} roads  List of roads clipped to subregion
    *
    * @apiExample {curl} Example Usage: 
    *    curl http://localhost:4000/admin/2110147000

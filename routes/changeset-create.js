@@ -4,6 +4,24 @@ var Boom = require('boom');
 var knex = require('../connection.js');
 
 module.exports = {
+  /**
+   * @api {put} /changeset/create Create a changeset
+   * @apiName CreateChangeset
+   * @apiGroup iD
+   * @apiDescription Given a user and and a user ID, create a new changeset and
+   * return the newly created changeset ID.
+   *
+   * @apiParam {Number} uid User ID
+   * @apiParam {String} user User name 
+   *
+   * @apiSuccess {Number} id Created changeset ID
+   *
+   * @apiExample {curl} Example Usage: 
+   *    curl -X PUT --data "uid=1&user=openroads" http://localhost:4000/changeset/create 
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  {"id":"1194"}
+   */
   method: 'PUT',
   path: '/changeset/create',
   handler: function changesetCreate(req, res) {
