@@ -4,7 +4,7 @@
     "url": "/admin/:id",
     "title": "Get subregions geojson by region ID",
     "name": "GetAdmin",
-    "group": "Admin",
+    "group": "Analytics",
     "description": "<p>This endpoint returns the boundaries of the subregions in the given region,  as well as the roads clipped to the region. Used for analytics.</p> ",
     "parameter": {
       "fields": {
@@ -55,14 +55,14 @@
     ],
     "version": "0.0.0",
     "filename": "routes/admin.js",
-    "groupTitle": "Admin"
+    "groupTitle": "Analytics"
   },
   {
     "type": "get",
     "url": "/subregions/:id",
     "title": "Get list of subregions by region ID",
     "name": "GetSubregion",
-    "group": "Admin",
+    "group": "Analytics",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -168,14 +168,14 @@
     ],
     "version": "0.0.0",
     "filename": "routes/admin.js",
-    "groupTitle": "Admin"
+    "groupTitle": "Analytics"
   },
   {
     "type": "get",
     "url": "/subregions/",
     "title": "Get list of regions",
     "name": "GetSubregions",
-    "group": "Admin",
+    "group": "Analytics",
     "success": {
       "fields": {
         "Success 200": [
@@ -219,14 +219,14 @@
     ],
     "version": "0.0.0",
     "filename": "routes/admin.js",
-    "groupTitle": "Admin"
+    "groupTitle": "Analytics"
   },
   {
     "type": "get",
     "url": "/admin/search/:name",
     "title": "Search for administrative boundary by name",
     "name": "SearchAdmin",
-    "group": "Admin",
+    "group": "Analytics",
     "description": "<p>Given a search string, return 10 matching administrative boundaries. Search is case insensitive.</p> ",
     "parameter": {
       "fields": {
@@ -291,7 +291,356 @@
     ],
     "version": "0.0.0",
     "filename": "routes/admin.js",
-    "groupTitle": "Admin"
+    "groupTitle": "Analytics"
+  },
+  {
+    "type": "get",
+    "url": "/xml/node/:id",
+    "title": "Get node by Id",
+    "name": "XmlNode",
+    "description": "<p>Returns OSM XML of requested Node.</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "nodeId",
+            "description": "<p>Node ID.</p> "
+          }
+        ]
+      }
+    },
+    "group": "ToFix",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "XML",
+            "optional": false,
+            "field": "node",
+            "description": "<p>Node</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "node.id",
+            "description": "<p>Entity ID</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "node.visible",
+            "description": "<p>Whether entity can be rendered</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "node.version",
+            "description": "<p>Number of edits made to this entity</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "node.changeset",
+            "description": "<p>Most recent changeset</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "node.timestamp",
+            "description": "<p>Most recent edit</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "node.user",
+            "description": "<p>User that created entity</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "node.uid",
+            "description": "<p>User ID that created entity</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "node.lat",
+            "description": "<p>Entity latitude</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "node.lon",
+            "description": "<p>Entity longitude</p> "
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "<osm version=\"6\" generator=\"OpenRoads\">\n  <node id=\"74038\" visible=\"true\" \n    version=\"1\" changeset=\"0\" \n    timestamp=\"Wed Mar 11 2015 09:38:41 GMT+0000 (UTC)\" \n    user=\"OpenRoads\" uid=\"1\" \n    lat=\"9.5820416\" lon=\"123.8162931\"/>\n</osm>",
+          "type": "xml"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example Usage: ",
+        "content": "curl http://localhost:4000/xml/node/74038",
+        "type": "curl"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "routes/nodes.js",
+    "groupTitle": "ToFix"
+  },
+  {
+    "type": "get",
+    "url": "/relations/:wayId/[full]",
+    "title": "Get way by Id",
+    "name": "XmlWay",
+    "description": "<p>Returns OSM XML of requested Way along with full  representation of nodes in that way. Appending <code>/full</code> to the endpoint  returns the same result.</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Way ID.</p> "
+          }
+        ]
+      }
+    },
+    "group": "ToFix",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "XML",
+            "optional": false,
+            "field": "way",
+            "description": "<p>Relation</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "way.id",
+            "description": "<p>Entity ID</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "way.visible",
+            "description": "<p>Whether entity can be rendered</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "way.version",
+            "description": "<p>Number of edits made to this entity</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "way.changeset",
+            "description": "<p>Most recent changeset</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "way.timestamp",
+            "description": "<p>Most recent edit</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "way.user",
+            "description": "<p>User that created entity</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "way.uid",
+            "description": "<p>User ID that created entity</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "way.lat",
+            "description": "<p>Entity latitude</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "way.lon",
+            "description": "<p>Entity longitude</p> "
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "<osm version=\"6\" generator=\"OpenRoads\">\n  <node id=\"27\" visible=\"true\" version=\"1\" changeset=\"0\" timestamp=\"Wed Mar 11 2015 09:38:41 GMT+0000 (UTC)\" user=\"OpenRoads\" uid=\"1\" lat=\"9.787903\" lon=\"123.939617\"/>\n  <node id=\"28\" visible=\"true\" version=\"1\" changeset=\"0\" timestamp=\"Wed Mar 11 2015 09:38:41 GMT+0000 (UTC)\" user=\"OpenRoads\" uid=\"1\" lat=\"9.788083\" lon=\"123.939679\"/>\n  <way id=\"26\" visible=\"true\" version=\"1\" changeset=\"0\" timestamp=\"Wed Mar 11 2015 09:38:41 GMT+0000 (UTC)\" user=\"OpenRoads\" uid=\"1\">\n    <nd ref=\"27\"/>\n    <nd ref=\"28\"/>\n    <tag k=\"highway\" v=\"unclassified\"/>\n    <tag k=\"or_rdclass\" v=\"barangay\"/>\n  </way>\n</osm>",
+          "type": "xml"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example Usage: ",
+        "content": "curl http://localhost:4000/xml/way/26",
+        "type": "curl"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "routes/way.js",
+    "groupTitle": "ToFix"
+  },
+  {
+    "type": "POST",
+    "url": "/upload/[changesetId]",
+    "title": "Upload changeset Data",
+    "name": "UploadChangeset",
+    "group": "Utility",
+    "description": "<p>Upload OSM Changeset Data to given changeset return the changeset and a bounding box that covers the location of its  edits.</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "changesetID",
+            "description": "<p>Optional changeset ID</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "File",
+            "optional": false,
+            "field": "file",
+            "description": "<p>OSM XML File</p> "
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "changeset",
+            "description": "<p>Changeset object</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "changeset.id",
+            "description": "<p>Changeset ID.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "changeset.user_id",
+            "description": "<p>Changeset User ID.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Date",
+            "optional": false,
+            "field": "changeset.created_at",
+            "description": "<p>Changeset Date of creation.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "changeset.min_lat",
+            "description": "<p>Min Latitude of bounding box.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "changeset.max_lat",
+            "description": "<p>Max Latitude of bounding box.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "changeset.min_lon",
+            "description": "<p>Min Longitude of bounding box.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "changeset.max_lon",
+            "description": "<p>Max Longitude of bounding box.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "Date",
+            "optional": false,
+            "field": "changeset.closed_at",
+            "description": "<p>Changeset Date of creation.</p> "
+          },
+          {
+            "group": "Success 200",
+            "type": "number",
+            "optional": false,
+            "field": "changeset.num_changes",
+            "description": "<p>Number of edits in this changeset.</p> "
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\"changeset\":\n  {\n   \"id\":\"1\",\n   \"user_id\":\"2254600\",\n   \"created_at\":\"2015-03-13T03:51:39.000Z\",\n   \"min_lat\":97923478,\n   \"max_lat\":97923478,\n   \"min_lon\":1239780018,\n   \"max_lon\":1239780018,\n   \"closed_at\":\"2015-04-21T18:44:51.858Z\",\n   \"num_changes\":31076\n   }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example Usage: ",
+        "content": "curl -d @road.osm http://localhost:4000/upload",
+        "type": "curl"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "routes/osc-upload.js",
+    "groupTitle": "Utility"
   },
   {
     "type": "put",

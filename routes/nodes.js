@@ -7,6 +7,38 @@ var XML = require('../services/xml.js');
 var Node = require('../models/node-model.js');
 
 module.exports = {
+  /**
+   * @api {get} /xml/node/:id Get node by Id
+   * @apiName XmlNode
+   * 
+   * @apiDescription Returns OSM XML of requested Node.
+   * @apiParam {Number} nodeId Node ID.
+   *
+   * @apiGroup ToFix
+   *
+   * @apiSuccess {XML} node Node
+   * @apiSuccess {String} node.id Entity ID
+   * @apiSuccess {String} node.visible Whether entity can be rendered
+   * @apiSuccess {String} node.version Number of edits made to this entity
+   * @apiSuccess {String} node.changeset Most recent changeset
+   * @apiSuccess {String} node.timestamp Most recent edit
+   * @apiSuccess {String} node.user User that created entity
+   * @apiSuccess {String} node.uid User ID that created entity
+   * @apiSuccess {String} node.lat Entity latitude
+   * @apiSuccess {String} node.lon Entity longitude
+   *  
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/xml/node/74038
+   *  
+   * @apiSuccessExample {xml} Success-Response:
+   *  <osm version="6" generator="OpenRoads">
+   *    <node id="74038" visible="true" 
+   *      version="1" changeset="0" 
+   *      timestamp="Wed Mar 11 2015 09:38:41 GMT+0000 (UTC)" 
+   *      user="OpenRoads" uid="1" 
+   *      lat="9.5820416" lon="123.8162931"/>
+   *  </osm>
+   */
   method: 'GET',
   path: '/xml/node/{nodeId}',
   handler: function (req, res) {

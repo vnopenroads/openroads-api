@@ -13,7 +13,7 @@ module.exports = [
   /**
    * @api {get} /subregions/ Get list of regions
    * @apiName GetSubregions
-   * @apiGroup Admin
+   * @apiGroup Analytics
    * @apiSuccess {Object[]} adminAreas      List of regions
    * @apiSuccess {String} adminAreas.name   Region name.
    * @apiSuccess {String} adminAreas.id     Region ID.
@@ -52,7 +52,7 @@ module.exports = [
   /**
    * @api {get} /subregions/:id Get list of subregions by region ID
    * @apiName GetSubregion
-   * @apiGroup Admin
+   * @apiGroup Analytics
    *
    * @apiParam {Number} id Region ID.
    * 
@@ -162,7 +162,7 @@ module.exports = [
   /**
    * @api {get} /admin/:id Get subregions geojson by region ID
    * @apiName GetAdmin
-   * @apiGroup Admin
+   * @apiGroup Analytics
    * @apiDescription This endpoint returns the boundaries of the subregions
    * in the given region, 
    * as well as the roads clipped to the region. Used for analytics. 
@@ -247,7 +247,7 @@ module.exports = [
   /**
    * @api {get} /admin/search/:name Search for administrative boundary by name
    * @apiName SearchAdmin
-   * @apiGroup Admin
+   * @apiGroup Analytics
    * @apiDescription Given a search string, return 10 matching administrative
    * boundaries. Search is case insensitive.
    *

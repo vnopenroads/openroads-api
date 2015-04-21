@@ -5,6 +5,7 @@ var log = require('../services/log.js');
 var Promise = require('bluebird');
 
 module.exports = [
+  
   {
     method: 'GET',
     path: '/relations/{id}',
