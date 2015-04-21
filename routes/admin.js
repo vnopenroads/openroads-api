@@ -10,6 +10,29 @@ var queryPolygon = require('../services/query-polygon.js');
 var knex = require('../connection');
 
 module.exports = [
+  /**
+   * @api {get} /subregions/ Get list of regions
+   * @apiName GetSubregions
+   * @apiGroup Admin
+   *
+   * @apiSuccess {Object[]} adminAreas      List of regions
+   * @apiSuccess {String} adminAreas.name   Region name.
+   * @apiSuccess {String} adminAreas.id     Region ID.
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *    "adminAreas": [
+   *    {
+   *      "name": "Region I (Ilocos region)",
+   *      "id": "1000000000"
+   *    },
+   *    {
+   *      "name": "Region II (Cagayan Valley)",
+   *      "id": "2000000000"
+   *    },
+   *    ...
+   *    ]
+   *  }
+   */
   {
     method: 'GET',
     path: '/subregions',
@@ -23,6 +46,43 @@ module.exports = [
       });
     }
   },
+  /**
+   * @api {get} /subregions/:id Get subregions by region ID
+   * @apiName GetSubregion
+   * @apiGroup Admin
+   *
+   * @apiParam {Number} id Region ID.
+   * 
+   * @apiSuccess {Object} meta Region metadata
+   * @apiSuccess {Number} meta.id Region ID.
+   * @apiSuccess {String} meta.name Region name.
+   * @apiSuccess {Number} meta.type Region type.
+   * @apiSuccess {String} meta.NAME_0 Country name.
+   * @apiSuccess {String} meta.NAME_1 Region name.
+   * @apiSuccess {String} meta.ID_1_OR Region ID.
+   * @apiSuccess {Object[]} adminAreas List of Subregions.
+   * @apiSuccess {String} adminAreas.name   Subregion name.
+   * @apiSuccess {String} adminAreas.id     Subregion ID.
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *  "meta": {
+   *    "id": 2000000000,
+   *    "name": "Region II (Cagayan Valley)",
+   *    "type": 1,
+   *    "NAME_0": "Philippines",
+   *    "NAME_1": "Region II (Cagayan Valley)",
+   *    "ID_1_OR": 2000000000
+   *  },
+   *  "adminAreas": [
+   *    {
+   *      "name": "Batanes",
+   *      "id": "2110000000"
+   *    },
+   *    ...
+   *  ]}
+   */
+
   {
     method: 'GET',
     path: '/subregions/{id}',
@@ -93,6 +153,66 @@ module.exports = [
       });
     }
   },
+  /**
+   * @api {get} /admin/:id Get subregions geojson by Region ID
+   * @apiName GetAdmin
+   * @apiGroup Admin
+   * @apiDescription This endpoint returns the boundaries of the subregions
+   * in the given region, 
+   * as well as the roads clipped to the region. Used for analytics. 
+   *
+   * @apiParam {Number} id Municipality or Barangay ID.
+   * 
+   * @apiSuccess {Object} subregions Subregion boundaries GeoJSON
+   * @apiSuccess {Object} roads  Roads in Subregion GeoJSON
+   *
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/admin/2110147000
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *  "subregions": {
+   *    "type": "FeatureCollection",
+   *    "properties": {
+   *      "ID_0": 177,
+   *      "ISO": "PHL",
+   *      "NAME_0": "Philippines",
+   *      "ID_2_OR": 2110000000,
+   *      "NAME_2": "Batanes",
+   *      "ID_3_OR": 2110147000,
+   *      ...
+   *      }
+   *    },
+   *    "features": [{
+   *      "type": "Feature",
+   *      "properties": {
+   *        "ISO": "PHL",
+   *        "NAME_0": "Philippines",
+   *        "NAME_2": "Batanes",
+   *        "NAME_3": "Basco",
+   *        "NAME_4": "Chanarian",
+   *          ...
+   *        "ID_4_OR": 2110147001
+   *      },
+   *      "geometry": {
+   *      "type": "Polygon",
+   *      "coordinates": [[[121.95786285400389, 20.432300567627006],
+   *              ...]]
+   *      },
+   *      "id": "2110147001",
+   *      "name": "Chanarian", 
+   *      },
+   *    ...]
+   *    },
+   *    "roads": {
+   *      "type":"FeatureCollection",
+   *      "properties": {...},
+   *      "features": [...]
+   *    }
+   *  }
+  
+   */
+
   {
     method: 'GET',
     path: '/admin/{id}',
@@ -118,6 +238,38 @@ module.exports = [
       });
     }
   },
+  /**
+   * @api {get} /admin/search/:name Search for administrative boundary by name
+   * @apiName SearchAdmin
+   * @apiGroup Admin
+   * @apiDescription Given a search string, return 10 matching administrative
+   * boundaries. Search is case insensitive.
+   *
+   * @apiParam {String} name Search parameter
+   * 
+   * @apiSuccess {Object[]} boundaries List of matching boundaries
+   * @apiSuccess {String} boundaries.id  ID of boundary
+   * @apiSuccess {String} boundaries.name Name of boundary
+   * @apiSuccess {String} boundaries.type  type of boundary
+   *
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/admin/search/Bayan
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  [
+   *    {
+   *      "id": "6360688002",
+   *      "name": "Atabayan",
+   *       "type": 4
+   *    },
+   *    {
+   *      "id": "10160264001",
+   *      "name": "Bagongbayan",
+   *      "type": 4
+   *    },
+   *    ...
+   *  ]
+   */
   {
     method: 'GET',
     path: '/admin/search/{name}',
