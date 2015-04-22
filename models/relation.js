@@ -154,6 +154,13 @@ var Relation = {
       .returning('id')
       .then(function(ids) {
 
+        // Although we don't need the new IDs in the changeset,
+        // it's useful to return a map of new IDs in the final response
+        // for testing purposes.
+        creates.forEach(function(change, i) {
+          map.relation[change.id] = ids[i];
+        });
+
         // Use the changeset and new IDs to retrieve the members and tags.
         // Pass along the map object to retrieve new member IDs.
         // This returns an array of promises.
