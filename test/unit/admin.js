@@ -147,7 +147,7 @@ describe('admin endpoint', function() {
 
 });
 
-describe('admin search endpoint', function() {
+describe.only('admin search endpoint', function() {
 
   it('responds with the right results for term sayan', function(done) {
     var expected = '[{"id":"3771538003","name":"Apsayan","type":4},{"id":"1350635003","name":"Bacsayan","type":4},{"id":"1390751003","name":"Bacsayan","type":4},{"id":"17420846003","name":"Bansayan","type":4},{"id":"17420820003","name":"Bansayan","type":4},{"id":"17420844025","name":"Bansayan","type":4},{"id":"4120174012","name":"Calansayan","type":4},{"id":"7691413004","name":"Cansayang","type":4},{"id":"2180316013","name":"Capissayan Norte","type":4},{"id":"2180316014","name":"Capissayan Sur","type":4}]';
@@ -155,6 +155,20 @@ describe('admin search endpoint', function() {
     server.injectThen({
       method: 'GET',
       url: '/admin/search/sayan'
+    })
+    .then(function (resp) {
+      resp.payload.should.equal(expected);
+      done();
+    })
+    .catch(done);
+  });
+
+  it('responds with the right results for sayan- case insensitive', function(done) {
+    var expected = '[{"id":"3771538003","name":"Apsayan","type":4},{"id":"1350635003","name":"Bacsayan","type":4},{"id":"1390751003","name":"Bacsayan","type":4},{"id":"17420846003","name":"Bansayan","type":4},{"id":"17420820003","name":"Bansayan","type":4},{"id":"17420844025","name":"Bansayan","type":4},{"id":"4120174012","name":"Calansayan","type":4},{"id":"7691413004","name":"Cansayang","type":4},{"id":"2180316013","name":"Capissayan Norte","type":4},{"id":"2180316014","name":"Capissayan Sur","type":4}]';
+
+    server.injectThen({
+      method: 'GET',
+      url: '/admin/search/SaYaN'
     })
     .then(function (resp) {
       resp.payload.should.equal(expected);
