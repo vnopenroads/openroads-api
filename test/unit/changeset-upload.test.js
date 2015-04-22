@@ -8,34 +8,9 @@ var Node = require('./helpers/create-node.js');
 var Way = require('./helpers/create-way.js');
 var Relation = require('./helpers/create-relation.js');
 var Change = require('./helpers/create-changeset.js');
+var test = require('./helpers/server-test.js');
 
 var log = require('../../services/log.js');
-
-// Takes a mock changeset and the done function.
-// Also takes a callback, which executes after the response.
-// If there's a callback, it should call done().
-var test = function(mock, done, cb) {
-  var options = {
-    method: 'POST',
-    url: '/changeset/1/upload',
-    payload: {
-      osmChange: mock
-    }
-  };
-  server.injectThen(options)
-  .then(function(res) {
-    if (cb) {
-      return cb(res);
-    }
-    else {
-      res.statusCode.should.eql(200);
-      return done();
-    }
-  }).catch(function(err) {
-    console.log(err);
-    return done(err);
-  });
-};
 
 function makeNodes(ii) {
   var nodes = [];
@@ -207,7 +182,7 @@ describe('changeset upload endpoint', function() {
     });
   });
 
-  it.only('Returns the modified IDs of newly-created elements', function(done) {
+  it('Returns the modified IDs of newly-created elements', function(done) {
     var nodes = makeNodes(3);
     var way = new Way().nodes(nodes);
     var relation = new Relation().members('node', nodes);
