@@ -969,7 +969,7 @@ define({ "api": [
     "title": "Upload changeset Data",
     "name": "UploadChangeset",
     "group": "iD",
-    "description": "<p>Upload JSON Changeset Data to given changeset return the changeset and a bounding box that covers the location of its  edits.</p> <p>The OSM Change JSON Format is the of the form</p> <pre><code> {  <br>   \"version\": 0.1, <br>   \"generator\": \"iD\", <br>   \"create\": {},  <br>   \"modify\": {},  <br>   \"delete\": {}, <br> } </code></pre>  <p>Each of the create, modify and delete blocks can contain entities such as Node, Way or Relation. Check the API Usage Example for more detail.</p> ",
+    "description": "<p>Upload JSON Changeset Data to given changeset return the changeset and a bounding box that covers the location of its edits.</p> <p>The OSM Change JSON Format is the of the form</p> <pre><code> {  <br>   \"version\": 0.1, <br>   \"generator\": \"iD\", <br>   \"create\": {},  <br>   \"modify\": {},  <br>   \"delete\": {}, <br> } </code></pre>  <p>Each of the create, modify and delete blocks can contain entities such as Node, Way or Relation. Check the API Usage Example for more detail.</p> ",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1068,15 +1068,15 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\"changeset\":\n  {\n   \"id\":\"1\",\n   \"user_id\":\"2254600\",\n   \"created_at\":\"2015-03-13T03:51:39.000Z\",\n   \"min_lat\":97923478,\n   \"max_lat\":97923478,\n   \"min_lon\":1239780018,\n   \"max_lon\":1239780018,\n   \"closed_at\":\"2015-04-21T18:44:51.858Z\",\n   \"num_changes\":31076\n   }\n}",
+          "content": "{\n\"changeset\":\n  {\n   \"id\":\"1\",\n   \"user_id\":\"2254600\",\n   \"created_at\":\"2015-03-13T03:51:39.000Z\",\n   \"min_lat\":97923478,\n   \"max_lat\":97923478,\n   \"min_lon\":1239780018,\n   \"max_lon\":1239780018,\n   \"closed_at\":\"2015-04-21T18:44:51.858Z\",\n   \"num_changes\":31076\n   },\n\"created\":\n  {\n   \"node\":{\n     \"-1\":\"743049\",\n     \"-2\":\"743050\",\n     \"-3\":\"743051\"\n     },\n   \"way\":{\n     \"-1\":\"168483\"\n     }\n   }\n }",
           "type": "json"
         }
       ]
     },
     "examples": [
       {
-        "title": "Example Usage: ",
-        "content": "curl -d '{\n \"osmChange\": {\n   \"version\":0.1, \n   \"generator\":\"openroads-iD\", \n   \"create\":{ },\n   \"modify\":{\n     \"node\":[\n       {\"id\":\"21851\", \n        \"lon\":123.9780018,\n        \"lat\":9.7923478,\"version\":\"1\", \"tag\":[], \n        \"changeset\":1 }]\n   },\n   \"delete\": {}\n }\n}' -H 'Content-Type: application/json' http://localhost:4000/changeset/1/upload",
+        "title": "Example Usage:",
+        "content": "curl -d '{\n \"osmChange\": {\n   \"version\":0.1,\n   \"generator\":\"openroads-iD\",\n   \"create\":{ },\n   \"modify\":{\n     \"node\":[\n       {\"id\":\"21851\",\n        \"lon\":123.9780018,\n        \"lat\":9.7923478,\"version\":\"1\", \"tag\":[],\n        \"changeset\":1 }]\n   },\n   \"delete\": {}\n }\n}' -H 'Content-Type: application/json' http://localhost:4000/changeset/1/upload",
         "type": "curl"
       }
     ],
