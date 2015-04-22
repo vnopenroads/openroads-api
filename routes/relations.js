@@ -5,6 +5,53 @@ var log = require('../services/log.js');
 var Promise = require('bluebird');
 
 module.exports = [
+  /**
+   * @api {get} /relations/:id Get relation by ID
+   * @apiName GetRelation
+   * @apiGroup Analytics
+   *
+   * @apiParam {Number} id Relation ID.
+   * 
+   * @apiSuccess {Object} relation Relation
+   * @apiSuccess {String} relation.id     Relation id.
+   * @apiSuccess {String} relation.timestamp   Relation creation date.
+   * @apiSuccess {String} relation.visible   Whether entity can be rendered.
+   * @apiSuccess {Object[]} relation.tags   Tags associated to this relation.
+   * @apiSuccess {Object[]} relation.members   List of members belonging to this relation
+   * @apiSuccess {Object} relation.members.relation_id  ID of relation
+   * @apiSuccess {Object} relation.members.relation_type  Type of member (Way or Node)
+   * @apiSuccess {Object} relation.members.member_id  ID of member
+   * @apiSuccess {Object} relation.members.member_role  Member role
+   * @apiSuccess {Object} relation.members.sequence_id  Order of member within relation
+   *
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/relations/260
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  [
+   *    {
+   *    "id": "260",
+   *    "changeset_id": "1",
+   *    "timestamp": "2015-04-21T17:31:51.105Z",
+   *    "visible": true,
+   *    "version": "1",
+   *    "tags": [{
+   *      "relation_id": "260",
+   *      "k": "test",
+   *      "v": "relation_endpoint"
+   *      }],
+   *    "members": [
+   *    {
+   *      "relation_id": "260",
+   *      "member_type": "Node",
+   *      "member_id": "698236",
+   *      "member_role": " ",
+   *      "sequence_id": 0
+   *     },
+   *    ...
+   *    ]
+   *  }]
+   */
   {
     method: 'GET',
     path: '/relations/{id}',
@@ -16,6 +63,44 @@ module.exports = [
       .then(res);
     }
   },
+  /**
+   * @api {get} /relations?key1=value1&key2=value2 Query relations by tag
+   * @apiName GetRelations
+   * @apiGroup Analytics
+   * @apiDescription Get relations that either belong to a way, or are
+   * tagged with an attribute.
+   *
+   * @apiParam (Querying by way ID) {String} member member=WayID eg. member=32
+   * @apiParam (Querying by tag) {String} tag_name tag=value eg. road_condition=poor
+   *
+   * @apiSuccess {Object[]} relations      List of relations
+   * @apiSuccess {String} relations.id     Relation id.
+   * @apiSuccess {String} relations.timestamp   Relation creation date.
+   * @apiSuccess {String} relations.visible   Whether entity can be rendered.
+   * @apiSuccess {Object[]} relations.tags   Tags associated to this relation.
+   *
+   * @apiExample {curl} Querying by member: 
+   *    curl http://localhost:4000/relations?member=168329
+   * @apiExample {curl} Querying by tag: 
+   *    curl http://localhost:4000/relations?test=relation_endpoint
+   *   
+   * @apiSuccessExample {json} Success-Response:
+   *  [
+   *    {
+   *      "id": "260",
+   *      "changeset_id": "1",
+   *      "timestamp": "2015-04-21T17:31:51.105Z",
+   *      "visible": true,
+   *      "version": "1",
+   *      "tags": [
+   *      {
+   *        "relation_id": "260",
+   *        "k": "test",
+   *        "v": "relation_endpoint"
+   *      }]
+   *    }
+   *  ]
+   */
   {
     method: 'GET',
     path: '/relations',

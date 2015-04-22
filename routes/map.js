@@ -8,6 +8,35 @@ var Node = require('../models/node-model.js');
 var BoundingBox = require('../services/bounding-box.js');
 
 module.exports = {
+  /**
+   * @api {get} /xml/map OSM XML - Get entities in bounding box
+   * @apiName XmlMap
+   * 
+   * @apiDescription Returns an OSM XML list of entities within the 
+   * provided bounding box
+   * @apiParam {Number[4]} bbox [min_lon, min_lat, max_lon, max_lat]
+   *
+   * @apiGroup iD
+   *
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/xml/map?bbox=123.81042480468751,9.584500864717155,123.81591796875,9.58991730708743
+   *  
+   * @apiSuccessExample {xml} Success-Response:
+   *  <osm version="6" generator="OpenRoads">
+   *  <bounds minlat="9.584500864717155" minlon="123.81042480468" maxlat="9.58991730708" maxlon="123.81591796875"/>
+   *    <node id="74038" changeset="1" timestamp="Wed Mar 11 2015 09:38:41 GMT+0000" lat="9.5820416" lon="123.81629"/>
+   *    <node id="77930" changeset="1" timestamp="Wed Mar 11 2015 09:38:41 GMT+0000" lat="9.5920337" lon="123.81491"/>
+   *    ...
+   *    <way id="77931" visible="true" version="1" changeset="0" timestamp="Wed Mar 11 2015 09:38:41 GMT+0000">
+   *      <nd ref="77930"/>
+   *      <nd ref="77932"/>
+   *      ...
+   *      <tag k="highway" v="secondary"/>
+   *      <tag k="or_rdclass" v="provincial"/>
+   *      <tag k="or_brgy" v="Dao"/>
+   *    </way>
+   *  </osm>
+   */
   method: 'GET',
   path: '/xml/map',
   handler: function (req, res) {

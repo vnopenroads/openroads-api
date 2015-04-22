@@ -41,3 +41,10 @@ To test the bounding box query:
 ```sh
 curl http://localhost:1337/xml/map?bbox=123.81042480468751,9.584500864717155,123.81591796875,9.58991730708743
 ```
+
+### Building the documentation
+
+```sh
+npm install -g apidoc
+npm run gendoc
+```
