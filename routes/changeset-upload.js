@@ -22,9 +22,6 @@ function upload(req, res) {
     }
     var meta = changesets[0];
 
-    // Keep track of the number of changes this upload operation is doing.
-    var numChanges = parseInt(meta.num_changes, 10) || 0;
-
     // Use changeset in request body.
     var changeset = req.payload.osmChange;
     if (!changeset) {
@@ -38,22 +35,25 @@ function upload(req, res) {
       // Use this to map old ids to new ids.
       var map = {
         node: {},
-        way: {}
+        way: {},
+        relation: {}
       }
 
-      // TODO increment numChanges.
       query('node', changeset, meta, map, transaction).then(function() {
         query('way', changeset, meta, map, transaction).then(function() {
           query('relation', changeset, meta, map, transaction).then(function() {
 
             // Update changeset with new bounding box.
-            var updated = updateChangeset(changeset, meta, numChanges);
+            var updated = updateChangeset(changeset, meta);
             knex('changesets')
             .where('id', meta.id)
             .update(updated)
             .then(function() {
               transaction.commit();
-              return res({ changeset: _.extend({}, meta, updated) });
+              return res({
+                changeset: _.extend({}, meta, updated),
+                created: map
+              });
             })
             .catch(function(err) {
               log.error('Changeset update fails', err);
@@ -103,13 +103,20 @@ function toArray(val) {
   return [val];
 }
 
-function updateChangeset(changeset, meta, numChanges) {
+function updateChangeset(changeset, meta) {
+
+  // Keep track of the number of changes this upload operation is doing.
+  var numChanges = parseInt(meta.num_changes, 10) || 0;
   var nodes = [];
   ['create', 'modify', 'delete'].forEach(function(action) {
     if (changeset[action].node) {
       nodes.push.apply(nodes, changeset[action].node);
     }
+    ['node', 'way', 'relation'].forEach(function(entity) {
+      numChanges += changeset[action][entity] ? changeset[action][entity].length : 0;
+    });
   });
+
   var bbox = BoundingBox.fromNodes(nodes).toScaled();
   var changesetUpdate = {
     min_lon: bbox.minLon | 0,
@@ -128,9 +135,9 @@ module.exports = {
    * @apiName UploadChangeset
    * @apiGroup iD
    * @apiDescription Upload JSON Changeset Data to given changeset
-   * return the changeset and a bounding box that covers the location of its 
+   * return the changeset and a bounding box that covers the location of its
    * edits.
-   * 
+   *
    * The OSM Change JSON Format is the of the form
    * <pre><code>
    * {  <br>
@@ -145,30 +152,30 @@ module.exports = {
    * Each of the create, modify and delete blocks can contain entities such as Node, Way
    * or Relation. Check the API Usage Example for more detail.
    * @apiParam {Number} id Changeset ID
-   * @apiParam {Object} osmChange OSM Changeset Data in JSON 
+   * @apiParam {Object} osmChange OSM Changeset Data in JSON
    *
    * @apiSuccess {Object} changeset Changeset object
    * @apiSuccess {String} changeset.id Changeset ID.
    * @apiSuccess {String} changeset.user_id Changeset User ID.
    * @apiSuccess {Date} changeset.created_at Changeset Date of creation.
-   * @apiSuccess {Number} changeset.min_lat Min Latitude of bounding box. 
-   * @apiSuccess {Number} changeset.max_lat Max Latitude of bounding box. 
-   * @apiSuccess {Number} changeset.min_lon Min Longitude of bounding box. 
-   * @apiSuccess {Number} changeset.max_lon Max Longitude of bounding box. 
+   * @apiSuccess {Number} changeset.min_lat Min Latitude of bounding box.
+   * @apiSuccess {Number} changeset.max_lat Max Latitude of bounding box.
+   * @apiSuccess {Number} changeset.min_lon Min Longitude of bounding box.
+   * @apiSuccess {Number} changeset.max_lon Max Longitude of bounding box.
    * @apiSuccess {Date} changeset.closed_at Changeset Date of creation.
    * @apiSuccess {number} changeset.num_changes Number of edits in this changeset.
    *
-   * @apiExample {curl} Example Usage: 
+   * @apiExample {curl} Example Usage:
    *  curl -d '{
    *   "osmChange": {
-   *     "version":0.1, 
-   *     "generator":"openroads-iD", 
+   *     "version":0.1,
+   *     "generator":"openroads-iD",
    *     "create":{ },
    *     "modify":{
    *       "node":[
-   *         {"id":"21851", 
+   *         {"id":"21851",
    *          "lon":123.9780018,
-   *          "lat":9.7923478,"version":"1", "tag":[], 
+   *          "lat":9.7923478,"version":"1", "tag":[],
    *          "changeset":1 }]
    *     },
    *     "delete": {}
@@ -176,7 +183,8 @@ module.exports = {
    *  }' -H 'Content-Type: application/json' http://localhost:4000/changeset/1/upload
    *
    * @apiSuccessExample {json} Success-Response:
-   *  {"changeset":
+   *  {
+   *  "changeset":
    *    {
    *     "id":"1",
    *     "user_id":"2254600",
@@ -187,8 +195,19 @@ module.exports = {
    *     "max_lon":1239780018,
    *     "closed_at":"2015-04-21T18:44:51.858Z",
    *     "num_changes":31076
+   *     },
+   *  "created":
+   *    {
+   *     "node":{
+   *       "-1":"743049",
+   *       "-2":"743050",
+   *       "-3":"743051"
+   *       },
+   *     "way":{
+   *       "-1":"168483"
+   *       }
    *     }
-   *  }
+   *   }
    */
   method: 'POST',
   path: '/changeset/{changesetID}/upload',

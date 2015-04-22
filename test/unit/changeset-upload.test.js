@@ -11,7 +11,10 @@ var Change = require('./helpers/create-changeset.js');
 
 var log = require('../../services/log.js');
 
-var test = function(mock, done) {
+// Takes a mock changeset and the done function.
+// Also takes a callback, which executes after the response.
+// If there's a callback, it should call done().
+var test = function(mock, done, cb) {
   var options = {
     method: 'POST',
     url: '/changeset/1/upload',
@@ -21,9 +24,15 @@ var test = function(mock, done) {
   };
   server.injectThen(options)
   .then(function(res) {
-    res.statusCode.should.eql(200);
-    return done();
+    if (cb) {
+      return cb(res);
+    }
+    else {
+      res.statusCode.should.eql(200);
+      return done();
+    }
   }).catch(function(err) {
+    console.log(err);
     return done(err);
   });
 };
@@ -50,10 +59,7 @@ describe('changeset upload endpoint', function() {
   });
 
   it('Creates 500 nodes', function(done) {
-    var nodes = [];
-    for (var i = 0; i < 500; ++i) {
-      nodes.push(new Node({ id: -(i+1) }));
-    }
+    var nodes = makeNodes(500);
     cs.create('node', nodes);
     test(cs.get(), done);
   });
@@ -176,7 +182,7 @@ describe('changeset upload endpoint', function() {
     });
   });
 
-  it('Deletes 1 relatin', function(done) {
+  it('Deletes 1 relation', function(done) {
     knex('current_relations').where('changeset_id', 1).then(function(relations) {
       relations = relations[0];
       cs.delete('relation', relations);
@@ -184,4 +190,36 @@ describe('changeset upload endpoint', function() {
     });
   });
 
+  it('Increments the number of changes', function(done) {
+    knex('changesets').where('id', 1).then(function(changeset) {
+      var nodes = makeNodes(15);
+      var way = new Way().nodes(nodes);
+      var relation = new Relation().members('node', nodes);
+      cs.create('node', nodes);
+      cs.create('way', way);
+      cs.create('relation', relation);
+      test(cs.get(), null, function(res) {
+        var oldChanges = changeset[0].num_changes;
+        var newChanges = res.result.changeset.num_changes;
+        (newChanges).should.be.equal(oldChanges + 15 + 1 + 1);
+        done();
+      });
+    });
+  });
+
+  it.only('Returns the modified IDs of newly-created elements', function(done) {
+    var nodes = makeNodes(3);
+    var way = new Way().nodes(nodes);
+    var relation = new Relation().members('node', nodes);
+    cs.create('node', nodes);
+    cs.create('way', way);
+    cs.create('relation', relation);
+    test(cs.get(), null, function(res) {
+      var created = res.result.created;
+      created.node.should.have.property('-3');
+      created.way.should.have.property('-1');
+      created.relation.should.have.property('-1');
+      done();
+    });
+  });
 });
