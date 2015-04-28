@@ -11,6 +11,7 @@ module.exports = {
   /**
    * @api {get} /map GeoJSON - Get entities in bounding box
    * @apiName Map
+   * @apiVersion 0.1.0
    * 
    * @apiParam {Number[4]} bbox [min_lon, min_lat, max_lon, max_lat]
    *

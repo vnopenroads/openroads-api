@@ -131,11 +131,11 @@ function updateChangeset(changeset, meta) {
 
 module.exports = {
   /**
-   * @api {POST} /changeset/:id/upload Upload changeset Data
+   * @api {POST} /changeset/:id/upload Upload changeset data
    * @apiName UploadChangeset
    * @apiGroup iD
    * @apiDescription Upload JSON Changeset Data to given changeset
-   * return the changeset and a bounding box that covers the location of its
+   * Return the changeset and a bounding box that covers the location of its
    * edits.
    *
    * The OSM Change JSON Format is the of the form
@@ -151,6 +151,8 @@ module.exports = {
    *
    * Each of the create, modify and delete blocks can contain entities such as Node, Way
    * or Relation. Check the API Usage Example for more detail.
+   * @apiVersion 0.1.0
+   *
    * @apiParam {Number} id Changeset ID
    * @apiParam {Object} osmChange OSM Changeset Data in JSON
    *

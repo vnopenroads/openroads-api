@@ -8,8 +8,9 @@ module.exports = {
    * @api {put} /changeset/create Create a changeset
    * @apiName CreateChangeset
    * @apiGroup iD
-   * @apiDescription Given a user and and a user ID, create a new changeset and
+   * @apiDescription Given a user and a user ID, create a new changeset and
    * return the newly created changeset ID.
+   * @apiVersion 0.1.0
    *
    * @apiParam {Number} uid User ID
    * @apiParam {String} user User name 
