@@ -132,8 +132,8 @@ function updateChangeset(changeset, meta) {
 module.exports = {
   /**
    * @api {POST} /changeset/:id/upload Upload changeset data
+   * @apiGroup Changeset
    * @apiName UploadChangeset
-   * @apiGroup iD
    * @apiDescription Upload JSON Changeset Data to given changeset
    * Return the changeset and a bounding box that covers the location of its
    * edits.

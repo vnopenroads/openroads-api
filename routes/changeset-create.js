@@ -6,8 +6,8 @@ var knex = require('../connection.js');
 module.exports = {
   /**
    * @api {put} /changeset/create Create a changeset
+   * @apiGroup Changeset
    * @apiName CreateChangeset
-   * @apiGroup iD
    * @apiDescription Given a user and a user ID, create a new changeset and
    * return the newly created changeset ID.
    * @apiVersion 0.1.0

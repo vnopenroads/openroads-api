@@ -44,10 +44,10 @@ function oscUpload(req, res) {
 module.exports = {
   /**
    * @api {POST} /upload/[changesetId] Bulk Upload
+   * @apiGroup Changeset
    * @apiName UploadBulk
-   * @apiGroup Utility
-   * @apiDescription Upload OSM Changeset Data to given changeset.
-   * Return the changeset and a bounding box that covers the location of its 
+   * @apiDescription Upload OSM Changeset Data to a given changeset.
+   * Return the changeset and a bounding box that covers the location of its
    * edits.
    * @apiVersion 0.1.0
    * 

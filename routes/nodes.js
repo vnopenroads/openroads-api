@@ -9,8 +9,8 @@ var Node = require('../models/node-model.js');
 module.exports = {
   /**
    * @api {get} /xml/node/:id Get node by Id
+   * @apiGroup Features
    * @apiName XmlNode 
-   * @apiGroup ToFix
    * @apiDescription Returns OSM XML of requested Node.
    * @apiVersion 0.1.0
    *

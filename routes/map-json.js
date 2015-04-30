@@ -10,12 +10,11 @@ var log = require('../services/log.js');
 module.exports = {
   /**
    * @api {get} /map GeoJSON - Get entities in bounding box
+   * @apiGroup Features in bbox
    * @apiName Map
    * @apiVersion 0.1.0
    * 
    * @apiParam {Number[4]} bbox [min_lon, min_lat, max_lon, max_lat]
-   *
-   * @apiGroup iD
    * 
    * @apiSuccess {GeoJSON} FeatureCollection List of OSM Roads
    *

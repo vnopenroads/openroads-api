@@ -30,8 +30,8 @@ function serveSingleWay(req, res) {
 module.exports = [
   /**
    * @api {get} /xml/way/:wayId/[full] Get way by ID
+   * @apiGroup Features
    * @apiName XmlWay
-   * @apiGroup ToFix
    * @apiDescription Returns OSM XML of requested Way along with full 
    * representation of nodes in that way. Appending `/full` to the endpoint 
    * returns the same result.
