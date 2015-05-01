@@ -1082,7 +1082,7 @@ define({ "api": [
     "type": "get",
     "url": "/map",
     "title": "GeoJSON - Get entities in bounding box",
-    "group": "Features_in_bbox",
+    "group": "bbox",
     "name": "Map",
     "version": "0.1.0",
     "parameter": {
@@ -1126,13 +1126,13 @@ define({ "api": [
       }
     ],
     "filename": "routes/map-json.js",
-    "groupTitle": "Features_in_bbox"
+    "groupTitle": "bbox"
   },
   {
     "type": "get",
     "url": "/xml/map",
     "title": "OSM XML - Get entities in bounding box",
-    "group": "Features_in_bbox",
+    "group": "bbox",
     "name": "XmlMap",
     "description": "<p>Returns an OSM XML list of entities within the  provided bounding box</p> ",
     "version": "0.1.0",
@@ -1166,6 +1166,6 @@ define({ "api": [
       ]
     },
     "filename": "routes/map.js",
-    "groupTitle": "Features_in_bbox"
+    "groupTitle": "bbox"
   }
 ] });
