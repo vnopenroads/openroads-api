@@ -1,7 +1,7 @@
 {
   "name": "openroads-api",
-  "version": "0.0.1",
-  "description": "An API for the openroads project",
+  "version": "0.1.0",
+  "description": "An API for the OpenRoads project",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

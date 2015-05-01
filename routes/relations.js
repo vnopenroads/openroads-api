@@ -7,8 +7,9 @@ var Promise = require('bluebird');
 module.exports = [
   /**
    * @api {get} /relations/:id Get relation by ID
+   * @apiGroup Features
    * @apiName GetRelation
-   * @apiGroup Analytics
+   * @apiVersion 0.1.0
    *
    * @apiParam {Number} id Relation ID.
    * 
@@ -65,10 +66,11 @@ module.exports = [
   },
   /**
    * @api {get} /relations?key1=value1&key2=value2 Query relations by tag
+   * @apiGroup Features
    * @apiName GetRelations
-   * @apiGroup Analytics
    * @apiDescription Get relations that either belong to a way, or are
    * tagged with an attribute.
+   * @apiVersion 0.1.0
    *
    * @apiParam (Querying by way ID) {String} member member=WayID eg. member=32
    * @apiParam (Querying by tag) {String} tag_name tag=value eg. road_condition=poor

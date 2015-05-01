@@ -12,7 +12,7 @@ module.exports = function getAdminBoundary(id) {
       boundary = data[0].geo;
     }
     if(!boundary) {
-      throw new Error('Coule not find admin region with id '+id);
+      throw new Error('Could not find admin region with id '+id);
     }
     // Tack on the id because it's otherwise buried in some
     // property, with different keys for different admin levels

@@ -12,8 +12,11 @@ var knex = require('../connection');
 module.exports = [
   /**
    * @api {get} /subregions/ Get list of regions
-   * @apiName GetSubregions
-   * @apiGroup Analytics
+   * @apiGroup Administrative areas
+   * @apiName subregions
+   * @apiDescription Returns a list with all the regions.
+   * @apiVersion 0.1.0
+   *
    * @apiSuccess {Object[]} adminAreas      List of regions
    * @apiSuccess {String} adminAreas.name   Region name.
    * @apiSuccess {String} adminAreas.id     Region ID.
@@ -50,11 +53,16 @@ module.exports = [
     }
   },
   /**
-   * @api {get} /subregions/:id Get list of subregions by region ID
-   * @apiName GetSubregion
-   * @apiGroup Analytics
+   * @api {get} /subregions/:id Get list of subregions by ID
+   * @apiGroup Administrative areas
+   * @apiName GetSubregions
+   * @apiDescription Returns meta-data about an administrative area and its 
+   * direct descendants. When passing the ID of a province, the API returns
+   * only its municipalities and cities, not the barangays.
+   * @apiVersion 0.1.0
    *
-   * @apiParam {Number} id Region ID.
+   * @apiParam {Number} id ID of the region, province, municipality, city or 
+   * barangay.
    * 
    * @apiSuccess {Object} meta Region metadata
    * @apiSuccess {Number} meta.id Region ID.
@@ -62,7 +70,14 @@ module.exports = [
    * @apiSuccess {Number} meta.type Region type.
    * @apiSuccess {String} meta.NAME_0 Country name.
    * @apiSuccess {String} meta.NAME_1 Region name.
+   * @apiSuccess {String} meta.NAME_2 Province name.
+   * @apiSuccess {String} meta.NAME_3 Municipality / city name.
+   * @apiSuccess {String} meta.NAME_4 Barangay name.
    * @apiSuccess {String} meta.ID_1_OR Region ID.
+   * @apiSuccess {String} meta.ID_1_OR Region ID.
+   * @apiSuccess {String} meta.ID_2_OR Province ID.
+   * @apiSuccess {String} meta.ID_3_OR Municipality / city ID.
+   * @apiSuccess {String} meta.ID_4_OR Barangay ID.
    * @apiSuccess {Object[]} adminAreas List of Subregions.
    * @apiSuccess {String} adminAreas.name   Subregion name.
    * @apiSuccess {String} adminAreas.id     Subregion ID.
@@ -160,12 +175,13 @@ module.exports = [
     }
   },
   /**
-   * @api {get} /admin/:id Get subregions geojson by region ID
+   * @api {get} /admin/:id Get boundaries and road data of subregions
+   * @apiGroup Administrative areas
    * @apiName GetAdmin
-   * @apiGroup Analytics
    * @apiDescription This endpoint returns the boundaries of the subregions
-   * in the given region, 
-   * as well as the roads clipped to the region. Used for analytics. 
+   * in the given administrative area, as well as the roads clipped to the region.
+   * The results are returned in GeoJSON.
+   * @apiVersion 0.1.0
    *
    * @apiParam {Number} id Municipality or Barangay ID.
    * 
@@ -245,11 +261,12 @@ module.exports = [
     }
   },
   /**
-   * @api {get} /admin/search/:name Search for administrative boundary by name
+   * @api {get} /admin/search/:name Search for administrative area by name
+   * @apiGroup Administrative areas
    * @apiName SearchAdmin
-   * @apiGroup Analytics
    * @apiDescription Given a search string, return 10 matching administrative
-   * boundaries. Search is case insensitive.
+   * area. Search is case insensitive.
+   * @apiVersion 0.1.0
    *
    * @apiParam {String} name Search parameter
    * 
