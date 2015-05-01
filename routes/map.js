@@ -10,7 +10,7 @@ var BoundingBox = require('../services/bounding-box.js');
 module.exports = {
   /**
    * @api {get} /xml/map OSM XML - Get entities in bounding box
-   * @apiGroup Features in bbox
+   * @apiGroup bbox
    * @apiName XmlMap
    * @apiDescription Returns an OSM XML list of entities within the 
    * provided bounding box

@@ -1,7 +1,7 @@
 'use strict';
 var Boom = require('boom');
 
-var knex = require('../connection.js')
+var knex = require('../connection.js');
 var toGeoJSON = require('../services/osm-data-to-geojson.js');
 var queryBbox = require('../services/query-bbox.js');
 var BoundingBox = require('../services/bounding-box.js');
@@ -10,7 +10,7 @@ var log = require('../services/log.js');
 module.exports = {
   /**
    * @api {get} /map GeoJSON - Get entities in bounding box
-   * @apiGroup Features in bbox
+   * @apiGroup bbox
    * @apiName Map
    * @apiVersion 0.1.0
    * 
