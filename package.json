@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "test": "OR_DEBUG=true mocha --recursive",
-    "gendoc": "./node_modules/.bin/apidoc -i routes"
+    "gendoc": "./node_modules/.bin/apidoc -i routes",
+    "postinstall": "npm run gendoc"
   },
   "repository": {
     "type": "git",
