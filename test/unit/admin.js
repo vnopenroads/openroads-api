@@ -134,12 +134,15 @@ describe('admin endpoint', function() {
       }
     };
 
-    // jshint maxlen: false
-    var expected = '{"type":"FeatureCollection","properties":{},"features":[{"type":"Feature","geometry":{"type":"LineString","coordinates":[[124.7463826,9.5306962],[124.7589139,9.5306539],[124.7589139,9.537891]]},"properties":{"or_condition":"bad","highway":"motorway"}},{"type":"Feature","geometry":{"type":"LineString","coordinates":[[124.746447,9.5298921],[124.7594504,9.5298286],[124.7594718,9.5372139]]},"properties":{"or_condition":"good","highway":"motorway"}},{"type":"Feature","geometry":{"type":"LineString","coordinates":[[124.7461466,9.5265485],[124.7493867,9.5280087],[124.751275,9.5264427],[124.7595147,9.5264427]]},"properties":{"name":"shouldbeclipped","or_condition":"fair","highway":"motorway"}}]}';
-
     queryPolygon(poly)
     .then(function (result) {
-      JSON.stringify(result).should.equal(expected);
+      result.should.have.property('features');
+      result.features.length.should.be.greaterThan(0);
+      var isclipped = result.features.some(function(feature) {
+        return feature.properties.name &&
+          feature.properties.name === 'shouldbeclipped';
+      });
+      isclipped.should.equal(true);
       done();
     })
     .catch(done);
@@ -151,7 +154,7 @@ describe('admin search endpoint', function() {
   function sortIDs(a, b) {
     var idA = parseInt(a.id);
     var idB = parseInt(b.id);
-    return (idA < idB) ? -1 : (idA > idB) ? 1 : 0; 
+    return (idA < idB) ? -1 : (idA > idB) ? 1 : 0;
   }
 
   it('responds with the right results for term sayan', function(done) {
