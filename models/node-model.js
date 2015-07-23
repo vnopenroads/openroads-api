@@ -179,17 +179,29 @@ var Node = {
   query: {
     create: function(changeset, meta, map, transaction) {
       var creates = changeset.create.node;
+      var start;
       if (!creates) {
         return [];
       }
 
+      start = new Date();
       // Map each node creation to a model with proper attributes.
       var models = creates.map(function(entity) {
         return Node.fromEntity(entity, meta);
       });
 
+      log.info('Node models to insert in creation:', models.length);
+      log.info('Seconds elapsed to create models:', (new Date() - start) / 1000);
+      start = new Date();
+
       // Insert all node models, then use returned ids to insert all tags.
-      var query = transaction(Node.tableName).insert(models).returning('id').then(function(ids) {
+      returng transaction(Node.tableName)
+      .on('query', function(d) {
+        log.info(d);
+      })
+      .insert(models).returning('id').then(function(ids) {
+        log.info('Seconds elapsed to insert models:', (new Date() - start) / 1000);
+        start = new Date();
         var tags = [];
         for (var i = 0, ii = creates.length; i < ii; ++i) {
 
@@ -216,6 +228,7 @@ var Node = {
             }));
           }
         }
+        log.info('Seconds elapsed to create node model map:', (new Date() - start) / 1000);
 
         // Only save tags if there are any.
         if (tags.length) {

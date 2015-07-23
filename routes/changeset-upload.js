@@ -39,8 +39,21 @@ function upload(req, res) {
         relation: {}
       }
 
+      var start = new Date();
       query('node', changeset, meta, map, transaction).then(function() {
+
+        log.info('Seconds elapsed to finish nodes:', (new Date() - start) / 1000);
+        transaction.commit();
+        return res({
+          created: map
+        });
+
+        /*
+        /* Commenting this out so we can focus on nodes.
         query('way', changeset, meta, map, transaction).then(function() {
+
+          log.info('Seconds elapsed to finish ways:', (new Date() - start) / 1000);
+
           query('relation', changeset, meta, map, transaction).then(function() {
 
             // Update changeset with new bounding box.
@@ -62,6 +75,7 @@ function upload(req, res) {
             });
           });
         });
+        */
       });
 
     }).catch(function(err) {

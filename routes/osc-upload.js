@@ -3,12 +3,14 @@ var XML = require('../services/xml');
 var create = require('./changeset-create').handler;
 var upload = require('./changeset-upload').handler;
 var Boom = require('boom');
+var log = require('../services/log');
 /*
   This route combines changeset id creation,
   XML reading and changeset upload
 */
 
 function oscUpload(req, res) {
+  var start = new Date();
   try {
     var json = XML.read(req.payload.toString());
   } catch(e) {
@@ -16,6 +18,10 @@ function oscUpload(req, res) {
       return res(Boom.badRequest('Could not parse XML file'));
     }
   }
+
+  var elapsed = (new Date() - start) / 1000;
+  log.info('Reading XML bulk upload seconds:', elapsed);
+
   var uploadParams = {
     params: {
       changesetID: req.params.changesetID
@@ -50,7 +56,7 @@ module.exports = {
    * Return the changeset and a bounding box that covers the location of its
    * edits.
    * @apiVersion 0.1.0
-   * 
+   *
    * @apiParam {Number} [changesetID] Changeset ID
    * @apiParam  {File} file OSM XML File
    *
@@ -58,14 +64,14 @@ module.exports = {
    * @apiSuccess {String} changeset.id Changeset ID.
    * @apiSuccess {String} changeset.user_id Changeset User ID.
    * @apiSuccess {Date} changeset.created_at Changeset Date of creation.
-   * @apiSuccess {Number} changeset.min_lat Min Latitude of bounding box. 
-   * @apiSuccess {Number} changeset.max_lat Max Latitude of bounding box. 
-   * @apiSuccess {Number} changeset.min_lon Min Longitude of bounding box. 
-   * @apiSuccess {Number} changeset.max_lon Max Longitude of bounding box. 
+   * @apiSuccess {Number} changeset.min_lat Min Latitude of bounding box.
+   * @apiSuccess {Number} changeset.max_lat Max Latitude of bounding box.
+   * @apiSuccess {Number} changeset.min_lon Min Longitude of bounding box.
+   * @apiSuccess {Number} changeset.max_lon Max Longitude of bounding box.
    * @apiSuccess {Date} changeset.closed_at Changeset Date of creation.
    * @apiSuccess {number} changeset.num_changes Number of edits in this changeset.
    *
-   * @apiExample {curl} Example Usage: 
+   * @apiExample {curl} Example Usage:
    *  curl -d @road.osm http://localhost:4000/upload
    *
    * @apiSuccessExample {json} Success-Response:
@@ -87,7 +93,8 @@ module.exports = {
   path: '/upload/{changesetID?}',
   config: {
     payload: {
-      parse: false
+      parse: false,
+      maxBytes: 135000000
     }
   },
   handler: oscUpload

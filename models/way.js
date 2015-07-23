@@ -133,19 +133,28 @@ var Way = {
   query: {
     create: function(changeset, meta, map, transaction) {
       var creates = changeset.create.way;
+      var start;
       if (!creates) {
         return [];
       }
+
+      start = new Date();
 
       // Create a list of models of just way creations with proper attributes.
       var models = creates.map(function(entity) {
         return Way.fromEntity(entity, meta);
       });
 
+      log.info('Way models to insert in creation:', models.length);
+      log.info('Seconds elapsed to create models:', (new Date() - start) / 1000);
+      start = new Date();
+
       // Bundle all the way insertions, bundle all the way nodes,
       // then bundle all the tag insertions if any.
       var query = transaction(Way.tableName).insert(models).returning('id').then(function(ids) {
 
+        log.info('Seconds elapsed to insert way models:', (new Date() - start) / 1000);
+        start = new Date();
         var tags = [];
         var wayNodes = [];
         for (var i = 0, ii = creates.length; i < ii; ++i) {
@@ -185,6 +194,7 @@ var Way = {
             }));
           }
         }
+        log.info('Seconds elapsed to create way model map:', (new Date() - start) / 1000);
 
         // The dependents array will always contain a way node insertion query.
         // If there are way tags, it will include those too.
