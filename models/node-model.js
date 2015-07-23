@@ -195,7 +195,7 @@ var Node = {
       start = new Date();
 
       // Insert all node models, then use returned ids to insert all tags.
-      returng transaction(Node.tableName)
+      return transaction(Node.tableName)
       .on('query', function(d) {
         log.info(d);
       })
