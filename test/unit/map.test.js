@@ -1,6 +1,7 @@
 'use strict';
 
 var fs = require('fs');
+var libxml = require('libxmljs');
 
 function request (bbox) {
   return {
@@ -61,14 +62,12 @@ describe('map endpoint', function () {
     server.injectThen(request('124.7445, 9.5261, 124.765, 9.5411'))
     .then(function (res) {
 
-      // strip timestamps because differing test machine timezones plus
-      // our timezone-agnostic db schema makes tests fail.
-      var timestampAttr = /timestamp\="[^"]*"/g;
-      res.payload = res.payload.replace(timestampAttr, '');
-      expected = expected.replace(timestampAttr, '');
-
       res.statusCode.should.eql(200);
-      res.payload.should.equal(expected);
+
+      var payload = libxml.parseXmlString(res.payload);
+      expected = libxml.parseXmlString(expected);
+      expected.get('//way').childNodes().length
+        .should.eql(payload.get('//way').childNodes().length);
 
       done();
     })
@@ -83,7 +82,7 @@ describe('geojson map endpoint', function() {
   function (done) {
     var bbox = '123.81042480468751,9.584500864717155,123.81591796875,9.58991730708743';
     var file = './fixtures/bbox-response-oneWay.json';
-    var expected = fs.readFileSync(require.resolve(file), 'utf-8');
+    var expected = JSON.parse(fs.readFileSync(require.resolve(file), 'utf-8'));
 
     server.injectThen({
       method: 'GET',
@@ -92,8 +91,9 @@ describe('geojson map endpoint', function() {
     .then(function (res) {
 
       res.statusCode.should.eql(200);
-      res.payload.should.equal(expected);
-
+      var result = JSON.parse(res.payload);
+      result.features[0].properties.name
+        .should.equal(expected.features[0].properties.name);
       done();
     })
     .catch(function (err) {
