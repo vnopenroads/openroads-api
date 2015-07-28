@@ -66,8 +66,12 @@ describe('map endpoint', function () {
 
       var payload = libxml.parseXmlString(res.payload);
       expected = libxml.parseXmlString(expected);
-      expected.get('//way').childNodes().length
-        .should.eql(payload.get('//way').childNodes().length);
+      console.log(expected.toString());
+      console.log(payload.toString());
+
+
+      expected.get('//way[@id="166017"]').childNodes().length
+        .should.eql(payload.get('//way[@id="166017"]').childNodes().length);
 
       done();
     })
