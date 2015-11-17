@@ -2,6 +2,7 @@
 
 var Boom = require('boom');
 var _ = require('lodash');
+var Promise = require('bluebird');
 
 var getAdminBoundary = require('../services/admin-boundary.js');
 var getSubregionFeatures = require('../services/admin-subregions.js').getFeatures;
@@ -174,6 +175,30 @@ module.exports = [
       });
     }
   },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   /**
    * @api {get} /admin/:id Get boundaries and road data of subregions
    * @apiGroup Administrative areas
@@ -235,31 +260,17 @@ module.exports = [
   
    */
 
-  {
-    method: 'GET',
-    path: '/admin/{id}',
-    handler: function (req, res) {
 
-      var id = +(req.params.id || '');
 
-      getAdminBoundary(id)
-      .then(function (boundary) {
-        return getSubregionFeatures(boundary.adminType, id, boundary)
-        .then(function (subregions) {
-          return queryPolygon(boundary)
-          .then(function(roads) {
-            res({
-              subregions: subregions,
-              roads: roads
-            });
-          });
-        });
-      })
-      .catch(function (err) {
-        res(Boom.wrap(err));
-      });
-    }
-  },
+
+
+
+
+
+
+
+
+
   /**
    * @api {get} /admin/search/:name Search for administrative area by name
    * @apiGroup Administrative areas
@@ -309,5 +320,272 @@ module.exports = [
           res(data);
         });
     }
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  {
+    method: 'GET',
+    path: '/admin/{id}',
+    handler: function (req, res) {
+      var id = +(req.params.id || '');
+
+      getAdminBoundary(id).then(function (boundary) {
+        var main = fixProperties(boundary, boundary.properties);
+        fixIDs(main).then(function (main) {
+          return res(main);
+        });
+      })
+      .catch(function (err) {
+        console.log('err', err);
+        res(Boom.wrap(err));
+      });
+    }
+  },
+
+  {
+    method: 'GET',
+    path: '/admin/{id}/boundary',
+    handler: function (req, res) {
+      var id = +(req.params.id || '');
+
+      getAdminBoundary(id).then(function (boundary) {
+        var props = fixProperties(boundary, boundary.properties);
+        fixIDs(props).then(function (props) {
+          // Result is a geoJSON;
+          var result = {
+            type: boundary.type,
+            properties: props,
+            geometry: boundary.geometry
+          };
+
+          return res(result);
+        });
+      })
+      .catch(function (err) {
+        console.log('err', err);
+        res(Boom.wrap(err));
+      });
+    }
+  },
+
+  {
+    method: 'GET',
+    path: '/admin/{id}/road-network',
+    handler: function (req, res) {
+      var id = +(req.params.id || '');
+
+      getAdminBoundary(id).then(function (boundary) {
+        return queryPolygon(boundary).then(function (roads) {
+          var props = fixProperties(boundary, roads.properties);
+          fixIDs(props).then(function (props) {
+            // Result is a geoJSON;
+            var result = {
+              type: roads.type,
+              properties: props,
+              features: roads.features
+            };
+            return res(result);
+          });
+        });
+      })
+      .catch(function (err) {
+        console.log('err', err);
+        res(Boom.wrap(err));
+      });
+    }
+  },
+
+  {
+    method: 'GET',
+    path: '/admin',
+    handler: function (req, res) {
+      return listSubregions().then(function (subregions) {
+        // Fix subregion id.
+        _.forEach(subregions, function (o) {
+          o.id = +(o.id);
+        });
+        return res({ adminAreas: subregions });
+      })
+      .catch(function (err) {
+        console.log('err', err);
+        res(Boom.wrap(err));
+      });
+    }
+  },
+
+  {
+    method: 'GET',
+    path: '/admin/{id}/subregions',
+    handler: function (req, res) {
+      var id = +(req.params.id || '');
+
+      getAdminBoundary(id).then(function (boundary) {
+        return listSubregions(boundary.adminType, id, boundary).then(function (subregions) {
+          // Fix subregion id.
+          _.forEach(subregions, function (o) {
+            o.id = +(o.id);
+          });
+
+          var main = fixProperties(boundary, boundary.properties);
+          fixIDs(main).then(function (main) {
+            main.adminAreas = subregions;
+            return res(main);
+          });
+        });
+      })
+      .catch(function (err) {
+        console.log('err', err);
+        res(Boom.wrap(err));
+      });
+    }
+  },
+
+  {
+  method: 'GET',
+  path: '/admin/{id}/subregions/boundary',
+  handler: function (req, res) {
+    var id = +(req.params.id || '');
+
+    getAdminBoundary(id).then(function (boundary) {
+      if (boundary.adminType <= 2) {
+        return res(Boom.badRequest('Request region is too large.'));
+      }
+
+      return getSubregionFeatures(boundary.adminType, id, boundary).then(function (subregions) {
+        var features = _.map(subregions.features, function (o) {
+          var obj = _.pick(o, 'type', 'geometry');
+          switch(boundary.adminType) {
+            case 3:
+              obj.properties = {
+                id: +(o.id),
+                name: o.name,
+                type: 4
+              };
+            break;
+            // There are no subregions for adminType 4
+          }
+          return obj;
+        });
+
+        var props = fixProperties(boundary, subregions.properties);
+        fixIDs(props).then(function (props) {
+          // Result is a geoJSON;
+          var result = {
+            type: subregions.type,
+            properties: props,
+            features: features
+          };
+
+          return res(result);
+        });
+      });
+    })
+    .catch(function (err) {
+      console.log('err', err);
+      res(Boom.wrap(err));
+    });
   }
+}
 ];
+
+
+
+
+
+
+
+/**
+ * Helper function
+ *
+ * Extracts and combines the needed keys from baseMeat and rawProps,
+ * 
+ * @param  baseMeta
+ *   The base meta for the admin area. Expects it to contain the following keys:
+ *   - id
+ *   - name
+ *   - adminType (will be changed to "type")
+ *  
+ * @param  rawProps
+ *   The properties from where to extract the values when they exist:
+ *   NAME_0, NAME_1, NAME_2, NAME_3, NAME_4,
+ *   ID_0_OR, ID_1_OR, ID_2_OR', ID_3_OR, ID_4_OR
+ * 
+ * @return props
+ */
+var fixProperties = function (baseMeta, rawProps) {
+  var props = _.pick(rawProps, ['NAME_0', 'NAME_1', 'NAME_2', 'NAME_3', 'NAME_4', 'ID_0_OR', 'ID_1_OR', 'ID_2_OR', 'ID_3_OR', 'ID_4_OR']);
+  props.id = baseMeta.id;
+  props.name = baseMeta.name;
+  props.type = baseMeta.adminType;
+
+  return props;
+}
+
+/**
+ * Corrects the ids for Barangays and Municipalities.
+ * Barangays don't have the ids in the response, and municipalities lack NAME_1.
+ * 
+ * @param  props
+ *   The props as returned from fixProperties();
+ *
+ * @see fixProperties()
+ * 
+ * @return Promise
+ *   A promise is returned because there's some async executions.
+ */
+var fixIDs = function (props) {
+  return new Promise(function(resolve, reject) {
+    var id = props.id;
+    switch(props.type) {
+      case 4:
+        // Barangays don't have the ids in the response, but they can be
+        // easily computed.
+        props.ID_2_OR = parseInt((id + '').slice(0, -7) + '0000000', 10);
+        props.ID_3_OR = parseInt((id + '').slice(0, -3) + '000', 10);
+      case 3:
+        props.ID_1_OR = parseInt((id + '').slice(0, -9) + '000000000', 10);
+        // Get the region name both for municipalities and barangay. 
+        getAdminBoundary(props.ID_1_OR).then(function (reg) {
+          props.NAME_1 = reg.properties.NAME_1;
+          resolve(props);
+        });
+      break;
+      default:
+        resolve(props);
+      break;
+    }
+  });
+}
