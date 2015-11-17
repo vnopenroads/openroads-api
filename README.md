@@ -16,12 +16,24 @@ npm install
 
 Before running the server, you will need to add `local.js` in your root directory to include directions to the postgresql database. Add your own values to the url where you're hosting the OSM databse.
 
-
 ```javascript
 module.exports.connection = {
-    url: 'postgres://USER:PASSWORD@HOST:POST/DATABASE',
+    production: 'postgres://USER:PASSWORD@HOST:POST/DATABASE',
 }
 ```
+
+To make it easier to point at different databases (e.g., a staging or test db),
+you may additional urls in addition to `production`, and then target them using
+the `OR_ENV` environment variable.  E.g.:
+```js
+module.exports.connection = {
+    production: 'postgres://USER:PASSWORD@HOST:POST/DATABASE',
+    staging: 'postgres://user2:otherpass@staging.host.com:port/db'
+}
+```
+
+And then run `OR_ENV=staging npm start`
+
 
 ### Installing a database with docker
 
