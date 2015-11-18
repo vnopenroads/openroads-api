@@ -12,206 +12,6 @@ var knex = require('../connection');
 
 module.exports = [
   /**
-   * @api {get} /subregions/ Get list of regions
-   * @apiGroup Administrative areas
-   * @apiName subregions
-   * @apiDescription Returns a list with all the regions.
-   * @apiVersion 0.1.0
-   *
-   * @apiSuccess {Object[]} adminAreas      List of regions
-   * @apiSuccess {String} adminAreas.name   Region name.
-   * @apiSuccess {String} adminAreas.id     Region ID.
-   *
-   * @apiExample {curl} Example Usage: 
-   *    curl http://localhost:4000/subregions
-   *  
-   * @apiSuccessExample {json} Success-Response:
-   *  {
-   *    "adminAreas": [
-   *    {
-   *      "name": "Region I (Ilocos region)",
-   *      "id": "1000000000"
-   *    },
-   *    {
-   *      "name": "Region II (Cagayan Valley)",
-   *      "id": "2000000000"
-   *    },
-   *    ...
-   *    ]
-   *  }
-   */
-  {
-    method: 'GET',
-    path: '/subregions',
-    handler: function (req, res) {
-      return listSubregions()
-      .then(function (subregions) {
-        return res({ adminAreas: subregions });
-      })
-      .catch(function(err) {
-        res(Boom.wrap(err));
-      });
-    }
-  },
-  /**
-   * @api {get} /subregions/:id Get list of subregions by ID
-   * @apiGroup Administrative areas
-   * @apiName GetSubregions
-   * @apiDescription Returns meta-data about an administrative area and its 
-   * direct descendants. When passing the ID of a province, the API returns
-   * only its municipalities and cities, not the barangays.
-   * @apiVersion 0.1.0
-   *
-   * @apiParam {Number} id ID of the region, province, municipality, city or 
-   * barangay.
-   * 
-   * @apiSuccess {Object} meta Region metadata
-   * @apiSuccess {Number} meta.id Region ID.
-   * @apiSuccess {String} meta.name Region name.
-   * @apiSuccess {Number} meta.type Region type.
-   * @apiSuccess {String} meta.NAME_0 Country name.
-   * @apiSuccess {String} meta.NAME_1 Region name.
-   * @apiSuccess {String} meta.NAME_2 Province name.
-   * @apiSuccess {String} meta.NAME_3 Municipality / city name.
-   * @apiSuccess {String} meta.NAME_4 Barangay name.
-   * @apiSuccess {String} meta.ID_1_OR Region ID.
-   * @apiSuccess {String} meta.ID_1_OR Region ID.
-   * @apiSuccess {String} meta.ID_2_OR Province ID.
-   * @apiSuccess {String} meta.ID_3_OR Municipality / city ID.
-   * @apiSuccess {String} meta.ID_4_OR Barangay ID.
-   * @apiSuccess {Object[]} adminAreas List of Subregions.
-   * @apiSuccess {String} adminAreas.name   Subregion name.
-   * @apiSuccess {String} adminAreas.id     Subregion ID.
-   *
-   * @apiExample {curl} Example Usage: 
-   *    curl http://localhost:4000/subregions/2000000000
-   *
-   * @apiSuccessExample {json} Success-Response:
-   *  {
-   *  "meta": {
-   *    "id": 2000000000,
-   *    "name": "Region II (Cagayan Valley)",
-   *    "type": 1,
-   *    "NAME_0": "Philippines",
-   *    "NAME_1": "Region II (Cagayan Valley)",
-   *    "ID_1_OR": 2000000000
-   *  },
-   *  "adminAreas": [
-   *    {
-   *      "name": "Batanes",
-   *      "id": "2110000000"
-   *    },
-   *    ...
-   *  ]}
-   */
-
-  {
-    method: 'GET',
-    path: '/subregions/{id}',
-    handler: function (req, res) {
-      var id = +(req.params.id || '');
-
-      getAdminBoundary(id)
-      .then(function (boundary) {
-        return listSubregions(boundary.adminType, id, boundary)
-        .then(function (subregions) {
-
-          var response = {
-            meta: {
-              id: id,
-              name: boundary.name,
-              type: boundary.adminType
-            },
-            adminAreas: subregions
-          };
-
-          // Some dirty work to strip what we don't need
-          // just to make it cleaner.
-          var keysToKeep;
-          switch(boundary.adminType) {
-            case 1:
-              keysToKeep = ['NAME_0', 'NAME_1', 'ID_1_OR'];
-            break;
-            case 2:
-              keysToKeep = ['NAME_0', 'NAME_1', 'ID_1_OR', 'NAME_2', 'ID_2_OR'];
-            break;
-            case 3:
-              keysToKeep = ['NAME_0', 'NAME_2', 'ID_2_OR', 'NAME_3', 'ID_3_OR'];
-            break;
-            case 4:
-              keysToKeep = ['NAME_0', 'NAME_2', 'NAME_3', 'NAME_4', 'ID_4_OR'];
-            break;
-          }
-
-          _.forEach(keysToKeep, function(key) {
-            response.meta[key] = boundary.properties[key];
-          });
-
-          // In the case of municipalities and barangay the region is not on the
-          // data. We need a new query.
-          switch(boundary.adminType) {
-            case 4:
-              // Barangays don't have the ids in the response, but they can be
-              // easily computed.
-              response.meta.ID_2_OR = parseInt((id + '').slice(0, -7) + '0000000', 10);
-              response.meta.ID_3_OR = parseInt((id + '').slice(0, -3) + '000', 10);
-            case 3:
-              response.meta.ID_1_OR = parseInt((id + '').slice(0, -9) + '000000000', 10);
-              // Get the region name both for municipalities and barangay. 
-              getAdminBoundary(response.meta.ID_1_OR).then(function (reg) {
-                response.meta.NAME_1 = reg.properties.NAME_1;
-                return res(response);
-              });
-            break;
-            default:
-              return res(response);
-            break;
-          }
-
-        });
-      })
-      .catch(function (err) {
-        res(Boom.wrap(err));
-      });
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /**
    * @api {get} /admin/:id Get metadata about an admin area.
    * @apiGroup Administrative areas
    * @apiName GetAdmin
@@ -219,15 +19,25 @@ module.exports = [
    * admin area.
    * @apiVersion 0.1.0
    *
-   * @apiParam {Number} ID of the region, province, municipality, city or 
+   * @apiParam {Number} ID ID of the region, province, municipality, city or 
    * barangay.
    * 
-   * @apiSuccess {JSON} metadata
+   * @apiSuccess {Number} id Region ID.
+   * @apiSuccess {String} name Region name.
+   * @apiSuccess {Number} type Region type.
+   * @apiSuccess {String} NAME_0 Country name.
+   * @apiSuccess {String} NAME_1 Region name.
+   * @apiSuccess {String} NAME_2 Province name.
+   * @apiSuccess {String} NAME_3 Municipality / city name.
+   * @apiSuccess {String} ID_1_OR Region ID.
+   * @apiSuccess {String} ID_1_OR Region ID.
+   * @apiSuccess {String} ID_2_OR Province ID.
+   * @apiSuccess {String} ID_3_OR Municipality / city ID.
    *
-   * @apiExample {curl} Example Usage: 
+   * @apiExample {curl} Metadata: 
    *    curl http://localhost:4000/admin/13591204000
    *
-   * @apiSuccessExample {json} Success-Response:
+   * @apiSuccessExample {json} metadata
    * {
    *   "id": 13591204000,
    *   "name": "Dumaran",
@@ -241,27 +51,8 @@ module.exports = [
    *   "ID_3_OR": 13591204000
    * }
    */
-  {
-    method: 'GET',
-    path: '/admin/{id}',
-    handler: function (req, res) {
-      var id = +(req.params.id || '');
-
-      getAdminBoundary(id).then(function (boundary) {
-        var main = fixProperties(boundary, boundary.properties);
-        fixIDs(main).then(function (main) {
-          return res(main);
-        });
-      })
-      .catch(function (err) {
-        console.log('err', err);
-        res(Boom.wrap(err));
-      });
-    }
-  },
-
   /**
-   * @api {get} /admin/:id/boundary Get metadata and boundaries of an admin area.
+   * @api {get} /admin/:id?boundary=true Get metadata and boundaries of an admin area.
    * @apiGroup Administrative areas
    * @apiName GetAdminBoundaries
    * @apiDescription This endpoint returns the metadata and boundaries about the
@@ -269,13 +60,27 @@ module.exports = [
    * The results are returned in GeoJSON.
    * @apiVersion 0.1.0
    *
-   * @apiParam {Number} ID of the region, province, municipality, city or 
+   * @apiParam {Number} ID ID of the region, province, municipality, city or 
    * barangay.
    * 
-   * @apiSuccess {GeoJSON} Boundary information
+   * @apiSuccess {String} type The geoJSON type
+   * @apiSuccess {Object} properties The geoJSON properties
+   * @apiSuccess {Number} properties.id Region ID.
+   * @apiSuccess {String} properties.name Region name.
+   * @apiSuccess {Number} properties.type Region type.
+   * @apiSuccess {String} properties.NAME_0 Country name.
+   * @apiSuccess {String} properties.NAME_1 Region name.
+   * @apiSuccess {String} properties.NAME_2 Province name.
+   * @apiSuccess {String} properties.NAME_3 Municipality / city name.
+   * @apiSuccess {String} properties.ID_1_OR Region ID.
+   * @apiSuccess {String} properties.ID_1_OR Region ID.
+   * @apiSuccess {String} properties.ID_2_OR Province ID.
+   * @apiSuccess {String} properties.ID_3_OR Municipality / city ID.
+   * @apiSuccess {Object} geometry The geoJSON geometry.
+
    *
    * @apiExample {curl} Example Usage: 
-   *    curl http://localhost:4000/admin/13591204000/boundary
+   *    curl http://localhost:4000/admin/13591204000?boundary=true
    *
    * @apiSuccessExample {json} Success-Response:
    * {
@@ -298,35 +103,8 @@ module.exports = [
    *   }
    * }
    */
-  {
-    method: 'GET',
-    path: '/admin/{id}/boundary',
-    handler: function (req, res) {
-      var id = +(req.params.id || '');
-
-      getAdminBoundary(id).then(function (boundary) {
-        var props = fixProperties(boundary, boundary.properties);
-        fixIDs(props).then(function (props) {
-          // Result is a geoJSON;
-          var result = {
-            type: boundary.type,
-            properties: props,
-            geometry: boundary.geometry
-          };
-
-          return res(result);
-        });
-      })
-      .catch(function (err) {
-        console.log('err', err);
-        res(Boom.wrap(err));
-      });
-    }
-  },
-
   /**
-   * @api {get} /admin/:id/boundary Get metadata and road-network of an admin
-   * area.
+   * @api {get} /admin/:id?roadNetwork=true Get metadata and road-network of an admin area.
    * @apiGroup Administrative areas
    * @apiName GetAdminRoadNetwork
    * @apiDescription This endpoint returns the metadata and road-network about
@@ -334,12 +112,25 @@ module.exports = [
    * The results are returned in GeoJSON.
    * @apiVersion 0.1.0
    *
-   * @apiParam {Number} ID municipality, city or barangay.
+   * @apiParam {Number} ID ID of municipality, city or barangay.
    * 
-   * @apiSuccess {GeoJSON} Road network information
+   * @apiSuccess {String} type The geoJSON type
+   * @apiSuccess {Object} properties The geoJSON properties
+   * @apiSuccess {Number} properties.id Region ID.
+   * @apiSuccess {String} properties.name Region name.
+   * @apiSuccess {Number} properties.type Region type.
+   * @apiSuccess {String} properties.NAME_0 Country name.
+   * @apiSuccess {String} properties.NAME_1 Region name.
+   * @apiSuccess {String} properties.NAME_2 Province name.
+   * @apiSuccess {String} properties.NAME_3 Municipality / city name.
+   * @apiSuccess {String} properties.ID_1_OR Region ID.
+   * @apiSuccess {String} properties.ID_1_OR Region ID.
+   * @apiSuccess {String} properties.ID_2_OR Province ID.
+   * @apiSuccess {String} properties.ID_3_OR Municipality / city ID.
+   * @apiSuccess {Array} features The roads
    *
    * @apiExample {curl} Example Usage: 
-   *    curl http://localhost:4000/admin/13591204000/road-network
+   *    curl http://localhost:4000/admin/13591204000?roadNetwork=true
    *
    * @apiSuccessExample {json} Success-Response:
    * {
@@ -373,34 +164,100 @@ module.exports = [
    */
   {
     method: 'GET',
-    path: '/admin/{id}/road-network',
+    path: '/admin/{id}',
     handler: function (req, res) {
       var id = +(req.params.id || '');
 
-      getAdminBoundary(id).then(function (boundary) {
-        return queryPolygon(boundary).then(function (roads) {
-          var props = fixProperties(boundary, roads.properties);
+      // Query for boundary.
+      if (Boolean(req.query.boundary) == true) {
+        getAdminBoundary(id).then(function (boundary) {
+          var props = fixProperties(boundary, boundary.properties);
           fixIDs(props).then(function (props) {
             // Result is a geoJSON;
             var result = {
-              type: roads.type,
+              type: boundary.type,
               properties: props,
-              features: roads.features
+              geometry: boundary.geometry
             };
+
             return res(result);
           });
+        })
+        .catch(function (err) {
+          console.log('err', err);
+          res(Boom.wrap(err));
         });
-      })
-      .catch(function (err) {
-        console.log('err', err);
-        res(Boom.wrap(err));
-      });
+      }
+      // Query for Road Network.
+      else if (Boolean(req.query.roadNetwork) == true) {
+        getAdminBoundary(id).then(function (boundary) {
+          return queryPolygon(boundary).then(function (roads) {
+            var props = fixProperties(boundary, roads.properties);
+            fixIDs(props).then(function (props) {
+              // Result is a geoJSON;
+              var result = {
+                type: roads.type,
+                properties: props,
+                features: roads.features
+              };
+              return res(result);
+            });
+          });
+        })
+        .catch(function (err) {
+          console.log('err', err);
+          res(Boom.wrap(err));
+        });
+      }
+      // Return meta.
+      else {
+        getAdminBoundary(id).then(function (boundary) {
+          var main = fixProperties(boundary, boundary.properties);
+          fixIDs(main).then(function (main) {
+            return res(main);
+          });
+        })
+        .catch(function (err) {
+          console.log('err', err);
+          res(Boom.wrap(err));
+        });
+      }
+
     }
   },
 
+  /**
+   * @api {get} /admin/subregions Get subregions of the whole country.
+   * @apiGroup Administrative areas subregions
+   * @apiName GetSubregions
+   * @apiDescription This endpoint returns the subregions of the whole country.
+   * @apiVersion 0.1.0
+   *
+   * @apiSuccess {Array} adminAreas The regions
+   * @apiSuccess {Number} adminAreas.id Region ID.
+   * @apiSuccess {String} adminAreas.name Region name.
+   *
+   * @apiExample {curl} Example Usage: 
+   *    curl http://localhost:4000/admin/subregions
+   *
+   * @apiSuccessExample {json} Success-Response:
+   * {
+   *   "adminAreas": [
+   *     {
+   *       "name": "Region I (Ilocos region)",
+   *       "id": 1000000000
+   *     },
+   *     {
+   *       "name": "Region II (Cagayan Valley)",
+   *       "id": 2000000000
+   *     }
+   *     ...  
+   *   ]
+   * }
+   */
   {
     method: 'GET',
-    path: '/admin',
+    path: '/admin/subregions',
     handler: function (req, res) {
       return listSubregions().then(function (subregions) {
         // Fix subregion id.
@@ -418,16 +275,30 @@ module.exports = [
 
   /**
    * @api {get} /admin/:id/subregions Get metadata of subregions of an admin area.
-   * @apiGroup Administrative areas
+   * @apiGroup Administrative areas subregions
    * @apiName GetAdminSubregions
    * @apiDescription This endpoint returns the metadata about the subregions of 
    * a given admin area.
    * @apiVersion 0.1.0
    *
-   * @apiParam {Number} ID of the region, province, municipality, city or 
+   * @apiParam {Number} ID ID of the region, province, municipality, city or 
    * barangay.
    * 
-   * @apiSuccess {JSON} metadata
+   * @apiSuccess {Number} id Region ID.
+   * @apiSuccess {String} name Region name.
+   * @apiSuccess {Number} type Region type.
+   * @apiSuccess {String} NAME_0 Country name.
+   * @apiSuccess {String} NAME_1 Region name.
+   * @apiSuccess {String} NAME_2 Province name.
+   * @apiSuccess {String} NAME_3 Municipality / city name.
+   * @apiSuccess {String} ID_1_OR Region ID.
+   * @apiSuccess {String} ID_1_OR Region ID.
+   * @apiSuccess {String} ID_2_OR Province ID.
+   * @apiSuccess {String} ID_3_OR Municipality / city ID.
+   * @apiSuccess {Array} adminAreas The regions
+   * @apiSuccess {Number} adminAreas.id Region ID.
+   * @apiSuccess {String} adminAreas.name Region name.
+   * @apiSuccess {Number} adminAreas.type Region type (2, 3, 4).
    *
    * @apiExample {curl} Example Usage: 
    *    curl http://localhost:4000/admin/13591204000/subregions
@@ -453,48 +324,40 @@ module.exports = [
    *   ]
    * }
    */
-  {
-    method: 'GET',
-    path: '/admin/{id}/subregions',
-    handler: function (req, res) {
-      var id = +(req.params.id || '');
-
-      getAdminBoundary(id).then(function (boundary) {
-        return listSubregions(boundary.adminType, id, boundary).then(function (subregions) {
-          // Fix subregion id.
-          _.forEach(subregions, function (o) {
-            o.id = +(o.id);
-          });
-
-          var main = fixProperties(boundary, boundary.properties);
-          fixIDs(main).then(function (main) {
-            main.adminAreas = subregions;
-            return res(main);
-          });
-        });
-      })
-      .catch(function (err) {
-        console.log('err', err);
-        res(Boom.wrap(err));
-      });
-    }
-  },
   /**
-   * @api {get} /admin/:id/subregions/boundary Get metadata and boundaries of the
-   * subregions of an admin area.
-   * @apiGroup Administrative areas
+   * @api {get} /admin/:id/subregions?boundary=true Get metadata and boundaries of the subregions of an admin area.
+   * @apiGroup Administrative areas subregions
    * @apiName GetAdminSubregionsBoundaries
    * @apiDescription This endpoint returns the metadata and boundaries about the
    * subregions of a given admin area.
    * The results are returned in GeoJSON.
    * @apiVersion 0.1.0
    *
-   * @apiParam {Number} ID of the municipality, city or barangay.
+   * @apiParam {Number} ID ID of the municipality, city or barangay.
    * 
-   * @apiSuccess {GeoJSON} Boundary information
+   * @apiSuccess {String} type The geoJSON type
+   * @apiSuccess {Object} properties The geoJSON properties
+   * @apiSuccess {Number} properties.id Region ID.
+   * @apiSuccess {String} properties.name Region name.
+   * @apiSuccess {Number} properties.type Region type.
+   * @apiSuccess {String} properties.NAME_0 Country name.
+   * @apiSuccess {String} properties.NAME_1 Region name.
+   * @apiSuccess {String} properties.NAME_2 Province name.
+   * @apiSuccess {String} properties.NAME_3 Municipality / city name.
+   * @apiSuccess {String} properties.ID_1_OR Region ID.
+   * @apiSuccess {String} properties.ID_1_OR Region ID.
+   * @apiSuccess {String} properties.ID_2_OR Province ID.
+   * @apiSuccess {String} properties.ID_3_OR Municipality / city ID.
+   * @apiSuccess {Array} features The roads
+   * @apiSuccess {String} features.type The geoJSON type
+   * @apiSuccess {Object} features.geometry The geoJSON geometry
+   * @apiSuccess {Object} features.properties The geoJSON properties
+   * @apiSuccess {Number} features.properties.id Region ID.
+   * @apiSuccess {String} features.properties.name Region name.
+   * @apiSuccess {Number} features.properties.type Region type (2, 3, 4).
    *
    * @apiExample {curl} Example Usage: 
-   *    curl http://localhost:4000/admin/13591204000/subregions/boundary
+   *    curl http://localhost:4000/admin/13591204000/subregions?boundary=true
    *
    * @apiSuccessExample {json} Success-Response:
    * {
@@ -536,49 +399,72 @@ module.exports = [
    */
   {
     method: 'GET',
-    path: '/admin/{id}/subregions/boundary',
+    path: '/admin/{id}/subregions',
     handler: function (req, res) {
       var id = +(req.params.id || '');
 
-      getAdminBoundary(id).then(function (boundary) {
-        if (boundary.adminType <= 2) {
-          return res(Boom.badRequest('Request region is too large.'));
-        }
+      if (Boolean(req.query.boundary) == true) {
+        getAdminBoundary(id).then(function (boundary) {
+          if (boundary.adminType <= 2) {
+            return res(Boom.badRequest('Request region is too large.'));
+          }
 
-        return getSubregionFeatures(boundary.adminType, id, boundary).then(function (subregions) {
-          var features = _.map(subregions.features, function (o) {
-            var obj = _.pick(o, 'type', 'geometry');
-            switch(boundary.adminType) {
-              case 3:
-                obj.properties = {
-                  id: +(o.id),
-                  name: o.name,
-                  type: 4
-                };
-              break;
-              // There are no subregions for adminType 4
-            }
-            return obj;
+          return getSubregionFeatures(boundary.adminType, id, boundary).then(function (subregions) {
+            var features = _.map(subregions.features, function (o) {
+              var obj = _.pick(o, 'type', 'geometry');
+              switch(boundary.adminType) {
+                case 3:
+                  obj.properties = {
+                    id: +(o.id),
+                    name: o.name,
+                    type: 4
+                  };
+                break;
+                // There are no subregions for adminType 4
+              }
+              return obj;
+            });
+
+            var props = fixProperties(boundary, subregions.properties);
+            fixIDs(props).then(function (props) {
+              // Result is a geoJSON;
+              var result = {
+                type: subregions.type,
+                properties: props,
+                features: features
+              };
+
+              return res(result);
+            });
           });
-
-          var props = fixProperties(boundary, subregions.properties);
-          fixIDs(props).then(function (props) {
-            // Result is a geoJSON;
-            var result = {
-              type: subregions.type,
-              properties: props,
-              features: features
-            };
-
-            return res(result);
-          });
+        })
+        .catch(function (err) {
+          console.log('err', err);
+          res(Boom.wrap(err));
         });
-      })
-      .catch(function (err) {
-        console.log('err', err);
-        res(Boom.wrap(err));
-      });
-    }
+      }
+      else {
+        getAdminBoundary(id).then(function (boundary) {
+          return listSubregions(boundary.adminType, id, boundary).then(function (subregions) {
+            // Fix subregion id.
+            _.forEach(subregions, function (o) {
+              o.id = +(o.id);
+            });
+
+            var main = fixProperties(boundary, boundary.properties);
+            fixIDs(main).then(function (main) {
+              main.adminAreas = subregions;
+              return res(main);
+            });
+          });
+        })
+        .catch(function (err) {
+          console.log('err', err);
+          res(Boom.wrap(err));
+        });
+      }
+      }
+
   },
 
   /**
@@ -635,11 +521,6 @@ module.exports = [
     }
   }
 ];
-
-
-
-
-
 
 /**
  * Helper function
