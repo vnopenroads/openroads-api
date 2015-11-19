@@ -238,7 +238,7 @@ describe('admin endpoint', function() {
     .catch(done);
   });
 
-  it.only('responds with barangays road network', function(done) {
+  it('responds with barangays road network', function(done) {
     server.injectThen({
       method: 'GET',
       url: '/admin/13591204002?roadNetwork=true'
