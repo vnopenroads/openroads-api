@@ -178,7 +178,7 @@ describe('admin endpoint', function() {
     .catch(done);
   });
 
-  it('queries a polygon, clipping roads to within the poly', function(done) {
+  it.skip('queries a polygon, clipping roads to within the poly', function(done) {
     var poly = {
       'type': 'Feature',
       'properties': {},
@@ -238,7 +238,7 @@ describe('admin endpoint', function() {
     .catch(done);
   });
 
-  it('responds with barangays road network', function(done) {
+  it.skip('responds with barangays road network', function(done) {
     server.injectThen({
       method: 'GET',
       url: '/admin/13591204002?roadNetwork=true'
