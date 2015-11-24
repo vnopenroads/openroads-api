@@ -26,7 +26,7 @@ function get(url) {
 describe('Upload', function () {
   it('Creates a way tagged as an mpa', function (done) {
     var nodes = makeNodes(10);
-    var mpa = new Area().nodes(nodes).tags({k: 'mpa', v: 'true'});
+    var mpa = new Area().nodes(nodes).tags({k: 'protect_type', v: 'marine_area'});
     var cs = new Change();
     cs.create('node', nodes).create('way', mpa);
     test(cs.get(), null, function (res) {
