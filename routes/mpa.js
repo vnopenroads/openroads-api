@@ -5,67 +5,16 @@ var _ = require('lodash');
 var inside = require('turf-inside');
 var buffer = require('turf-buffer');
 var point = require('turf-point');
-var knex = require('../connection.js');
-var queryWays = require('../services/query-ways.js');
-var toGeoJSON = require('../services/osm-data-to-geojson.js');
-
-var getMpasGeoJSON = function () {
-  return knex('current_way_tags')
-  .select('way_id')
-  .where({
-    k: 'protect_type',
-    v: 'marine_area'
-  })
-  .then(function(resp) {
-    var ids = _.pluck(resp, 'way_id');
-    return queryWays(knex, ids);
-   })
-  .then(function (result) {
-    var geoJSON = toGeoJSON(result, 'Polygon');
-    // Keep the Id.
-    _.forEach(geoJSON.features, function (o, i) {
-      geoJSON.features[i].properties.id = +(result.ways[i].id);
-    });
-    return geoJSON;
-  })
-};
-
-var getMpa = function (id) {
-  return queryWays(knex, id)
-  .then(function (resp) {
-    if (!resp.ways.length) {
-      throw Boom.notFound();
-    }
-
-    var hasTag = _.find(resp.ways[0].tags, {k: 'protect_type', v: 'marine_area'});
-    if (!hasTag) {
-      throw Boom.badRequest('Provided ID is not an MPA');
-    }
-    // Return only one feature.
-    var feature = toGeoJSON(resp, 'Polygon').features[0];
-    feature.properties.id = +(id);
-    return feature;
-  })
-};
-
-var coordsFromString = function (coordString) {
-  var c = coordString.split(',').map(parseFloat);
-  if (c.length != 2) {
-    return null;
-  }
-  if (!isNaN(c[0]) && !isNaN(c[1]) && c[0] >= -180 && c[0] <= 180 && c[1] >= -90 && c[1] <= 90) {
-    return c;
-  }
-  return null;
-};
+var polyDistance = require('../services/polygon-distance.js');
+var queryMPAs = require('../services/query-mpas.js');
+var coordsFromString = require('../services/coords.js').fromString;
 
 module.exports = [
   {
     method: 'GET',
     path: '/mpas',
     handler: function (req, res) {
-
-      getMpasGeoJSON()
+      queryMPAs.getMpas()
       .then(function (geoJSON) {
         return res(geoJSON);
       })
@@ -88,10 +37,10 @@ module.exports = [
         return res(Boom.badRequest('Mpa ID must be a non-zero number'));
       }
 
-      getMpa(mpaId)
+      queryMPAs.getMpa(mpaId)
       .then(function (feature) {
         res(feature);
-      })  
+      })
       .catch(function (err) {
         console.log(err);
         res(Boom.wrap(err));
@@ -122,17 +71,16 @@ module.exports = [
         radius = null;
       }
 
-      getMpa(mpaId)
+      queryMPAs.getMpa(mpaId)
       .then(function (feature) {
         console.log('resp', feature);
         var f = radius ? buffer(feature, radius, 'kilometers') : feature;
         if (inside(coordsPoint, f)) {
           return res(f);
-        }
-        else {
+        } else {
           return res({});
         }
-      })  
+      })
       .catch(function (err) {
         console.log(err);
         res(Boom.wrap(err));
@@ -153,9 +101,33 @@ module.exports = [
       }
       var coordsPoint = point(coords);
 
-      getMpasGeoJSON()
+      var limit = parseFloat(req.query.limit);
+      if (isNaN(limit) || limit <= 0) {
+        limit = null;
+      }
+
+      queryMPAs.getMpas()
       .then(function (geoJSON) {
-        return res('NOT IMPLEMENTED');
+        var f = _.chain(geoJSON.features)
+          .map(function (o) {
+            // When inside the distance becomes 0.
+            if (inside(coordsPoint, o)) {
+              o.properties.distance = 0;
+            } else {
+              o.properties.distance = polyDistance(o, coordsPoint);
+            }
+            return o;
+          })
+          .sortBy(function (o) {
+            return o.properties.distance;
+          });
+
+        if (limit !== null) {
+          f = f.take(limit);
+        }
+
+        geoJSON.features = f.value();
+        return res(geoJSON);
       })
       .catch(function (err) {
         console.log(err);
@@ -182,12 +154,11 @@ module.exports = [
         radius = null;
       }
 
-      getMpasGeoJSON()
+      queryMPAs.getMpas()
       .then(function (geoJSON) {
-
         geoJSON.features = _.filter(geoJSON.features, function (f) {
           // Buffer if radius is set.
-          var f = radius ? buffer(f, radius, 'kilometers') : f;
+          f = radius ? buffer(f, radius, 'kilometers') : f;
           return inside(coordsPoint, f);
         });
 
@@ -198,5 +169,5 @@ module.exports = [
         res(Boom.wrap(err));
       });
     }
-  },
+  }
 ];

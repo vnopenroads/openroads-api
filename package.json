@@ -38,6 +38,7 @@
     "turf-inside": "^1.1.4",
     "turf-linestring": "^1.0.2",
     "turf-point": "^2.0.1",
+    "turf-point-on-line": "^1.0.2",
     "winston": "^0.9.0"
   },
   "devDependencies": {
