@@ -12,7 +12,7 @@ var coordsFromString = require('../services/coords.js').fromString;
 module.exports = [
   {
     method: 'GET',
-    path: '/mpas',
+    path: '/openroads/mpas',
     handler: function (req, res) {
       queryMPAs.getMpas()
       .then(function (geoJSON) {
@@ -30,7 +30,7 @@ module.exports = [
 
   {
     method: 'GET',
-    path: '/mpas/{mpaId}',
+    path: '/openroads/mpas/{mpaId}',
     handler: function (req, res) {
       var mpaId = parseInt(req.params.mpaId || '', 10);
       if (!mpaId || isNaN(mpaId) || mpaId < 0) {
@@ -53,7 +53,7 @@ module.exports = [
 
   {
     method: 'GET',
-    path: '/mpas/{mpaId}/contain/{coords}', // radius=X',
+    path: '/openroads/mpas/{mpaId}/contain/{coords}', // radius=X',
     handler: function (req, res) {
       var mpaId = parseInt(req.params.mpaId || '', 10);
       if (!mpaId || isNaN(mpaId) || mpaId < 0) {
@@ -93,7 +93,7 @@ module.exports = [
 
   {
     method: 'GET',
-    path: '/mpas/near/{coords}', // limit=X
+    path: '/openroads/mpas/near/{coords}', // limit=X
     handler: function (req, res) {
       var coords = coordsFromString(req.params.coords);
       if (!coords) {
@@ -141,7 +141,7 @@ module.exports = [
 
   {
     method: 'GET',
-    path: '/mpas/contain/{coords}', // radius=X
+    path: '/openroads/mpas/contain/{coords}', // radius=X
     handler: function (req, res) {
       var coords = coordsFromString(req.params.coords);
       if (!coords) {
