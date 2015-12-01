@@ -3,7 +3,7 @@ var libxml = require('libxmljs');
 
 // to-fix endpoint tests.
 
-describe('to-fix endpoints', function() {
+describe.skip('to-fix endpoints', function() {
   /*
 
   it('returns a single node from /xml/node/:id', function (done) {

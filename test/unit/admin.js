@@ -1,12 +1,10 @@
 'use strict';
 
 var getAdminBoundary = require('../../services/admin-boundary.js');
-var getSubregionFeatures = require('../../services/admin-subregions.js')
-  .getFeatures;
+var getSubregionFeatures = require('../../services/admin-subregions.js').getFeatures;
 var queryPolygon = require('../../services/query-polygon.js');
 
-
-describe('subregions endpoint', function() {
+describe.skip('subregions endpoint', function() {
 
   it('responds with the right schema for the whole country', function(done) {
     server.injectThen({
@@ -79,7 +77,7 @@ describe('subregions endpoint', function() {
   });
 });
 
-describe('admin endpoint', function() {
+describe.skip('admin endpoint', function() {
 
   it('responds with the right schema for a municipality', function(done) {
     server.injectThen({
@@ -150,7 +148,7 @@ describe('admin endpoint', function() {
 
 });
 
-describe('admin search endpoint', function() {
+describe.skip('admin search endpoint', function() {
   function sortIDs(a, b) {
     var idA = parseInt(a.id);
     var idB = parseInt(b.id);

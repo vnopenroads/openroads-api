@@ -1,54 +1,24 @@
 'use strict';
-var knex = require('../../connection');
-var log = require('../../services/log');
-
 var Area = require('./helpers/create-area');
-var Way = require('./helpers/create-way');
 var Node = require('./helpers/create-node');
 var Change = require('./helpers/create-changeset');
-var test = require('./helpers/server-test');
+var serverTest = require('./helpers/server-test');
 
-function makeNodes(ii) {
-  var nodes = [];
-  for (var i = 0; i < ii; ++i) {
-    nodes.push(new Node({ id: -(i+1) }));
-  }
-  return nodes;
-}
+var testChangeset = new serverTest.testChangeset();
+var get = serverTest.createGet('/openroads/mpas');
 
-function get(url) {
-  return server.injectThen({
-    method: 'GET',
-    url: '/openroads/mpas' + url
-  });
-}
-
-describe('Upload', function () {
-  // it.only('Creates a way tagged as an mpa', function (done) {
-  //   var nodes = makeNodes(10);
-  //   var mpa = new Area().nodes(nodes).tags({k: 'protect_type', v: 'marine_area'});
-  //   var cs = new Change();
-  //   cs.create('node', nodes).create('way', mpa);
-  //   test(cs.get(), null, function (res) {
-  //     var created = res.result.created;
-  //     created.way.should.have.property('-1');
-  //     done();
-  //   });
-  // });
-});
-
-describe.only('Area retrieval endpoint', function () {
-  var changesetId;
+describe('Area retrieval endpoint', function () {
   after(function (done) {
-    cleanAll(changesetId, done);
+    testChangeset.remove()
+      .then(function () {
+        return done();
+      })
+      .catch(done);
   });
 
   before('Create areas', function (done) {
-    createChangeset()
-      .then(function (id) {
-        // Needed for deletion.
-        changesetId = id;
-
+    testChangeset.create()
+      .then(function (changesetId) {
         // Area 1:
         var nodes1 = [
           new Node({id: -100, lat: 9.5779114 , lon: 123.8365824, changeset: changesetId}),
@@ -70,28 +40,13 @@ describe.only('Area retrieval endpoint', function () {
         var cs = new Change();
         cs.create('node', nodes1.concat(nodes2)).create('way', [a1, a2]);
 
-        /////////////////////////////////
-        ///  vv Put in a neat helper vv
-        server.injectThen({
-          method: 'POST',
-          url: '/changeset/' + changesetId + '/upload',
-          payload: {
-            osmChange: cs.get()
-          }
-        })
-        .then(function(res) {
-          res.statusCode.should.eql(200);
-          return done();
-        }).catch(function(err) {
-          console.log(err);
-          return done(err);
-        });
-        ///  ^^ Put in a neat helper ^^
-        /////////////////////////////////
+        testChangeset.upload(cs.get())
+          .then(function(res) {
+            return done();
+          })
+          .catch(done);
       })
-      .catch(function (err) {
-        return done(err);
-      });
+      .catch(done);
   });
 
   it('Returns all MPAs', function (done) {
@@ -193,90 +148,3 @@ describe.only('Area retrieval endpoint', function () {
     .catch(done);
   });
 });
-
-
-
-///////////////////////////////////////////////////
-/// VVV    MOVE    VVV
-
-function createChangeset() {
-  return server.injectThen({
-    method: 'PUT',
-    url: '/changeset/create',
-    payload: {
-      uid: 99,
-      user: 'openroads',
-      comment: 'test comment'
-    }
-  })
-  .then(function (res) {
-    res.statusCode.should.eql(200);
-    var result = JSON.parse(res.payload);
-    result.id.should.be.within(0, Number.MAX_VALUE); 
-    return result.id;
-  });
-}
-
-function cleanAll(id, done) {
-  knex.transaction(function(transaction) {
-    var nodeIds = knex.select('id')
-      .from('current_nodes')
-      .where('changeset_id', id);
-
-    var wayIds = knex.select('id')
-      .from('current_ways')
-      .where('changeset_id', id);
-
-    var relationIds = knex.select('id')
-      .from('current_relations')
-      .where('changeset_id', id);
-
-    return transaction('current_way_nodes')
-      .whereIn('node_id', nodeIds)
-      .orWhereIn('way_id', wayIds)
-      .del()
-      .returning('*')
-      .then(function(deleted) {
-        console.log(deleted.length, 'way nodes deleted');
-        return transaction('current_way_tags').whereIn('way_id', wayIds).del().returning('*');
-      })
-      .then(function(deleted) {
-        console.log(deleted.length, 'way tags deleted');
-        return transaction('current_node_tags').whereIn('node_id', nodeIds).del().returning('*');
-      })
-      .then(function(deleted) {
-        console.log(deleted.length, 'node tags deleted');
-        return transaction('current_relation_tags').whereIn('relation_id', relationIds).del().returning('*');
-      })
-      .then(function(deleted) {
-        console.log(deleted.length, 'relation tags deleted');
-        return transaction('current_relation_members').whereIn('relation_id', relationIds).del().returning('*');
-      })
-      .then(function(deleted) {
-        console.log(deleted.length, 'relation members deleted');
-        return transaction('current_ways').where('changeset_id', id).del().returning('*');
-      })
-      .then(function(deleted) {
-        console.log(deleted.length, 'nodes deleted');
-        return transaction('current_nodes').where('changeset_id', id).del().returning('*');
-      })
-      .then(function(deleted) {
-        console.log(deleted.length, 'ways deleted');
-        return transaction('current_relations').where('changeset_id', id).del().returning('*');
-      })
-      .then(function(deleted) {
-        console.log(deleted.length, 'relations deleted');
-        return transaction('changesets').where('id', id).del().returning('*');
-      })
-      .then(function(deleted) {
-        console.log(deleted.length, 'changesets deleted');
-      });
-  })
-  .then(function() {
-    console.log('Cleaned up tests');
-    return done();
-  })
-  .catch(function(err) {
-    return done(err);
-  });
-}
