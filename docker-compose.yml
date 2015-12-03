@@ -1,8 +1,7 @@
 postgres:
   build: ./db-server
   ports:
-    - "5432:5432"
-
+    - "5433:5432"
 test:
   build: .
   command: ./wait_test.sh
