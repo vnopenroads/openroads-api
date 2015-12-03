@@ -1,5 +1,5 @@
 postgres:
-  image: opengovt/openroads-db
+  build: ./db-server
   ports:
     - "5432:5432"
 

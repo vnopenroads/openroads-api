@@ -33,7 +33,7 @@ if [ ! "$(ls -A $DATADIR)" ]; then
 	EOSQL
 
         # Add admin boundaries
-        su postgres sh -c "cat admin_boundaries.csv | psql postgres://osm:password@192.168.99.100/api06_test -c "'"'"copy admin_boundaries FROM stdin DELIMITER ',' CSV HEADER;"'"'" "
+        su postgres sh -c "cat admin_boundaries.csv | psql -U osm api06_test -c "'"'"copy admin_boundaries FROM stdin DELIMITER ',' CSV HEADER;"'"'" "
 	# Stop the database.
 	su postgres sh -lc "pg_ctl -w stop"
 fi
