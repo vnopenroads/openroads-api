@@ -1,7 +1,11 @@
 language: node_js
+sudo: required
+services:
+  - docker
+
 node_js:
 - '0.10'
-script: npm test
+script: npm docker-test
 deploy:
   provider: heroku
   api_key:
