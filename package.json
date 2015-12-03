@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "test": "OR_DEBUG=true mocha --recursive",
+    "docker-test": "docker-compose run && docker-compose stop && docker rm -f",
     "gendoc": "./node_modules/.bin/apidoc -i routes",
     "postinstall": "npm run gendoc"
   },
