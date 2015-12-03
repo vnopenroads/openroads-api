@@ -5,7 +5,7 @@ services:
 
 node_js:
 - '0.10'
-script: npm docker-test
+script: npm run docker-test
 deploy:
   provider: heroku
   api_key:
