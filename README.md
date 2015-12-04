@@ -10,9 +10,11 @@ The local development depends on `docker` and `docker-compose`. For Mac OS X and
 For Linux follow [these](https://docs.docker.com/compose/install/) instructions. Optionally, you can run your own database
 
 ### Starting the server
-This will launch the API at `http://YOUR_DOCKER_HOST:4000`
-```
-npm run docker-start
+This will launch the API and database in the background at `http://YOUR_DOCKER_HOST:4000`.
+```sh
+npm run docker-start # starts the API and DB
+npm run docker-stop # stops the API and DB
+npm run docker-logs # gets the API logs
 ```
 
 ### Running docker tests
