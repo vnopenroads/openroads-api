@@ -160,7 +160,7 @@ describe('admin endpoint', function() {
   it('fetches a boundary for a given municipality id', function(done) {
     getAdminBoundary(7150216000)
     .then(function (boundary) {
-      boundary.properties.name.should.equal('Batuan');
+      boundary.name.should.equal('Batuan');
       boundary.geometry.coordinates[0].should.have.length(311);
       done();
     })
