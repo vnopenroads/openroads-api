@@ -9,7 +9,14 @@ The OpenRoads API is part of the [OpenRoads project](https://github.com/developm
 The local development depends on `docker` and `docker-compose`. For Mac OS X and Windows download the [Docker Toolbox](https://www.docker.com/docker-toolbox).
 For Linux follow [these](https://docs.docker.com/compose/install/) instructions. Optionally, you can run your own database
 
+### Starting the server
+This will launch the API at `http://YOUR_DOCKER_HOST:4000`
+```
+npm run docker-start
+```
+
 ### Running docker tests
+For linux users, you might need to run using `sudo`
 ```sh
 npm run docker-test
 ```

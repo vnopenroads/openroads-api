@@ -2,8 +2,11 @@
 
 # http://brunorocha.org/python/dealing-with-linked-containers-dependency-in-docker-compose.html
 echo $WAIT_COMMAND
+if [ $# -gt 0 ]
+ then
+   WAIT_START_CMD=$@
+fi
 echo $WAIT_START_CMD
-
 is_ready() {
     eval "$WAIT_COMMAND"
 }
