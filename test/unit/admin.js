@@ -64,6 +64,7 @@ describe('admin subregions endpoint', function() {
   });
 
   it('yields barangays for a municipality', function(done) {
+    // this also tests getAdminBoundary()
     server.injectThen({
       method: 'GET',
       url: '/admin/13591204000/subregions'
@@ -156,22 +157,10 @@ describe('admin endpoint', function() {
     .catch(done);
   });
 
-  it('gets the barangays for a municipality', function (done) {
-    getAdminBoundary(7150216000)
-    .then(function(admin) {
-      return getSubregionFeatures(3, admin.id, admin);
-    })
-    .then(function (subregions) {
-      subregions.features.should.have.length(15);
-      done();
-    })
-    .catch(done);
-  });
-
   it('fetches a boundary for a given municipality id', function(done) {
     getAdminBoundary(7150216000)
     .then(function (boundary) {
-      boundary.properties.NAME_3.should.equal('Batuan');
+      boundary.properties.name.should.equal('Batuan');
       boundary.geometry.coordinates[0].should.have.length(311);
       done();
     })
