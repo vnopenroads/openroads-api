@@ -44,11 +44,9 @@ module.exports = [
    *   "type": 3,
    *   "NAME_0": "Philippines",
    *   "NAME_1": "Region IV-B (Mimaropa)",
-   *   "NAME_2": "Palawan",
-   *   "NAME_3": "Dumaran",
+   *   "NAME_2": "Palawan"
    *   "ID_1_OR": 13000000000,
-   *   "ID_2_OR": 13590000000,
-   *   "ID_3_OR": 13591204000
+   *   "ID_2_OR": 13590000000
    * }
    */
   /**
@@ -92,10 +90,8 @@ module.exports = [
    *     "NAME_0": "Philippines",
    *     "NAME_1": "Region IV-B (Mimaropa)",
    *     "NAME_2": "Palawan",
-   *     "NAME_3": "Dumaran",
    *     "ID_1_OR": 13000000000,
-   *     "ID_2_OR": 13590000000,
-   *     "ID_3_OR": 13591204000
+   *     "ID_2_OR": 13590000000
    *   },
    *   "geometry": {
    *     "type": "MultiPolygon",
@@ -141,11 +137,9 @@ module.exports = [
    *     "type": 3,
    *     "NAME_0": "Philippines",
    *     "NAME_1": "Region IV-B (Mimaropa)",
-   *     "NAME_2": "Palawan",
-   *     "NAME_3": "Dumaran",
+   *     "NAME_2": "Palawan"
    *     "ID_1_OR": 13000000000,
-   *     "ID_2_OR": 13590000000,
-   *     "ID_3_OR": 13591204000
+   *     "ID_2_OR": 13590000000
    *   },
    *   "features": [
    *     {
@@ -172,16 +166,14 @@ module.exports = [
       if (Boolean(req.query.boundary) == true) {
         getAdminBoundary(id).then(function (boundary) {
           var props = fixProperties(boundary, boundary.properties);
-          fixIDs(props).then(function (props) {
-            // Result is a geoJSON;
-            var result = {
-              type: boundary.type,
-              properties: props,
-              geometry: boundary.geometry
-            };
+          // Result is a geoJSON;
+          var result = {
+            type: boundary.type,
+            properties: props,
+            geometry: boundary.geometry
+          };
 
-            return res(result);
-          });
+          return res(result);
         })
         .catch(function (err) {
           console.log('err', err);
@@ -193,15 +185,13 @@ module.exports = [
         getAdminBoundary(id).then(function (boundary) {
           return queryPolygon(boundary).then(function (roads) {
             var props = fixProperties(boundary, roads.properties);
-            fixIDs(props).then(function (props) {
-              // Result is a geoJSON;
-              var result = {
-                type: roads.type,
-                properties: props,
-                features: roads.features
-              };
-              return res(result);
-            });
+            // Result is a geoJSON;
+            var result = {
+              type: roads.type,
+              properties: props,
+              features: roads.features
+            };
+            return res(result);
           });
         })
         .catch(function (err) {
@@ -213,9 +203,7 @@ module.exports = [
       else {
         getAdminBoundary(id).then(function (boundary) {
           var main = fixProperties(boundary, boundary.properties);
-          fixIDs(main).then(function (main) {
-            return res(main);
-          });
+          return res(main);
         })
         .catch(function (err) {
           console.log('err', err);
@@ -310,11 +298,9 @@ module.exports = [
    *   "type": 3,
    *   "NAME_0": "Philippines",
    *   "NAME_1": "Region IV-B (Mimaropa)",
-   *   "NAME_2": "Palawan",
-   *   "NAME_3": "Dumaran",
+   *   "NAME_2": "Palawan"
    *   "ID_1_OR": 13000000000,
-   *   "ID_2_OR": 13590000000,
-   *   "ID_3_OR": 13591204000,
+   *   "ID_2_OR": 13590000000
    *   "adminAreas": [
    *     {
    *       "name": "Bacao",
@@ -365,11 +351,9 @@ module.exports = [
    *   "properties": {
    *     "NAME_0": "Philippines",
    *     "NAME_1": "Region IV-B (Mimaropa)",
-   *     "NAME_2": "Palawan",
-   *     "NAME_3": "Dumaran",
+   *     "NAME_2": "Palawan"
    *     "ID_1_OR": 13000000000,
-   *     "ID_2_OR": 13590000000,
-   *     "ID_3_OR": 13591204000,
+   *     "ID_2_OR": 13590000000
    *     "id": 13591204000,
    *     "type": 3,
    *     "name": "Dumaran"
@@ -426,16 +410,14 @@ module.exports = [
             });
 
             var props = fixProperties(boundary, subregions.properties);
-            fixIDs(props).then(function (props) {
-              // Result is a geoJSON;
-              var result = {
-                type: subregions.type,
-                properties: props,
-                features: features
-              };
+            // Result is a geoJSON;
+            var result = {
+              type: subregions.type,
+              properties: props,
+              features: features
+            };
 
-              return res(result);
-            });
+            return res(result);
           });
         })
         .catch(function (err) {
@@ -452,10 +434,8 @@ module.exports = [
             });
 
             var main = fixProperties(boundary, boundary.properties);
-            fixIDs(main).then(function (main) {
-              main.adminAreas = subregions;
-              return res(main);
-            });
+            main.adminAreas = subregions;
+            return res(main);
           });
         })
         .catch(function (err) {
@@ -534,7 +514,8 @@ module.exports = [
  *   - adminType (will be changed to "type")
  *  
  * @param  rawProps
- *   The properties from where to extract the values when they exist:
+ *   The properties from where to extract the values when they exist and when 
+ *   they're not null:
  *   NAME_0, NAME_1, NAME_2, NAME_3, NAME_4,
  *   ID_0_OR, ID_1_OR, ID_2_OR', ID_3_OR, ID_4_OR
  * 
@@ -542,45 +523,10 @@ module.exports = [
  */
 var fixProperties = function (baseMeta, rawProps) {
   var props = _.pick(rawProps, ['NAME_0', 'NAME_1', 'NAME_2', 'NAME_3', 'NAME_4', 'ID_0_OR', 'ID_1_OR', 'ID_2_OR', 'ID_3_OR', 'ID_4_OR']);
+  props = _.omit(props, _.isNull);
   props.id = baseMeta.id;
   props.name = baseMeta.name;
   props.type = baseMeta.adminType;
 
   return props;
-}
-
-/**
- * Corrects the ids for Barangays and Municipalities.
- * Barangays don't have the ids in the response, and municipalities lack NAME_1.
- * 
- * @param  props
- *   The props as returned from fixProperties();
- *
- * @see fixProperties()
- * 
- * @return Promise
- *   A promise is returned because there's some async executions.
- */
-var fixIDs = function (props) {
-  return new Promise(function(resolve, reject) {
-    var id = props.id;
-    switch(props.type) {
-      case 4:
-        // Barangays don't have the ids in the response, but they can be
-        // easily computed.
-        props.ID_2_OR = parseInt((id + '').slice(0, -7) + '0000000', 10);
-        props.ID_3_OR = parseInt((id + '').slice(0, -3) + '000', 10);
-      case 3:
-        props.ID_1_OR = parseInt((id + '').slice(0, -9) + '000000000', 10);
-        // Get the region name both for municipalities and barangay. 
-        getAdminBoundary(props.ID_1_OR).then(function (reg) {
-          props.NAME_1 = reg.properties.NAME_1;
-          resolve(props);
-        });
-      break;
-      default:
-        resolve(props);
-      break;
-    }
-  });
 }
