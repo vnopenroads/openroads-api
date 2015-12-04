@@ -6,15 +6,16 @@ The OpenRoads API is part of the [OpenRoads project](https://github.com/developm
 ## Contributing
 
 ### Installing dependencies
+The local development depends on `docker` and `docker-compose`. For Mac OS X and Windows download the [Docker Toolbox](https://www.docker.com/docker-toolbox).
+For Linux follow [these](https://docs.docker.com/compose/install/) instructions. Optionally, you can run your own database
+
+### Running docker tests
 ```sh
-git clone git@github.com:opengovt/openroads-api.git
-cd openroads
-npm install
+npm run docker-test
 ```
 
-### Local configuration
-
-Before running the server, you will need to add `local.js` in your root directory to include directions to the postgresql database. Add your own values to the url where you're hosting the OSM databse.
+### Non-docker configuration
+Before running the server, you will need to add `local.js` in your root directory to include directions to the postgresql database. Add your own values to the url where you're hosting the OSM database. The `docker-start.sh` in the `db-server` repo is a starting point for creating your own OSM DB.
 
 ```javascript
 module.exports.connection = {
@@ -33,14 +34,6 @@ module.exports.connection = {
 ```
 
 And then run `OR_ENV=staging npm start`
-
-
-### Installing a database with docker
-
-The `db-server` directory contains instructions on running your own postgresql database with the appropriate table schema using Docker. For Mac OS X users you might need [docker-machine](https://github.com/docker/machine) or [Kitematic](https://kitematic.com/)
-
-
-### Running
 
 To run the server, use the following command:
 
