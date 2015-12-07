@@ -83,7 +83,7 @@ describe('map endpoint', function () {
   */
 });
 
-describe('geojson map endpoint', function() {
+describe.skip('geojson map endpoint', function() {
   /*
   it('returns the complete way when part lies outside bbox',
   function (done) {

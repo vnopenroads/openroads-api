@@ -143,7 +143,6 @@ describe('admin subregions endpoint', function() {
 describe('admin endpoint', function() {
   this.slow(5000);
 
-
   it('responds with the right schema for a municipality', function(done) {
     server.injectThen({
       method: 'GET',
