@@ -8,6 +8,9 @@ This repo comes with Docker configuration to spin up the API and a database. Thi
 
 To set up your environment, make sure `docker` and `docker-compose` are installed on your machine. For Mac OS X and Windows download the [Docker Toolbox](https://www.docker.com/docker-toolbox). For Linux follow [these](https://docs.docker.com/compose/install/) instructions.
 
+For Mac OS X or Windows, make sure you're running the following commands in a terminal that has the docker environment variables set. This can be done by running the `Docker Quickstart Terminal` app, or running `eval $(docker-machine env default)`. Linux users may need to use `sudo`
+
+
 ### Useful commands
 This will launch the API and database in the background at `http://YOUR_DOCKER_HOST:4000`.
 
@@ -36,7 +39,6 @@ The following command creates an empty postgres db, populates it with test data,
 npm run docker-test
 ```
 
-Linux users may need to use `sudo`
 
 To run a db on its own you can run docker-compose up [-d] postgres which will start the database on its own at $DOCKER_HOST:5433
 
