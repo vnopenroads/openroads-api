@@ -11,7 +11,7 @@
     "docker-logs": "docker-compose logs api",
     "docker-test": "docker-compose build && docker-compose run api ./wait.sh npm test; docker-compose stop && docker-compose rm -f",
     "docker-start-db": "docker-compose up -d postgres",
-    "docker-kill-db": "docker-compose kill postgres",
+    "docker-kill-db": "docker-compose stop && docker-compose rm -f",
     "gendoc": "./node_modules/.bin/apidoc -i routes",
     "postinstall": "npm run gendoc"
   },
