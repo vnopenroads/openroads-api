@@ -310,7 +310,7 @@ describe('admin endpoint', function() {
 
 });
 
-describe.only('admin search endpoint', function() {
+describe('admin search endpoint', function() {
   this.slow(5000);
 
   function sortIDs(a, b) {
