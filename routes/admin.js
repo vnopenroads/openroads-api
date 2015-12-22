@@ -1,8 +1,6 @@
 'use strict';
-
 var Boom = require('boom');
 var _ = require('lodash');
-var Promise = require('bluebird');
 
 var getAdminBoundary = require('../services/admin-boundary.js');
 var getSubregionFeatures = require('../services/admin-subregions.js').getFeatures;
@@ -19,9 +17,9 @@ module.exports = [
    * admin area.
    * @apiVersion 0.1.0
    *
-   * @apiParam {Number} ID ID of the region, province, municipality, city or 
+   * @apiParam {Number} ID ID of the region, province, municipality, city or
    * barangay.
-   * 
+   *
    * @apiSuccess {Number} id Region ID.
    * @apiSuccess {String} name Region name.
    * @apiSuccess {Number} type Region type.
@@ -34,7 +32,7 @@ module.exports = [
    * @apiSuccess {String} ID_2_OR Province ID.
    * @apiSuccess {String} ID_3_OR Municipality / city ID.
    *
-   * @apiExample {curl} Metadata: 
+   * @apiExample {curl} Metadata:
    *    curl http://localhost:4000/admin/13591204000
    *
    * @apiSuccessExample {json} metadata
@@ -58,9 +56,9 @@ module.exports = [
    * The results are returned in GeoJSON.
    * @apiVersion 0.1.0
    *
-   * @apiParam {Number} ID ID of the region, province, municipality, city or 
+   * @apiParam {Number} ID ID of the region, province, municipality, city or
    * barangay.
-   * 
+   *
    * @apiSuccess {String} type The geoJSON type
    * @apiSuccess {Object} properties The geoJSON properties
    * @apiSuccess {Number} properties.id Region ID.
@@ -77,7 +75,7 @@ module.exports = [
    * @apiSuccess {Object} geometry The geoJSON geometry.
 
    *
-   * @apiExample {curl} Example Usage: 
+   * @apiExample {curl} Example Usage:
    *    curl http://localhost:4000/admin/13591204000?boundary=true
    *
    * @apiSuccessExample {json} Success-Response:
@@ -109,7 +107,7 @@ module.exports = [
    * @apiVersion 0.1.0
    *
    * @apiParam {Number} ID ID of municipality, city or barangay.
-   * 
+   *
    * @apiSuccess {String} type The geoJSON type
    * @apiSuccess {Object} properties The geoJSON properties
    * @apiSuccess {Number} properties.id Region ID.
@@ -125,7 +123,7 @@ module.exports = [
    * @apiSuccess {String} properties.ID_3_OR Municipality / city ID.
    * @apiSuccess {Array} features The roads
    *
-   * @apiExample {curl} Example Usage: 
+   * @apiExample {curl} Example Usage:
    *    curl http://localhost:4000/admin/13591204000?roadNetwork=true
    *
    * @apiSuccessExample {json} Success-Response:
@@ -163,7 +161,7 @@ module.exports = [
       var id = +(req.params.id || '');
 
       // Query for boundary.
-      if (Boolean(req.query.boundary) == true) {
+      if (Boolean(req.query.boundary) === true) {
         getAdminBoundary(id).then(function (boundary) {
           var props = fixProperties(boundary, boundary.properties);
           // Result is a geoJSON;
@@ -181,7 +179,7 @@ module.exports = [
         });
       }
       // Query for Road Network.
-      else if (Boolean(req.query.roadNetwork) == true) {
+      else if (Boolean(req.query.roadNetwork) === true) {
         getAdminBoundary(id).then(function (boundary) {
           return queryPolygon(boundary).then(function (roads) {
             var props = fixProperties(boundary, roads.properties);
@@ -210,7 +208,6 @@ module.exports = [
           res(Boom.wrap(err));
         });
       }
-
     }
   },
 
@@ -225,7 +222,7 @@ module.exports = [
    * @apiSuccess {Number} adminAreas.id Region ID.
    * @apiSuccess {String} adminAreas.name Region name.
    *
-   * @apiExample {curl} Example Usage: 
+   * @apiExample {curl} Example Usage:
    *    curl http://localhost:4000/admin/subregions
    *
    * @apiSuccessExample {json} Success-Response:
@@ -239,7 +236,7 @@ module.exports = [
    *       "name": "Region II (Cagayan Valley)",
    *       "id": 2000000000
    *     }
-   *     ...  
+   *     ...
    *   ]
    * }
    */
@@ -265,13 +262,13 @@ module.exports = [
    * @api {get} /admin/:id/subregions Get metadata of subregions of an admin area.
    * @apiGroup Administrative areas subregions
    * @apiName GetAdminSubregions
-   * @apiDescription This endpoint returns the metadata about the subregions of 
+   * @apiDescription This endpoint returns the metadata about the subregions of
    * a given admin area.
    * @apiVersion 0.1.0
    *
-   * @apiParam {Number} ID ID of the region, province, municipality, city or 
+   * @apiParam {Number} ID ID of the region, province, municipality, city or
    * barangay.
-   * 
+   *
    * @apiSuccess {Number} id Region ID.
    * @apiSuccess {String} name Region name.
    * @apiSuccess {Number} type Region type.
@@ -288,7 +285,7 @@ module.exports = [
    * @apiSuccess {String} adminAreas.name Region name.
    * @apiSuccess {Number} adminAreas.type Region type (2, 3, 4).
    *
-   * @apiExample {curl} Example Usage: 
+   * @apiExample {curl} Example Usage:
    *    curl http://localhost:4000/admin/13591204000/subregions
    *
    * @apiSuccessExample {json} Success-Response:
@@ -320,7 +317,7 @@ module.exports = [
    * @apiVersion 0.1.0
    *
    * @apiParam {Number} ID ID of the municipality, city or barangay.
-   * 
+   *
    * @apiSuccess {String} type The geoJSON type
    * @apiSuccess {Object} properties The geoJSON properties
    * @apiSuccess {Number} properties.id Region ID.
@@ -342,7 +339,7 @@ module.exports = [
    * @apiSuccess {String} features.properties.name Region name.
    * @apiSuccess {Number} features.properties.type Region type (2, 3, 4).
    *
-   * @apiExample {curl} Example Usage: 
+   * @apiExample {curl} Example Usage:
    *    curl http://localhost:4000/admin/13591204000/subregions?boundary=true
    *
    * @apiSuccessExample {json} Success-Response:
@@ -387,7 +384,7 @@ module.exports = [
     handler: function (req, res) {
       var id = +(req.params.id || '');
 
-      if (Boolean(req.query.boundary) == true) {
+      if (Boolean(req.query.boundary) === true) {
         getAdminBoundary(id).then(function (boundary) {
           if (boundary.adminType <= 2) {
             return res(Boom.badRequest('Request region is too large.'));
@@ -396,15 +393,15 @@ module.exports = [
           return getSubregionFeatures(boundary.adminType, id, boundary).then(function (subregions) {
             var features = _.map(subregions.features, function (o) {
               var obj = _.pick(o, 'type', 'geometry');
-              switch(boundary.adminType) {
+              switch (boundary.adminType) {
                 case 3:
                   obj.properties = {
                     id: +(o.id),
                     name: o.name,
                     type: 4
                   };
-                break;
-                // There are no subregions for adminType 4
+                  break;
+                  // There are no subregions for adminType 4
               }
               return obj;
             });
@@ -443,8 +440,7 @@ module.exports = [
           res(Boom.wrap(err));
         });
       }
-      }
-
+    }
   },
 
   /**
@@ -456,13 +452,13 @@ module.exports = [
    * @apiVersion 0.1.0
    *
    * @apiParam {String} name Search parameter
-   * 
+   *
    * @apiSuccess {Object[]} boundaries List of matching boundaries
    * @apiSuccess {String} boundaries.id  ID of boundary
    * @apiSuccess {String} boundaries.name Name of boundary
    * @apiSuccess {String} boundaries.type  type of boundary
    *
-   * @apiExample {curl} Example Usage: 
+   * @apiExample {curl} Example Usage:
    *    curl http://localhost:4000/admin/search/Bayan
    *
    * @apiSuccessExample {json} Success-Response:
@@ -484,7 +480,6 @@ module.exports = [
     method: 'GET',
     path: '/admin/search/{name}',
     handler: function (req, res) {
-
       var name = '%' + req.params.name + '%';
 
       knex.select('id', 'name', 'type')
@@ -506,19 +501,19 @@ module.exports = [
  * Helper function
  *
  * Extracts and combines the needed keys from baseMeat and rawProps,
- * 
+ *
  * @param  baseMeta
  *   The base meta for the admin area. Expects it to contain the following keys:
  *   - id
  *   - name
  *   - adminType (will be changed to "type")
- *  
+ *
  * @param  rawProps
- *   The properties from where to extract the values when they exist and when 
+ *   The properties from where to extract the values when they exist and when
  *   they're not null:
  *   NAME_0, NAME_1, NAME_2, NAME_3, NAME_4,
  *   ID_0_OR, ID_1_OR, ID_2_OR', ID_3_OR, ID_4_OR
- * 
+ *
  * @return props
  */
 var fixProperties = function (baseMeta, rawProps) {
@@ -529,4 +524,4 @@ var fixProperties = function (baseMeta, rawProps) {
   props.type = baseMeta.adminType;
 
   return props;
-}
+};
