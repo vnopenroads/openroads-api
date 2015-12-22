@@ -7,6 +7,7 @@ var getSubregionFeatures = require('../services/admin-subregions.js').getFeature
 var listSubregions = require('../services/admin-subregions.js').list;
 var queryPolygon = require('../services/query-polygon.js');
 var knex = require('../connection');
+var ID = require('../services/id');
 
 module.exports = [
   /**
@@ -488,10 +489,56 @@ module.exports = [
         .orderBy('name')
         .limit(10)
         .then(function (data) {
-          _.forEach(data, function (o) {
-            o.id = +(o.id);
+          //data = [data[6]];
+          // Get parent ds
+          var relations = _.map(data, function (o) {
+            if (o.type === 1) {
+              return {
+                parent: o.id,
+                child: o.id
+              };
+            }
+            var i = new ID(o.id);
+            var ni = i.parentID(o.type - 1);
+            return {
+              parent: ni,
+              child: o.id
+            };
           });
-          res(data);
+
+          var pIds = _.pluck(relations, 'parent');
+
+          knex.select('id', 'name', 'type')
+            .from('admin_boundaries')
+            .whereIn('id', pIds)
+            .then(function (dd) {
+              var result = _.map(relations, function (o) {
+                var main = _.find(data, 'id', o.child);
+                var parent = _.find(dd, 'id', o.parent);
+                // With complete data this should not happen.
+                if (!parent) {
+                  parent = {
+                    name: 'parent Not Available',
+                    type: null,
+                    id: null
+                  };
+                }
+                if (main.type === 1) {
+                  main.parent = {
+                    name: 'Philippines',
+                    type: 0,
+                    id: 9999999999
+                  };
+                } else {
+                  main.parent = parent;
+                }
+                main.id = +(main.id);
+                main.parent.id = +(main.parent.id);
+                return main;
+              });
+
+              res(result);
+            });
         });
     }
   }
