@@ -157,10 +157,10 @@ describe('admin endpoint', function() {
   });
 
   it('fetches a boundary for a given municipality id', function(done) {
-    getAdminBoundary(7150216000)
+    getAdminBoundary(13030051003)
     .then(function (boundary) {
-      boundary.name.should.equal('Batuan');
-      boundary.geometry.coordinates[0].should.have.length(311);
+      boundary.name.should.equal('San Isidro');
+      boundary.geometry.coordinates[0].should.have.length(29);
       done();
     })
     .catch(done);
@@ -319,12 +319,12 @@ describe('admin search endpoint', function() {
     return (idA < idB) ? -1 : (idA > idB) ? 1 : 0;
   }
 
-  it('responds with the right results for term sayan', function(done) {
-    var expected = [{"id":3771538003,"name":"Apsayan","type":4},{"id":1350635003,"name":"Bacsayan","type":4},{"id":1390751003,"name":"Bacsayan","type":4},{"id":17420846003,"name":"Bansayan","type":4},{"id":17420820003,"name":"Bansayan","type":4},{"id":17420844025,"name":"Bansayan","type":4},{"id":4120174012,"name":"Calansayan","type":4},{"id":7691413004,"name":"Cansayang","type":4},{"id":2180316013,"name":"Capissayan Norte","type":4},{"id":2180316014,"name":"Capissayan Sur","type":4}];
-
+  it('responds with the right results for term quezon', function(done) {
+    var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},{"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},{"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},{"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},{"id":13751511036,"name":"Quezon","type":4,"parent": {"id":13751511000,"name":"Surigao City","type":3 }},{"id":13761530014,"name":"Quezon","type":4,"parent": {"id":13761530000,"name":"Tagbina","type":3 }},{"id":13761532013,"name":"Quezon","type":4,"parent": {"id":13761532000,"name":"Tandag City","type":3 }}];
+    
     server.injectThen({
       method: 'GET',
-      url: '/admin/search/sayan'
+      url: '/admin/search/quezon'
     })
     .then(function (resp) {
       JSON.parse(resp.payload).sort(sortIDs).should.be.eql(expected.sort(sortIDs));
@@ -333,12 +333,12 @@ describe('admin search endpoint', function() {
     .catch(done);
   });
 
-  it('responds with the right results for sayan- case insensitive', function(done) {
-    var expected = [{"id":3771538003,"name":"Apsayan","type":4},{"id":1350635003,"name":"Bacsayan","type":4},{"id":1390751003,"name":"Bacsayan","type":4},{"id":17420846003,"name":"Bansayan","type":4},{"id":17420820003,"name":"Bansayan","type":4},{"id":17420844025,"name":"Bansayan","type":4},{"id":4120174012,"name":"Calansayan","type":4},{"id":7691413004,"name":"Cansayang","type":4},{"id":2180316013,"name":"Capissayan Norte","type":4},{"id":2180316014,"name":"Capissayan Sur","type":4}];
+  it('responds with the right results for quezon - case insensitive', function(done) {
+    var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},{"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},{"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},{"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},{"id":13751511036,"name":"Quezon","type":4,"parent": {"id":13751511000,"name":"Surigao City","type":3 }},{"id":13761530014,"name":"Quezon","type":4,"parent": {"id":13761530000,"name":"Tagbina","type":3 }},{"id":13761532013,"name":"Quezon","type":4,"parent": {"id":13761532000,"name":"Tandag City","type":3 }}];
 
     server.injectThen({
       method: 'GET',
-      url: '/admin/search/SaYaN'
+      url: '/admin/search/QuEzOn'
     })
     .then(function (resp) {
       JSON.parse(resp.payload).sort(sortIDs).should.be.eql(expected.sort(sortIDs));
