@@ -59,10 +59,10 @@ function getFeatures(parentType, parentId, parentRegion) {
     var subRegions = _.pluck(data, 'geo');
     // HACK: strip actual boundary data for larger regions, because they're
     // waaaaaay too big.
-    if(parentType <= 2)
-      subRegions.forEach(function (feat) {
-        feat.geometry.coordinates = [];
-      });
+    // if(parentType <= 2)
+    //   subRegions.forEach(function (feat) {
+    //     feat.geometry.coordinates = [];
+    //   });
     return {
       type: 'FeatureCollection',
       properties: parentRegion ? parentRegion.properties : {},
