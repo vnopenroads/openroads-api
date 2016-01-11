@@ -27,7 +27,7 @@ describe('admin subregions endpoint', function() {
     })
     .then(function (resp) {
       var obj = JSON.parse(resp.payload);
-      obj.should.have.keys('id', 'name', 'type', 'NAME_0', 'adminAreas');
+      obj.should.have.keys('id', 'name', 'type', 'NAME_0', 'adminAreas', 'bbox');
       done();
     })
     .catch(done);
