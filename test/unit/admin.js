@@ -321,8 +321,6 @@ describe('admin search endpoint', function() {
 
   it('responds with the right results for term quezon', function(done) {
     var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},
-    {"id":1350617024,"name":"Quezon","type":4,"parent":{"id":1350617000,"name":"Cabugao","type":3}},
-    {"id":1350638020,"name":"Quezon","type":4,"parent":{"id":1350638000,"name":"Santa","type":3}},
     {"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},
     {"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},
     {"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},
@@ -343,8 +341,6 @@ describe('admin search endpoint', function() {
 
   it('responds with the right results for quezon - case insensitive', function(done) {
     var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},
-    {"id":1350617024,"name":"Quezon","type":4,"parent":{"id":1350617000,"name":"Cabugao","type":3}},
-    {"id":1350638020,"name":"Quezon","type":4,"parent":{"id":1350638000,"name":"Santa","type":3}},
     {"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},
     {"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},
     {"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},
