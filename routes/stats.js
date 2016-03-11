@@ -14,43 +14,51 @@ function serializeStats(knexResult) {
     var value = result.value;
 
     // Measure is in the format measure-category-subcategory
+    // Except in some cases, such as totals (measure-total)
     var measureClass = result.measure.split('-');
     var measure = measureClass[0];
     var category = measureClass[1];
     var subCategory = measureClass[2];
 
-    if (!(category in stat)) {
-      stat[category] = {}
+    if (!(category in stat)) { stat[category] = {}; }
+    if (typeof subCategory === 'undefined') {
+      stat[category][measure] = value;
+    } else {
+      if (!(subCategory in stat[category])) { stat[category][subCategory] = {}; }
+      stat[category][subCategory][measure] = value;
     }
-
-    if (!(subCategory in stat[category])) {
-      stat[category][subCategory] = {}
-    }
-    stat[category][subCategory][measure] = value;
   });
 
-  if (meta.id !== '0') {
-    return {'stats': stat, 'name': meta.name, 'type': meta.type};
+  if (meta.id === '0') {
+    return {
+      stats: stat,
+      name: meta.name,
+      id: meta.id
+    };
   } else {
-    // Processing national
-    return {'stats': stat, 'name': 'National', 'type': 0}
+    return {
+      stats: stat,
+      name: meta.name,
+      type: meta.type,
+      id: meta.id
+    };
   }
 }
 
 function handleNationalStats (req, res) {
-  return knex.table('admin_stats')
-  .where('id', '0')
-  .select()
-  .then(serializeStats)
-  .then(res);
+  return res.redirect('/admin/0/stats');
 }
 
 function handleAdminStats (req, res) {
   var id = req.params.id;
-  return knex('admin_stats')
-  .join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id')
-  .select()
-  .where('admin_stats.id', id)
+  var query = knex('admin_stats')
+    .select()
+    .where('admin_stats.id', id);;
+  if (id !== '0') {
+    query = query.join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id');
+  }
+
+  query
   .then(serializeStats)
   .then(res)
   .catch(function (err) {
@@ -65,11 +73,7 @@ module.exports = [
     path: '/admin/{id}/stats',
     handler: function handler (req, res) {
       var id = req.params.id;
-      if (id == 0) {
-        return handleNationalStats(req, res);
-      } else {
-        return handleAdminStats(req, res);
-      }
+      return handleAdminStats(req, res);
     }
   },
   {
