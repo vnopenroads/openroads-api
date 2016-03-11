@@ -4,13 +4,11 @@ var knex = require('../connection');
 // knexResult is an array of measures
 // for a single admin id
 function serializeStats(knexResult) {
-  var stat = {
-    'stats': {
-      'or_condition': {},
-      'or_rdclass': {},
-      'surface': {}
-    }
-  };
+  if (knexResult.length === 0) {
+    return Boom.notFound();
+  }
+  var meta = knexResult[0];
+  var stat = {};
 
   knexResult.forEach(function (result) {
     var value = result.value;
@@ -21,34 +19,62 @@ function serializeStats(knexResult) {
     var category = measureClass[1];
     var subCategory = measureClass[2];
 
-    result[category][subCategory][measure] = value;
+    if (!(category in stat)) {
+      stat[category] = {}
+    }
+
+    if (!(subCategory in stat[category])) {
+      stat[category][subCategory] = {}
+    }
+    stat[category][subCategory][measure] = value;
   });
 
-  return stat;
+  if (meta.id !== '0') {
+    return {'stats': stat, 'name': meta.name, 'type': meta.type};
+  } else {
+    // Processing national
+    return {'stats': stat, 'name': 'National', 'type': 0}
+  }
 }
+
+function handleNationalStats (req, res) {
+  return knex.table('admin_stats')
+  .where('id', '0')
+  .select()
+  .then(serializeStats)
+  .then(res);
+}
+
+function handleAdminStats (req, res) {
+  var id = req.params.id;
+  return knex('admin_stats')
+  .join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id')
+  .select()
+  .where('admin_stats.id', id)
+  .then(serializeStats)
+  .then(res)
+  .catch(function (err) {
+    console.log(err);
+  })
+}
+
 
 module.exports = [
   {
     method: 'GET',
     path: '/admin/{id}/stats',
-    handler: function (req, res) {
+    handler: function handler (req, res) {
       var id = req.params.id;
-      knex.select('admin_stats')
-      .join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id')
-      .where('id', id)
-      .then(seralizeStats)
-      .then(res)
+      if (id == 0) {
+        return handleNationalStats(req, res);
+      } else {
+        return handleAdminStats(req, res);
+      }
     }
   },
   {
     method: 'GET',
     path: '/admin/stats',
-    handler: function (req, res) {
-      knex.select('admin_stats')
-      .join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id')
-      .where('id', '0')
-      .then(serializeStats)
-      .then(res);
-    }
+    handler: handleNationalStats
   }
 ]
