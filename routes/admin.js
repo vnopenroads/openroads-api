@@ -1,6 +1,7 @@
 'use strict';
 var Boom = require('boom');
 var _ = require('lodash');
+var extent = require('turf-extent');
 
 var getAdminBoundary = require('../services/admin-boundary.js');
 var getSubregionFeatures = require('../services/admin-subregions.js').getFeatures;
@@ -245,17 +246,31 @@ module.exports = [
     method: 'GET',
     path: '/admin/subregions',
     handler: function (req, res) {
-      return listSubregions().then(function (subregions) {
-        // Fix subregion id.
-        _.forEach(subregions, function (o) {
-          o.id = +(o.id);
+      return getSubregionFeatures().then(function (subregions) {
+        var adminAreas = _.map(subregions.features, function (o) {
+          return {
+            id: +(o.id),
+            name: o.name,
+            bbox: extent(o)
+          }
         });
-        return res({ adminAreas: subregions });
+        return res({adminAreas: adminAreas});
       })
       .catch(function (err) {
         console.log('err', err);
         res(Boom.wrap(err));
       });
+      // return listSubregions().then(function (subregions) {
+      //   // Fix subregion id.
+      //   _.forEach(subregions, function (o) {
+      //     o.id = +(o.id);
+      //   });
+      //   return res({ adminAreas: subregions });
+      // })
+      // .catch(function (err) {
+      //   console.log('err', err);
+      //   res(Boom.wrap(err));
+      // });
     }
   },
 
@@ -425,14 +440,16 @@ module.exports = [
       }
       else {
         getAdminBoundary(id).then(function (boundary) {
-          return listSubregions(boundary.adminType, id, boundary).then(function (subregions) {
-            // Fix subregion id.
-            _.forEach(subregions, function (o) {
-              o.id = +(o.id);
-            });
-
+          return getSubregionFeatures(boundary.adminType, id, boundary).then(function (subregions) {
             var main = fixProperties(boundary, boundary.properties);
-            main.adminAreas = subregions;
+            main.adminAreas = _.map(subregions.features, function (o) {
+              return {
+                id: +(o.id),
+                name: o.name,
+                bbox: extent(o)
+              }
+            });
+            main.bbox = extent(boundary);
             return res(main);
           });
         })
@@ -440,6 +457,23 @@ module.exports = [
           console.log('err', err);
           res(Boom.wrap(err));
         });
+        // getAdminBoundary(id).then(function (boundary) {
+        //   return listSubregions(boundary.adminType, id, boundary).then(function (subregions) {
+        //     // Fix subregion id.
+        //     _.forEach(subregions, function (o) {
+        //       o.id = +(o.id);
+        //     });
+
+        //     var main = fixProperties(boundary, boundary.properties);
+        //     main.adminAreas = subregions;
+        //     main.bbox = extent(boundary);
+        //     return res(main);
+        //   });
+        // })
+        // .catch(function (err) {
+        //   console.log('err', err);
+        //   res(Boom.wrap(err));
+        // });
       }
     }
   },

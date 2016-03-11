@@ -27,7 +27,7 @@ describe('admin subregions endpoint', function() {
     })
     .then(function (resp) {
       var obj = JSON.parse(resp.payload);
-      obj.should.have.keys('id', 'name', 'type', 'NAME_0', 'adminAreas');
+      obj.should.have.keys('id', 'name', 'type', 'NAME_0', 'adminAreas', 'bbox');
       done();
     })
     .catch(done);
@@ -320,7 +320,13 @@ describe('admin search endpoint', function() {
   }
 
   it('responds with the right results for term quezon', function(done) {
-    var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},{"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},{"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},{"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},{"id":13751511036,"name":"Quezon","type":4,"parent": {"id":13751511000,"name":"Surigao City","type":3 }},{"id":13761530014,"name":"Quezon","type":4,"parent": {"id":13761530000,"name":"Tagbina","type":3 }},{"id":13761532013,"name":"Quezon","type":4,"parent": {"id":13761532000,"name":"Tandag City","type":3 }}];
+    var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},
+    {"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},
+    {"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},
+    {"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},
+    {"id":13751511036,"name":"Quezon","type":4,"parent": {"id":13751511000,"name":"Surigao City","type":3 }},
+    {"id":13761530014,"name":"Quezon","type":4,"parent": {"id":13761530000,"name":"Tagbina","type":3 }},
+    {"id":13761532013,"name":"Quezon","type":4,"parent": {"id":13761532000,"name":"Tandag City","type":3 }}];
     
     server.injectThen({
       method: 'GET',
@@ -334,7 +340,13 @@ describe('admin search endpoint', function() {
   });
 
   it('responds with the right results for quezon - case insensitive', function(done) {
-    var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},{"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},{"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},{"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},{"id":13751511036,"name":"Quezon","type":4,"parent": {"id":13751511000,"name":"Surigao City","type":3 }},{"id":13761530014,"name":"Quezon","type":4,"parent": {"id":13761530000,"name":"Tagbina","type":3 }},{"id":13761532013,"name":"Quezon","type":4,"parent": {"id":13761532000,"name":"Tandag City","type":3 }}];
+    var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},
+    {"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},
+    {"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},
+    {"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},
+    {"id":13751511036,"name":"Quezon","type":4,"parent": {"id":13751511000,"name":"Surigao City","type":3 }},
+    {"id":13761530014,"name":"Quezon","type":4,"parent": {"id":13761530000,"name":"Tagbina","type":3 }},
+    {"id":13761532013,"name":"Quezon","type":4,"parent": {"id":13761532000,"name":"Tandag City","type":3 }}];
 
     server.injectThen({
       method: 'GET',
