@@ -5,7 +5,6 @@ var extent = require('turf-extent');
 
 var getAdminBoundary = require('../services/admin-boundary.js');
 var getSubregionFeatures = require('../services/admin-subregions.js').getFeatures;
-var listSubregions = require('../services/admin-subregions.js').list;
 var queryPolygon = require('../services/query-polygon.js');
 var knex = require('../connection');
 var ID = require('../services/id');
@@ -260,17 +259,6 @@ module.exports = [
         console.log('err', err);
         res(Boom.wrap(err));
       });
-      // return listSubregions().then(function (subregions) {
-      //   // Fix subregion id.
-      //   _.forEach(subregions, function (o) {
-      //     o.id = +(o.id);
-      //   });
-      //   return res({ adminAreas: subregions });
-      // })
-      // .catch(function (err) {
-      //   console.log('err', err);
-      //   res(Boom.wrap(err));
-      // });
     }
   },
 
@@ -457,23 +445,6 @@ module.exports = [
           console.log('err', err);
           res(Boom.wrap(err));
         });
-        // getAdminBoundary(id).then(function (boundary) {
-        //   return listSubregions(boundary.adminType, id, boundary).then(function (subregions) {
-        //     // Fix subregion id.
-        //     _.forEach(subregions, function (o) {
-        //       o.id = +(o.id);
-        //     });
-
-        //     var main = fixProperties(boundary, boundary.properties);
-        //     main.adminAreas = subregions;
-        //     main.bbox = extent(boundary);
-        //     return res(main);
-        //   });
-        // })
-        // .catch(function (err) {
-        //   console.log('err', err);
-        //   res(Boom.wrap(err));
-        // });
       }
     }
   },
