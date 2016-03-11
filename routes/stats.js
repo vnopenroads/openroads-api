@@ -31,9 +31,7 @@ function serializeStats(knexResult) {
 
   if (meta.id === '0') {
     return {
-      stats: stat,
-      name: meta.name,
-      id: meta.id
+      stats: stat
     };
   } else {
     return {
