@@ -512,14 +512,13 @@ module.exports = [
           });
 
           var pIds = _.pluck(relations, 'parent');
-
           knex.select('id', 'name', 'type')
             .from('admin_boundaries')
             .whereIn('id', pIds)
             .then(function (dd) {
               var result = _.map(relations, function (o) {
                 var main = _.find(data, 'id', o.child);
-                var parent = _.find(dd, 'id', o.parent);
+                var parent = _.clone(_.find(dd, 'id', o.parent));
                 // With complete data this should not happen.
                 if (!parent) {
                   parent = {

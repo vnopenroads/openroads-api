@@ -339,6 +339,23 @@ describe('admin search endpoint', function() {
     .catch(done);
   });
 
+  it('responds with the right results when there is a shared parent', function(done) {
+    var expected = [
+    {"id":13020000000,"name":"Agusan Del Norte","type":2,"parent":{"id":13000000000,"name":"Region IV-B (Mimaropa)","type":1}},
+    {"id":13030000000,"name":"Agusan Del Sur","type":2,"parent":{"id":13000000000,"name":"Region IV-B (Mimaropa)","type":1}},
+    {"id":13020029002,"name":"Agusan Pequeno","type":4,"parent":{"id":13020029000,"name":"Butuan City","type":3}}];
+
+    server.injectThen({
+      method: 'GET',
+      url: '/admin/search/agusan'
+    })
+    .then(function (resp) {
+      JSON.parse(resp.payload).sort(sortIDs).should.be.eql(expected.sort(sortIDs));
+      done();
+    })
+    .catch(done);
+  });
+
   it('responds with the right results for quezon - case insensitive', function(done) {
     var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},
     {"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},
