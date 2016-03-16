@@ -62,7 +62,7 @@ module.exports = [
    *      <nd ref="27"/>
    *      <nd ref="28"/>
    *      <tag k="highway" v="unclassified"/>
-   *      <tag k="or_rdclass" v="barangay"/>
+   *      <tag k="or_responsibility" v="barangay"/>
    *    </way>
    *  </osm>
    */

@@ -32,7 +32,7 @@ module.exports = {
    *      <nd ref="77932"/>
    *      ...
    *      <tag k="highway" v="secondary"/>
-   *      <tag k="or_rdclass" v="provincial"/>
+   *      <tag k="or_responsibility" v="provincial"/>
    *      <tag k="or_brgy" v="Dao"/>
    *    </way>
    *  </osm>

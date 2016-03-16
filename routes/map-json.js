@@ -30,7 +30,7 @@ module.exports = {
    *        "type": "Feature",
    *        "properties": {
    *          "highway": "secondary",
-   *          "or_rdclass": "provincial",
+   *          "or_responsibility": "provincial",
    *          "or_brgy": "Dao",
    *          "name": "TINAGO_DAO ROAD",
    *          "or_mun": "Dauis",
