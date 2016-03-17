@@ -30,6 +30,7 @@ if [ ! "$(ls -A $DATADIR)" ]; then
 	su postgres sh -lc "psql -U osm api06_test" <<-EOSQL
 		\i /install/script/apidb_0.6.sql
 		\i /install/script/apidb_0.6_admin_boundaries.sql
+                \i /install/script/add_stats_201603082310.sql
 	EOSQL
 
         # Add admin boundaries
