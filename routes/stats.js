@@ -55,15 +55,81 @@ function handleAdminStats (req, res) {
   if (id !== '0') {
     query = query.join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id');
   }
+
   query
   .then(serializeStats)
   .then(res)
   .catch(function (err) {
     res(Boom.wrap(err));
-  })
+  });
 }
 
+
 module.exports = [
+  /**
+   * @api {get} /admin/:id/stats Get stats about an admin area.
+   * @apiGroup Administrative areas
+   * @apiName GetAdminStats
+   * @apiDescription This endpoint returns stats about the given admin area. Stats are grouped by surface, road condition, and road responsibility.
+   * @apiVersion 0.1.0
+   *
+   * @apiParam {Number} ID ID of the region, province, municipality, city or
+   * barangay.
+   *
+   * @apiSuccess {Object} stats Stats object
+   * @apiSuccess {Object} stats.totalLength totalLength Stats object.
+   * @apiSuccess {Number} stats.totalLength.length total length of roads in area.
+   * @apiSuccess {Object} stats.group Contains stats grouped by `group`
+   * @apiSuccess {Object} stats.group.type Contains stats for that group type (e.g: 'poor' for road condition group)
+   * @apiSuccess {Number} stats.group.type.metric total `metric` for all roads of that type in administrative areas
+   * @apiSuccess {String} name Name of admin area
+   * @apiSuccess {Number} type Type of admin area
+   * @apiSuccess {String} id ID of admin area
+   *
+   * @apiExample {curl} Example Usage:
+   *    curl http://localhost:4000/admin/13591204000/stats
+   *
+   * @apiSuccessExample {json} stats
+   * {
+   *   "stats": {
+   *     "totalLength": {
+   *       "length": 128.37
+   *     },
+   *   "surface": {
+   *     "roadTypeUndefined": {
+   *       "length": 128.37
+   *     }
+   *   },
+   *   "or_condition": {
+   *     "roadTypeUndefined": {
+   *       "length": 128.37
+   *     }
+   *   },
+   *   "or_rdclass": {
+   *      "roadTypeUndefined": {
+   *        "length": 25.2738
+   *      },
+   *      "barangay": {
+   *        "length": 25.1974
+   *      },
+   *      "provincial": {
+   *        "length": 15.0454
+   *      },
+   *      "private": {
+   *        "length": 29.0484
+   *      },
+   *      "municipal": {
+   *        "length": 5.33835
+   *      },"national": {
+   *        "length": 28.4666
+   *      }
+   *     }
+   *   },
+   *   "name": "Batangas",
+   *   "type": 2,
+   *   "id": "4120000000"
+   * }
+   */
   {
     method: 'GET',
     path: '/admin/{id}/stats',
@@ -72,6 +138,18 @@ module.exports = [
       return handleAdminStats(req, res);
     }
   },
+  /**
+   * @api {get} /admin/stats Get stats for the country.
+   * @apiGroup Administrative areas
+   * @apiName GetAdminStatsCountry
+   * @apiDescription This endpoint returns stats for the country. It redirects to `/admin/0/stats`, view the documentation for GetAdminStats to see the response format. 
+   * admin area.
+   * @apiVersion 0.1.0
+   *
+   * @apiExample {curl} Example Usage:
+   *    curl http://localhost:4000/admin/stats
+   *
+   */
   {
     method: 'GET',
     path: '/admin/stats',
