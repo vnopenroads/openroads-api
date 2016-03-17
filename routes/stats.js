@@ -55,15 +55,13 @@ function handleAdminStats (req, res) {
   if (id !== '0') {
     query = query.join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id');
   }
-
   query
   .then(serializeStats)
   .then(res)
   .catch(function (err) {
-    console.log(err);
+    res(Boom.wrap(err));
   })
 }
-
 
 module.exports = [
   {
