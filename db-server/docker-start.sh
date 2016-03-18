@@ -31,6 +31,7 @@ if [ ! "$(ls -A $DATADIR)" ]; then
 		\i /install/script/apidb_0.6.sql
 		\i /install/script/apidb_0.6_admin_boundaries.sql
                 \i /install/script/add_stats_201603082310.sql
+                \i /install/script/add_tasks_201603171512.sql
 	EOSQL
 
         # Add admin boundaries
