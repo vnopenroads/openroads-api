@@ -3,18 +3,16 @@
 const Boom = require('boom');
 const knex = require('../connection');
 
-function serializeTasks(knexResult, areaID, queryString) {
+function serializeTasks(knexResult, queryString) {
+  let meta = knexResult[0];
   let hasTasks;
-  // If nothing was returned, determine whether it was because the boundary doesn't exist at all
+
   if (knexResult.length === 0) {
+    // If no results were returned, the area doesn't exist
+    return Boom.notFound();
+  } else if (knexResult.length === 1 && !meta.id) {
+    // If one result with no task information was returned, then the area is legitimate
     hasTasks = false;
-    knexResult = knex('admin_boundaries')
-      .select([
-        'name AS adminName',
-        'type AS adminType'
-      ])
-      .where('id', areaID);
-    if (!knexResult.length) { return Boom.notFound(); }
   } else {
     hasTasks = true;
   }
@@ -44,16 +42,16 @@ function serializeTasks(knexResult, areaID, queryString) {
   }
 
   let response = {
-    tasks: tasks,
-    id: areaID
+    tasks: tasks
   };
-  if (areaID === 0) {
+  if (!meta.adminID) {
     response.name = 'Philippines';
     response.type = 0;
+    response.id = 0;
   } else {
-    let meta = knexResult[0];
     response.name = meta.adminName;
     response.type = meta.adminType;
+    response.id = meta.adminID;
   }
 
   return response;
@@ -72,18 +70,28 @@ function handleAdminTasks (req, res) {
       .where(knex.raw(`${id} = ANY(admin_tasks.adminids)`));
   }
   else {
+    // Create a fake record, so that the right-join always returns one record
+    // Otherwise, there's no way to get the administrative name and ID when serializing
+    let fakeRecord = knex('temp_admin_tasks')
+      .insert({
+        adminids: [id]
+      });
+
     query = knex('admin_tasks')
+      .unionAll(fakeRecord)
       .select([
+        'admin_tasks.*',
         'admin_boundaries.name AS adminName',
-        'admin_boundaries.type AS adminType'
+        'admin_boundaries.type AS adminType',
+        'admin_boundaries.id AS adminID'
       ])
-      .where(knex.raw(`${id} = ANY(admin_tasks.adminids)`))
-      .join('admin_boundaries', 'admin_boundaries.id', knex.raw('?', [String(id)]));
+      .whereRaw(`${id} = ANY(admin_tasks.adminids)`)
+      .rightJoin('admin_boundaries', 'admin_boundaries.id', knex.raw('${id}'));
   }
 
   query
   .then(function (knexResult) {
-    return serializeTasks(knexResult, id, req.query);
+    return serializeTasks(knexResult, req.query);
   })
   .then(res)
   .catch(function (err) {
