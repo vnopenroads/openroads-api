@@ -105,7 +105,7 @@ module.exports = [
    *       "length": 128.37
    *     }
    *   },
-   *   "or_rdclass": {
+   *   "or_responsibility": {
    *      "roadTypeUndefined": {
    *        "length": 25.2738
    *      },
