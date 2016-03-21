@@ -238,7 +238,7 @@ describe('admin endpoint', function() {
       obj.properties.name.should.equal('Bohol');
       obj.properties.type.should.equal(4);
       obj.features.should.have.length(1);
-      obj.features[0].properties.should.have.keys('highway', 'or_rdclass', 'source');
+      obj.features[0].properties.should.have.keys('highway', 'or_responsibility', 'source');
       done();
     })
     .catch(done);

@@ -453,7 +453,7 @@ module.exports = {
                      "v":"road"
                   },
                   {
-                     "k":"or_rdclass",
+                     "k":"or_responsibility",
                      "v":"fmr"
                   },
                   {
