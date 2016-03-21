@@ -9,8 +9,8 @@ function serializeTasks(knexResult, queryString) {
 
   if (knexResult.length === 0) {
     // If no results were returned, the area doesn't exist
-    return Boom.notFound();
-  } else if (knexResult.length === 1 && !meta.id) {
+    return Boom.notFound("Area's ID was not found in the `admin_boundaries` database");
+  } else if (knexResult.length === 1 && !meta.id && !meta.type) {
     // If one result with no task information was returned, then the area is legitimate
     hasTasks = false;
   } else {
@@ -57,6 +57,17 @@ function serializeTasks(knexResult, queryString) {
   return response;
 };
 
+function handleZeroTasks (knexResult, areaID) {
+  let query = knex('admin_boundaries')
+    .select([
+      'name AS adminName',
+      'type AS adminType',
+      'id AS adminID'
+    ])
+    .where('id', areaID);
+  return query;
+};
+
 function handleAdminTasks (req, res) {
   // Knex doesn't support array data types, so have to use raw SQL for the query
   // Therefore, should cast `id` to avoid SQL injection
@@ -70,15 +81,7 @@ function handleAdminTasks (req, res) {
       .where(knex.raw(`${id} = ANY(admin_tasks.adminids)`));
   }
   else {
-    // Create a fake record, so that the right-join always returns one record
-    // Otherwise, there's no way to get the administrative name and ID when serializing
-    let fakeRecord = knex('temp_admin_tasks')
-      .insert({
-        adminids: [id]
-      });
-
     query = knex('admin_tasks')
-      .unionAll(fakeRecord)
       .select([
         'admin_tasks.*',
         'admin_boundaries.name AS adminName',
@@ -86,10 +89,17 @@ function handleAdminTasks (req, res) {
         'admin_boundaries.id AS adminID'
       ])
       .whereRaw(`${id} = ANY(admin_tasks.adminids)`)
-      .rightJoin('admin_boundaries', 'admin_boundaries.id', knex.raw('${id}'));
+      .innerJoin('admin_boundaries', 'admin_boundaries.id', knex.raw(`${id}`));
   }
 
   query
+  .then(function (knexResult) {
+    if (knexResult.length === 0) {
+      return handleZeroTasks(knexResult, id);
+    } else {
+      return knexResult;
+    }
+  })
   .then(function (knexResult) {
     return serializeTasks(knexResult, req.query);
   })
