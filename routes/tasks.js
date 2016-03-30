@@ -70,6 +70,22 @@ function serializeTasks(knexResult, queryString) {
   return response;
 };
 
+function serializeWaytasks (knexResult, way_id) {
+  let tasks = [];
+  knexResult.forEach(function (task) {
+    tasks.push({
+      type: task.type,
+      details: task.details
+    });
+  });
+
+  let response = {
+    way_id: way_id,
+    tasks: tasks
+  };
+  return response;
+};
+
 function handleZeroTasks (knexResult, areaID) {
   let query = knex('admin_boundaries')
     .select([
@@ -88,7 +104,7 @@ function handleAdminTasks (req, res) {
 
   let query;
   if (id === 0) {
-    // National level doesn't have 
+    // National level doesn't have official boundary
     query = knex('admin_tasks')
       .select()
       .where(knex.raw(`${id} = ANY(admin_tasks.adminids)`));
@@ -106,20 +122,34 @@ function handleAdminTasks (req, res) {
   }
 
   query
-  .then(function (knexResult) {
-    if (knexResult.length === 0) {
-      return handleZeroTasks(knexResult, id);
-    } else {
-      return knexResult;
-    }
-  })
-  .then(function (knexResult) {
-    return serializeTasks(knexResult, req.query);
-  })
-  .then(res)
-  .catch(function (err) {
-    res(Boom.wrap(err));
-  });
+    .then(function (knexResult) {
+      if (knexResult.length === 0) {
+        return handleZeroTasks(knexResult, id);
+      } else {
+        return knexResult;
+      }
+    })
+    .then(function (knexResult) {
+      return serializeTasks(knexResult, req.query);
+    })
+    .then(res)
+    .catch(function (err) {
+      res(Boom.wrap(err));
+    });
+};
+
+function handleWaytaks (req, res) {
+  let way_id = Number(req.params.way_id);
+  let query = knex('admin_tasks')
+    .select()
+    .where('way_id', way_id);
+
+  query
+    .then(function (knexResult) {
+      return serializeWaytasks(knexResult, way_id);
+    })
+    .then(res)
+    .catch(err => { res(Boom.wrap(err))});
 };
 
 module.exports = [
@@ -188,6 +218,49 @@ module.exports = [
     path: '/admin/{id}/tasks',
     handler: function handler (req, res) {
       return handleAdminTasks(req, res);
+    }
+  },
+
+ /**
+   * @api {get} /admin/waytasks/:way_id Get to-fix tasks for a particular road
+   * @apiGroup Administrative areas
+   * @apiName GetWaytasks
+   * @apiDescription This endpoint returns uncompleted taks for a particular road.
+   * @apiVersion 0.1.0
+   *
+   * @apiParam {Number} way_id ID of the road
+   *
+   * @apiSuccess {Number} way_id ID of the road
+   * @apiSuccess {Array} bounds Bounding box of the road
+   * @apiSuccess {Array} tasks Contains all task objects
+   * @apiSuccess {String} task.type Category of the task
+   * @apiSuccess {String} task.details Plain-text description of the issue that needs to be fixed
+   *
+   * @apiExample {curl} Example Usage:
+   *    curl http://localhost:4000/admin/waytasks/5
+   *
+   * @apiSuccessExample {json} tasks
+   * {
+   *   "way_id": 5,
+   *   "bounds": [100.0, 0.0, 105.0, 1.0],
+   *   "tasks": [
+   *     {
+   *       "type": "missing-prop",
+   *       "details": "Some properties are missing: surface, or_condition"
+   *     },
+   *     {
+   *       "type": "some-other-type",
+   *       "details": "Details on this other issue with road 5"
+   *     }
+   *   ]
+   *   
+   * }
+   **/
+  {
+    method: 'GET',
+    path: '/admin/waytasks/{way_id}',
+    handler: function handler (req, res) {
+      return handleWaytaks(req, res);
     }
   }
 ];
