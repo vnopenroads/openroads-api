@@ -9,7 +9,7 @@ function serializeTasks(knexResult, queryString) {
 
   if (knexResult.length === 0) {
     // If no results were returned, the area doesn't exist
-    return Boom.notFound("Area's ID was not found in the `admin_boundaries` database");
+    return Boom.notFound("Area ID's boundary was not found in the database");
   } else if (knexResult.length === 1 && !meta.id && !meta.type) {
     // If one result with no task information was returned, then the area is legitimate
     hasTasks = false;
@@ -20,26 +20,39 @@ function serializeTasks(knexResult, queryString) {
   let page = Number(queryString.page) || 0;
   let limit = Number(queryString.limit) || 20;
 
-  let tasks = {
-    meta: {
-      page: page,
-      limit: limit,
-      total: hasTasks ? knexResult.length : 0
-    },
-    results: []
-  };
+  let results = [];
   if (hasTasks) {
-    knexResult.slice(
-      limit * page,
-      limit * (page + 1)
-    ).forEach(function (task) {
-      tasks.results.push({
-        id: Number(task.id),
+    // Group tasks by way for the `results`
+    let resultsByWay = {};
+    knexResult.forEach(function (task) {
+      if (!(task.way_id in resultsByWay)) { resultsByWay[task.way_id] = []; }
+      resultsByWay[task.way_id].push({
         type: task.type,
         details: task.details
       });
     });
+    Object.keys(resultsByWay).forEach(function (way_id) {
+      results.push({
+        way_id: Number(way_id),
+        tasks: resultsByWay[way_id]
+      });
+    });
+
+    // Ensure a consistent ordering
+    // Can't sort earlier since `way_id` was a string instead of a number then
+    results.sort(function (taskSetA, taskSetB) {
+      return taskSetA.way_id - taskSetB.way_id;
+    });
   }
+
+  let tasks = {
+    meta: {
+      page: page,
+      limit: limit,
+      total: results.length
+    },
+    results: results.slice(limit * page, limit * (page + 1))
+  };
 
   let response = {
     tasks: tasks
@@ -110,7 +123,7 @@ function handleAdminTasks (req, res) {
 };
 
 module.exports = [
-  /**
+ /**
    * @api {get} /admin/:id/tasks Get to-fix tasks within an admin area.
    * @apiGroup Administrative areas
    * @apiName GetAdminTasks
@@ -120,36 +133,56 @@ module.exports = [
    * @apiParam {Number} ID ID of the region, province, municipality, city or
    * barangay. Use `0` for the country as a whole.
    *
-   * @apiSuccess {Object} tasks Object containing all tasks, and metadata
-   * @apiSuccess {Object} tasks.meta Object containting pagination metadata
-   * @apiSuccess {Number} tasks.meta.page Page number of results (zero-indexed)
-   * @apiSuccess {Number} tasks.meta.limit Number of results to display at a time
-   * @apiSuccess {Number} tasks.meta.total Total number of results for the admin area
-   * @apiSuccess {Array} tasks.results Array of all task objects
-   * @apiSuccess {Number} task.id ID of road that has an assigned task
-   * @apiSuccess {String} task.type Category of the task
-   * @apiSuccess {String} task.details Plain-text description of the issue that needs to be fixed
    * @apiSuccess {String} name Name of admin area
    * @apiSuccess {Number} type Type of admin area
    * @apiSuccess {Number} id ID of admin area
+   * @apiSuccess {Object} meta Object containting pagination metadata
+   * @apiSuccess {Number} meta.page Page number of results (zero-indexed)
+   * @apiSuccess {Number} meta.limit Number of results to display at a time
+   * @apiSuccess {Number} meta.total Total number of results for the admin area
+   * @apiSuccess {Array} results Contains all task objects, grouped by `way_id` of the affected road
+   * @apiSuccess {String} task.type Category of the task
+   * @apiSuccess {String} task.details Plain-text description of the issue that needs to be fixed
    *
    * @apiExample {curl} Example Usage:
    *    curl http://localhost:4000/admin/7150213015/tasks
    *
    * @apiSuccessExample {json} tasks
    * {
-   *   "tasks": [
-   *     {
-   *       "id": 38,
-   *       "type": "missing-prop",
-   *       "details": "Some properties are missing: surface, or_condition"
-   *     }
-   *   ],
    *   "name": "Santo Rosario",
    *   "type": 4,
-   *   "id": 7150213015
+   *   "id": 7150213015,
+   *   "meta": {
+   *     "page": 0,
+   *     "limit": 20,
+   *     "total": 3
+   *   },
+   *   "results": [
+   *     {
+   *       "way_id": 5,
+   *       "tasks": [
+   *         {
+   *           "type": "missing-prop",
+   *           "details": "Some properties are missing: surface, or_condition"
+   *         },
+   *         {
+   *           "type": "some-other-type",
+   *           "details": "Details on this other issue with road 5"
+   *         }
+   *       ]
+   *     },
+   *     {
+   *       "way_id": 128,
+   *       "tasks": [
+   *         {
+   *           "type": "missing-prop",
+   *           "details": "Some properties are missing: surface"
+   *         }
+   *       ]
+   *     }
+   *   ]
    * }
-   */
+   **/
   {
     method: 'GET',
     path: '/admin/{id}/tasks',
