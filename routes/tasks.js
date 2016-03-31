@@ -3,7 +3,7 @@
 const Boom = require('boom');
 const knex = require('../connection');
 
-function serializeTasks(knexResult, queryString) {
+function serializeAdminWaytasks (knexResult, queryString) {
   let meta = knexResult[0];
   let hasTasks;
 
@@ -97,7 +97,7 @@ function handleZeroTasks (knexResult, areaID) {
   return query;
 };
 
-function handleAdminTasks (req, res) {
+function handleAdminWaytasks (req, res) {
   // Knex doesn't support array data types, so have to use raw SQL for the query
   // Therefore, should cast `id` to avoid SQL injection
   let id = Number(req.params.id);
@@ -105,19 +105,19 @@ function handleAdminTasks (req, res) {
   let query;
   if (id === 0) {
     // National level doesn't have official boundary
-    query = knex('admin_tasks')
+    query = knex('waytasks')
       .select()
-      .where(knex.raw(`${id} = ANY(admin_tasks.adminids)`));
+      .where(knex.raw(`${id} = ANY(waytasks.adminids)`));
   }
   else {
-    query = knex('admin_tasks')
+    query = knex('waytasks')
       .select([
-        'admin_tasks.*',
+        'waytasks.*',
         'admin_boundaries.name AS adminName',
         'admin_boundaries.type AS adminType',
         'admin_boundaries.id AS adminID'
       ])
-      .whereRaw(`${id} = ANY(admin_tasks.adminids)`)
+      .whereRaw(`${id} = ANY(waytasks.adminids)`)
       .innerJoin('admin_boundaries', 'admin_boundaries.id', knex.raw(`${id}`));
   }
 
@@ -130,7 +130,7 @@ function handleAdminTasks (req, res) {
       }
     })
     .then(function (knexResult) {
-      return serializeTasks(knexResult, req.query);
+      return serializeAdminWaytasks(knexResult, req.query);
     })
     .then(res)
     .catch(function (err) {
@@ -140,7 +140,7 @@ function handleAdminTasks (req, res) {
 
 function handleWaytaks (req, res) {
   let way_id = Number(req.params.way_id);
-  let query = knex('admin_tasks')
+  let query = knex('waytasks')
     .select()
     .where('way_id', way_id);
 
@@ -154,9 +154,9 @@ function handleWaytaks (req, res) {
 
 module.exports = [
  /**
-   * @api {get} /admin/:id/tasks Get to-fix tasks within an admin area.
+   * @api {get} /admin/:id/waytasks Get to-fix tasks within an admin area.
    * @apiGroup Administrative areas
-   * @apiName GetAdminTasks
+   * @apiName GetAdminWaytasks
    * @apiDescription This endpoint returns uncompleted taks within the given admin area. This currently includes all roads that are missing required properties.
    * @apiVersion 0.1.0
    *
@@ -175,9 +175,9 @@ module.exports = [
    * @apiSuccess {String} task.details Plain-text description of the issue that needs to be fixed
    *
    * @apiExample {curl} Example Usage:
-   *    curl http://localhost:4000/admin/7150213015/tasks
+   *    curl http://localhost:4000/admin/7150213015/waytasks
    *
-   * @apiSuccessExample {json} tasks
+   * @apiSuccessExample {json} waytasks
    * {
    *   "name": "Santo Rosario",
    *   "type": 4,
@@ -215,15 +215,15 @@ module.exports = [
    **/
   {
     method: 'GET',
-    path: '/admin/{id}/tasks',
+    path: '/admin/{id}/waytasks',
     handler: function handler (req, res) {
-      return handleAdminTasks(req, res);
+      return handleAdminWaytasks(req, res);
     }
   },
 
  /**
-   * @api {get} /admin/waytasks/:way_id Get to-fix tasks for a particular road
-   * @apiGroup Administrative areas
+   * @api {get} /way/:way_id/waytasks Get to-fix tasks for a particular road
+   * @apiGroup Features
    * @apiName GetWaytasks
    * @apiDescription This endpoint returns uncompleted taks for a particular road.
    * @apiVersion 0.1.0
@@ -239,7 +239,7 @@ module.exports = [
    * @apiExample {curl} Example Usage:
    *    curl http://localhost:4000/admin/waytasks/5
    *
-   * @apiSuccessExample {json} tasks
+   * @apiSuccessExample {json} waytasks
    * {
    *   "way_id": 5,
    *   "bounds": [100.0, 0.0, 105.0, 1.0],
@@ -258,7 +258,7 @@ module.exports = [
    **/
   {
     method: 'GET',
-    path: '/admin/waytasks/{way_id}',
+    path: '/way/{way_id}/waytasks',
     handler: function handler (req, res) {
       return handleWaytaks(req, res);
     }

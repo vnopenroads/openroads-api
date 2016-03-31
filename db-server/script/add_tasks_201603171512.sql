@@ -1,8 +1,8 @@
 --
--- Name: admin_tasks; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: waytasks; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
-CREATE TABLE admin_tasks (
+CREATE TABLE waytasks (
     id serial PRIMARY KEY,
     way_id bigint NOT NULL,
     adminids bigint[] NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE admin_tasks (
     details character varying(255) NOT NULL
 );
 
-CREATE INDEX admin_tasks_way_id_idx ON admin_tasks USING btree (way_id);
-CREATE INDEX admin_tasks_adminids_idx ON admin_tasks USING GIN (adminids);
+CREATE INDEX waytasks_way_id_idx ON waytasks USING btree (way_id);
+CREATE INDEX waytasks_adminids_idx ON waytasks USING GIN (adminids);
