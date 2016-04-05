@@ -34,6 +34,7 @@ function getIds(parentType, parentId) {
 
   var ids = [];
   for(var i = low; i < high; i += by) {
+    if (i === 0) continue;
     ids.push(i);
   }
 
@@ -48,7 +49,6 @@ function list(parentType, parentId) {
 }
 
 function getFeatures(parentType, parentId, parentRegion) {
-
   return knex('admin_boundaries')
   .whereIn('id', getIds(parentType, parentId))
   .then(function (data) {
