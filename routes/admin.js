@@ -246,13 +246,7 @@ module.exports = [
     path: '/admin/subregions',
     handler: function (req, res) {
       return getSubregionFeatures().then(function (subregions) {
-        var adminAreas = _.map(subregions.features, function (o) {
-          return {
-            id: +(o.id),
-            name: o.name,
-            bbox: extent(o)
-          }
-        });
+        var adminAreas = subregions.features.map(getSubregionProps);
         return res({adminAreas: adminAreas});
       })
       .catch(function (err) {
@@ -402,7 +396,8 @@ module.exports = [
                   obj.properties = {
                     id: +(o.id),
                     name: o.name,
-                    type: 4
+                    type: 4,
+                    completeness: o.completeness
                   };
                   break;
                   // There are no subregions for adminType 4
@@ -430,13 +425,7 @@ module.exports = [
         getAdminBoundary(id).then(function (boundary) {
           return getSubregionFeatures(boundary.adminType, id, boundary).then(function (subregions) {
             var main = fixProperties(boundary, boundary.properties);
-            main.adminAreas = _.map(subregions.features, function (o) {
-              return {
-                id: +(o.id),
-                name: o.name,
-                bbox: extent(o)
-              }
-            });
+            main.adminAreas = subregions.features.map(getSubregionProps);
             main.bbox = extent(boundary);
             return res(main);
           });
@@ -494,7 +483,6 @@ module.exports = [
         .orderBy('name')
         .limit(10)
         .then(function (data) {
-          //data = [data[6]];
           // Get parent ds
           var relations = _.map(data, function (o) {
             if (o.type === 1) {
@@ -578,3 +566,12 @@ var fixProperties = function (baseMeta, rawProps) {
 
   return props;
 };
+
+function getSubregionProps (o) {
+  return {
+    id: +(o.id),
+    name: o.name,
+    bbox: extent(o),
+    completeness: o.completeness
+  }
+}
