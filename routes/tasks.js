@@ -94,7 +94,7 @@ function handleZeroTasks (knexResult, areaID) {
 function handleAdminWaytasks (req, res) {
   // Knex doesn't support array data types, so have to use raw SQL for the query
   // Therefore, should cast `id` to avoid SQL injection
-  let id = Number(req.params.id);
+  let id = req.params.id ? Number(req.params.id) : 0;
 
   let query;
 
@@ -144,7 +144,7 @@ module.exports = [
    * @api {get} /admin/:id/waytasks Get to-fix tasks within an admin area.
    * @apiGroup Administrative areas
    * @apiName GetAdminWaytasks
-   * @apiDescription This endpoint returns uncompleted taks within the given admin area. This currently includes all roads that are missing required properties.
+   * @apiDescription This endpoint returns uncompleted tasks within the given admin area. This currently includes all roads that are missing required properties.
    * @apiVersion 0.1.0
    *
    * @apiParam {Number} ID ID of the region, province, municipality, city or
@@ -199,7 +199,7 @@ module.exports = [
    *     }
    *   ]
    * }
-   **/
+   */
   {
     method: 'GET',
     path: '/admin/{id}/waytasks',
@@ -207,12 +207,30 @@ module.exports = [
       return handleAdminWaytasks(req, res);
     }
   },
-
+  /**
+   * @api {get} /admin/waytasks Get the to-fix tasks for the country.
+   * @apiGroup Administrative areas
+   * @apiName GetAdminWaytasksCountry
+   * @apiDescription This endpoint returns the tasks for the country. See the 
+   * documentation for `admin/:id/waytasks` for more info.
+   * @apiVersion 0.1.0
+   *
+   * @apiExample {curl} Example Usage:
+   *    curl http://localhost:4000/admin/waytasks
+   *
+   */
+  {
+    method: 'GET',
+    path: '/admin/waytasks',
+    handler: function handler (req, res) {
+      return handleAdminWaytasks(req, res);
+    }
+  },
  /**
    * @api {get} /way/:way_id/waytasks Get to-fix tasks for a particular road
    * @apiGroup Features
    * @apiName GetWaytasks
-   * @apiDescription This endpoint returns uncompleted taks for a particular road.
+   * @apiDescription This endpoint returns uncompleted tasks for a particular road.
    * @apiVersion 0.1.0
    *
    * @apiParam {Number} way_id ID of the road
@@ -242,7 +260,7 @@ module.exports = [
    *   ]
    *   
    * }
-   **/
+   */
   {
     method: 'GET',
     path: '/way/{way_id}/waytasks',
