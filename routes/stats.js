@@ -1,3 +1,5 @@
+'use strict';
+
 var Boom = require('boom');
 var knex = require('../connection');
 
@@ -37,12 +39,9 @@ function serializeStats(knexResult) {
   };
 }
 
-function handleNationalStats (req, res) {
-  return res.redirect('/admin/0/stats');
-}
-
 function handleAdminStats (req, res) {
-  var id = req.params.id;
+  let id = req.params.id ? Number(req.params.id) : 0;
+
   var query = knex('admin_stats')
     .select()
     .where('admin_stats.id', id)
@@ -126,7 +125,6 @@ module.exports = [
     method: 'GET',
     path: '/admin/{id}/stats',
     handler: function handler (req, res) {
-      var id = req.params.id;
       return handleAdminStats(req, res);
     }
   },
@@ -145,6 +143,8 @@ module.exports = [
   {
     method: 'GET',
     path: '/admin/stats',
-    handler: handleNationalStats
+    handler: function handler (req, res) {
+      return handleAdminStats(req, res);
+    }
   }
 ]
