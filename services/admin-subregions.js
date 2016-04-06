@@ -50,17 +50,24 @@ function list(parentType, parentId) {
 
 function getFeatures(parentType, parentId, parentRegion) {
   return knex('admin_boundaries')
-  .whereIn('id', getIds(parentType, parentId))
-  .then(function (data) {
-    data.forEach(function(d) {
-      d.geo.id = d.id;
-      d.geo.name = d.name;
+  .whereIn('admin_boundaries.id', getIds(parentType, parentId))
+  .leftJoin('admin_stats', function() {
+    this.on('admin_boundaries.id', '=', 'admin_stats.id')
+      .andOn('admin_stats.measure', knex.raw('?', ['length-completeness']));
+  })
+  .select('admin_boundaries.id', 'admin_boundaries.name', 'admin_stats.value', 'admin_boundaries.geo')
+  .then(function (subregions) {
+    var features = subregions.map(function (d) {
+      return _.extend({}, d.geo, {
+        id: d.id,
+        name: d.name,
+        completeness: d.value
+      });
     });
-    var subRegions = _.pluck(data, 'geo');
     return {
       type: 'FeatureCollection',
       properties: parentRegion ? parentRegion.properties : {},
-      features: subRegions
+      features: features
     };
   });
 }

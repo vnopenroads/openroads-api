@@ -80,6 +80,20 @@ describe('admin subregions endpoint', function() {
     .catch(done);
   });
 
+  it('yields a completeness metric for admin areas', function(done) {
+    server.injectThen({
+      method: 'GET',
+      url: '/admin/subregions'
+    })
+    .then(function (resp) {
+      var obj = JSON.parse(resp.payload);
+      obj.adminAreas[0].should.have.keys(['id', 'name', 'bbox', 'completeness']);
+      done();
+    })
+    .catch(done);
+  });
+
+
   it('responds with code 400 for region subregion boundaries', function(done) {
     server.injectThen({
       method: 'GET',
@@ -329,7 +343,7 @@ describe('admin search endpoint', function() {
       {"id":13761530014,"type":4,"name":"Quezon","parent":{"id":13761530000,"name":"Tagbina","type":3},"bbox":[126.1268234252932,8.465009689331055,126.15695953369163,8.51272010803234]},
       {"id":13761532013,"type":4,"name":"Quezon","parent":{"id":13761532000,"name":"Tandag City","type":3},"bbox":[126.15045928955078,9.053370475769043,126.17285156250011,9.066610336303711]}
     ]
-    
+
     server.injectThen({
       method: 'GET',
       url: '/admin/search/quezon'
