@@ -320,13 +320,15 @@ describe('admin search endpoint', function() {
   }
 
   it('responds with the right results for term quezon', function(done) {
-    var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},
-    {"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},
-    {"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},
-    {"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},
-    {"id":13751511036,"name":"Quezon","type":4,"parent": {"id":13751511000,"name":"Surigao City","type":3 }},
-    {"id":13761530014,"name":"Quezon","type":4,"parent": {"id":13761530000,"name":"Tagbina","type":3 }},
-    {"id":13761532013,"name":"Quezon","type":4,"parent": {"id":13761532000,"name":"Tandag City","type":3 }}];
+    var expected = [
+      {"id":13591210000,"type":3,"name":"Quezon","parent":{"id":13590000000,"name":"Palawan","type":2},"bbox":[117.76358795166027,9.01955986022972,118.36121368408203,9.55039024353033]},
+      {"id":13300546012,"type":4,"name":"Quezon","parent":{"id":13300546000,"name":"Libjo","type":3},"bbox":[125.49250030517612,10.186739921569824,125.53472137451195,10.224089622497615]},
+      {"id":13751497016,"type":4,"name":"Quezon","parent":{"id":13751497000,"name":"Del Carmen","type":3},"bbox":[126.01599884033226,9.820810317993278,126.03263092041027,9.83810043334961]},
+      {"id":13751501012,"type":4,"name":"Quezon","parent":{"id":13751501000,"name":"Mainit","type":3},"bbox":[125.52903747558594,9.528791427612305,125.54736328125023,9.548560142517204]},
+      {"id":13751511036,"type":4,"name":"Quezon","parent":{"id":13751511000,"name":"Surigao City","type":3},"bbox":[125.48372650146496,9.726699829101676,125.51569366455078,9.747839927673397]},
+      {"id":13761530014,"type":4,"name":"Quezon","parent":{"id":13761530000,"name":"Tagbina","type":3},"bbox":[126.1268234252932,8.465009689331055,126.15695953369163,8.51272010803234]},
+      {"id":13761532013,"type":4,"name":"Quezon","parent":{"id":13761532000,"name":"Tandag City","type":3},"bbox":[126.15045928955078,9.053370475769043,126.17285156250011,9.066610336303711]}
+    ]
     
     server.injectThen({
       method: 'GET',
@@ -341,9 +343,10 @@ describe('admin search endpoint', function() {
 
   it('responds with the right results when there is a shared parent', function(done) {
     var expected = [
-    {"id":13020000000,"name":"Agusan Del Norte","type":2,"parent":{"id":13000000000,"name":"Region IV-B (Mimaropa)","type":1}},
-    {"id":13030000000,"name":"Agusan Del Sur","type":2,"parent":{"id":13000000000,"name":"Region IV-B (Mimaropa)","type":1}},
-    {"id":13020029002,"name":"Agusan Pequeno","type":4,"parent":{"id":13020029000,"name":"Butuan City","type":3}}];
+      {"id":13020000000,"type":2,"name":"Agusan Del Norte","parent":{"id":13000000000,"name":"Region IV-B (Mimaropa)","type":1},"bbox":[125.19894409179685,8.644116401672349,125.76863861083987,9.473800659179688]},
+      {"id":13030000000,"type":2,"name":"Agusan Del Sur","parent":{"id":13000000000,"name":"Region IV-B (Mimaropa)","type":1},"bbox":[125.24803161621094,7.925417423248291,126.37147521972656,9.177813529968262]},
+      {"id":13020029002,"type":4,"name":"Agusan Pequeno","parent":{"id":13020029000,"name":"Butuan City","type":3},"bbox":[125.52469635009777,8.97002983093273,125.5399627685548,8.989430427551326]}
+    ]
 
     server.injectThen({
       method: 'GET',
@@ -357,13 +360,15 @@ describe('admin search endpoint', function() {
   });
 
   it('responds with the right results for quezon - case insensitive', function(done) {
-    var expected = [{"id":13300546012,"name":"Quezon","type":4,"parent": {"id":13300546000,"name":"Libjo","type":3}},
-    {"id":13591210000,"name":"Quezon","type":3,"parent": {"id":13590000000,"name":"Palawan","type":2 }},
-    {"id":13751497016,"name":"Quezon","type":4,"parent": {"id":13751497000,"name":"Del Carmen","type":3 }},
-    {"id":13751501012,"name":"Quezon","type":4,"parent": {"id":13751501000,"name":"Mainit","type":3 }},
-    {"id":13751511036,"name":"Quezon","type":4,"parent": {"id":13751511000,"name":"Surigao City","type":3 }},
-    {"id":13761530014,"name":"Quezon","type":4,"parent": {"id":13761530000,"name":"Tagbina","type":3 }},
-    {"id":13761532013,"name":"Quezon","type":4,"parent": {"id":13761532000,"name":"Tandag City","type":3 }}];
+    var expected = [
+      {"id":13591210000,"type":3,"name":"Quezon","parent":{"id":13590000000,"name":"Palawan","type":2},"bbox":[117.76358795166027,9.01955986022972,118.36121368408203,9.55039024353033]},
+      {"id":13300546012,"type":4,"name":"Quezon","parent":{"id":13300546000,"name":"Libjo","type":3},"bbox":[125.49250030517612,10.186739921569824,125.53472137451195,10.224089622497615]},
+      {"id":13751497016,"type":4,"name":"Quezon","parent":{"id":13751497000,"name":"Del Carmen","type":3},"bbox":[126.01599884033226,9.820810317993278,126.03263092041027,9.83810043334961]},
+      {"id":13751501012,"type":4,"name":"Quezon","parent":{"id":13751501000,"name":"Mainit","type":3},"bbox":[125.52903747558594,9.528791427612305,125.54736328125023,9.548560142517204]},
+      {"id":13751511036,"type":4,"name":"Quezon","parent":{"id":13751511000,"name":"Surigao City","type":3},"bbox":[125.48372650146496,9.726699829101676,125.51569366455078,9.747839927673397]},
+      {"id":13761530014,"type":4,"name":"Quezon","parent":{"id":13761530000,"name":"Tagbina","type":3},"bbox":[126.1268234252932,8.465009689331055,126.15695953369163,8.51272010803234]},
+      {"id":13761532013,"type":4,"name":"Quezon","parent":{"id":13761532000,"name":"Tandag City","type":3},"bbox":[126.15045928955078,9.053370475769043,126.17285156250011,9.066610336303711]}
+    ]
 
     server.injectThen({
       method: 'GET',

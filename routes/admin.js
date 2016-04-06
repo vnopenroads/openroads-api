@@ -488,7 +488,7 @@ module.exports = [
     handler: function (req, res) {
       var name = '%' + req.params.name + '%';
 
-      knex.select('id', 'name', 'type')
+      knex.select('*')
         .from('admin_boundaries')
         .where('name', 'like', name)
         .orderBy('name')
@@ -537,6 +537,8 @@ module.exports = [
                   main.parent = parent;
                 }
                 main.id = +(main.id);
+                main.bbox = extent(main.geo);
+                delete main.geo;
                 main.parent.id = +(main.parent.id);
                 return main;
               });
