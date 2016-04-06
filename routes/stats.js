@@ -1,3 +1,5 @@
+'use strict';
+
 var Boom = require('boom');
 var knex = require('../connection');
 
@@ -29,32 +31,21 @@ function serializeStats(knexResult) {
     }
   });
 
-  if (meta.id === '0') {
-    return {
-      stats: stat
-    };
-  } else {
-    return {
-      stats: stat,
-      name: meta.name,
-      type: meta.type,
-      id: meta.id
-    };
-  }
-}
-
-function handleNationalStats (req, res) {
-  return res.redirect('/admin/0/stats');
+  return {
+    stats: stat,
+    name: meta.name,
+    type: meta.type,
+    id: +meta.id
+  };
 }
 
 function handleAdminStats (req, res) {
-  var id = req.params.id;
+  let id = req.params.id ? Number(req.params.id) : 0;
+
   var query = knex('admin_stats')
     .select()
-    .where('admin_stats.id', id);;
-  if (id !== '0') {
-    query = query.join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id');
-  }
+    .where('admin_stats.id', id)
+    .join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id');
 
   query
   .then(serializeStats)
@@ -134,7 +125,6 @@ module.exports = [
     method: 'GET',
     path: '/admin/{id}/stats',
     handler: function handler (req, res) {
-      var id = req.params.id;
       return handleAdminStats(req, res);
     }
   },
@@ -153,6 +143,8 @@ module.exports = [
   {
     method: 'GET',
     path: '/admin/stats',
-    handler: handleNationalStats
+    handler: function handler (req, res) {
+      return handleAdminStats(req, res);
+    }
   }
 ]
