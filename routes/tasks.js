@@ -55,17 +55,11 @@ function serializeAdminWaytasks (knexResult, queryString) {
   };
 
   let response = {
-    tasks: tasks
+    tasks: tasks,
+    name: meta.adminName,
+    type: meta.adminType,
+    id: meta.adminID
   };
-  if (!meta.adminID) {
-    response.name = 'Philippines';
-    response.type = 0;
-    response.id = 0;
-  } else {
-    response.name = meta.adminName;
-    response.type = meta.adminType;
-    response.id = meta.adminID;
-  }
 
   return response;
 };
@@ -103,23 +97,16 @@ function handleAdminWaytasks (req, res) {
   let id = Number(req.params.id);
 
   let query;
-  if (id === 0) {
-    // National level doesn't have official boundary
-    query = knex('waytasks')
-      .select()
-      .where(knex.raw(`${id} = ANY(waytasks.adminids)`));
-  }
-  else {
-    query = knex('waytasks')
-      .select([
-        'waytasks.*',
-        'admin_boundaries.name AS adminName',
-        'admin_boundaries.type AS adminType',
-        'admin_boundaries.id AS adminID'
-      ])
-      .whereRaw(`${id} = ANY(waytasks.adminids)`)
-      .innerJoin('admin_boundaries', 'admin_boundaries.id', knex.raw(`${id}`));
-  }
+
+  query = knex('waytasks')
+    .select([
+      'waytasks.*',
+      'admin_boundaries.name AS adminName',
+      'admin_boundaries.type AS adminType',
+      'admin_boundaries.id AS adminID'
+    ])
+    .whereRaw(`${id} = ANY(waytasks.adminids)`)
+    .innerJoin('admin_boundaries', 'admin_boundaries.id', knex.raw(`${id}`));
 
   query
     .then(function (knexResult) {

@@ -29,18 +29,12 @@ function serializeStats(knexResult) {
     }
   });
 
-  if (meta.id === '0') {
-    return {
-      stats: stat
-    };
-  } else {
-    return {
-      stats: stat,
-      name: meta.name,
-      type: meta.type,
-      id: meta.id
-    };
-  }
+  return {
+    stats: stat,
+    name: meta.name,
+    type: meta.type,
+    id: meta.id
+  };
 }
 
 function handleNationalStats (req, res) {
@@ -51,10 +45,8 @@ function handleAdminStats (req, res) {
   var id = req.params.id;
   var query = knex('admin_stats')
     .select()
-    .where('admin_stats.id', id);;
-  if (id !== '0') {
-    query = query.join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id');
-  }
+    .where('admin_stats.id', id)
+    .join('admin_boundaries', 'admin_stats.id', 'admin_boundaries.id');
 
   query
   .then(serializeStats)
