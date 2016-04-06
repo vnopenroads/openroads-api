@@ -35,7 +35,7 @@ function serializeStats(knexResult) {
     stats: stat,
     name: meta.name,
     type: meta.type,
-    id: meta.id
+    id: +meta.id
   };
 }
 

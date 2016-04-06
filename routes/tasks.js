@@ -58,7 +58,7 @@ function serializeAdminWaytasks (knexResult, queryString) {
     tasks: tasks,
     name: meta.adminName,
     type: meta.adminType,
-    id: meta.adminID
+    id: +meta.adminID
   };
 
   return response;
