@@ -453,56 +453,40 @@ module.exports = [
         .where('name', 'like', name)
         .orderBy('name')
         .limit(10)
-        .then(function (data) {
-          // Get parent ds
-          var relations = _.map(data, function (o) {
-            if (o.type === 1) {
-              return {
-                parent: o.id,
-                child: o.id
-              };
-            }
-            var i = new ID(o.id);
-            var ni = i.parentID(o.type - 1);
+        .then(function (searchResults) {
+          // Get parent ids
+          var parents = searchResults.map(function (d) {
+            var id = new ID(d.id);
             return {
-              parent: ni,
-              child: o.id
-            };
+              id: id.directParentID(),
+              child: id.string(),
+              _id: id
+            }
           });
-
-          var pIds = _.pluck(relations, 'parent');
           knex.select('id', 'name', 'type')
             .from('admin_boundaries')
-            .whereIn('id', pIds)
-            .then(function (dd) {
-              var result = _.map(relations, function (o) {
-                var main = _.find(data, 'id', o.child);
-                var parent = _.clone(_.find(dd, 'id', o.parent));
-                // With complete data this should not happen.
-                if (!parent) {
-                  parent = {
+            .whereIn('id', _.uniq(_.pluck(parents, 'id')))
+            .then(function (boundaries) {
+              var results = parents.map(function (d, i) {
+                var result = searchResults[i];
+                result.parent = _.find(boundaries, function (b) {
+                  return ' ' + b.id === ' ' + d.id;
+                });
+                if (!result.parent) {
+                  result.parent = {
                     name: 'parent Not Available',
                     type: null,
                     id: null
                   };
                 }
-                if (main.type === 1) {
-                  main.parent = {
-                    name: 'Philippines',
-                    type: 0,
-                    id: 9999999999
-                  };
-                } else {
-                  main.parent = parent;
-                }
-                main.id = +(main.id);
-                main.bbox = extent(main.geo);
-                delete main.geo;
-                main.parent.id = +(main.parent.id);
-                return main;
-              });
 
-              res(result);
+                result.id = d._id.num();
+                result.bbox = extent(result.geo);
+                delete result.geo;
+                result.parent.id = +result.parent.id;
+                return result;
+              });
+              return res(results);
             });
         });
     }

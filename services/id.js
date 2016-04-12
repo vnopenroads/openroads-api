@@ -28,7 +28,7 @@ var offsets = {
 };
 
 var ID = function (id) {
-  this.id = id || 99999999999;
+  this.id = id;
   this.id = parseInt(_.trim(this.id), 10);
   this.verify();
   this._type = this.identify();
@@ -40,17 +40,17 @@ ID.prototype.verify = function () {
   if (isNaN(this.id, 10)) {
     throw new TypeError('this.ID must be parse-able as a number');
   }
-  // this.IDs are a maximum of 11 characters.
+  // IDs are a maximum of 11 characters, or 0 in the case of the country ID.
   var id = '' + this.id;
   var length = id.length;
-  if (length > 11 || length < 10) {
+  if ((length > 11 || length < 10) && this.id !== 0) {
     throw new Error('ID must be between 10 and 11 characters');
   }
   return this;
 };
 
 ID.prototype.identify = function () {
-  if (this.id === 99999999999) {
+  if (this.id === 0) {
     return 'n';
   } else if (this.id % r === 0) {
     return 'r';
@@ -67,14 +67,18 @@ ID.prototype.type = function () {
   return this._type;
 };
 
-ID.prototype.level = function () {
+ID.prototype.getLevel = function (type) {
   return {
     'n': 0,
     'r': 1,
     'p': 2,
     'm': 3,
     'b': 4
-  }[this._type];
+  }[type];
+};
+
+ID.prototype.level = function () {
+  return this.getLevel(this._type);
 };
 
 ID.prototype.num = function () {
@@ -123,14 +127,22 @@ ID.prototype.parentID = function (parent) {
   if (!isNaN(parseInt(parent, 10))) {
     parent = ['n', 'r', 'p', 'm', 'b'][parent];
   }
-  if (parent === 'b') {
+  if (this.level() <= this.getLevel(parent)) {
+    console.log('Can\'t return the parent of a smaller admin region; returning current admin level instead');
     return id;
+  }
+  else if (parent === 'n') {
+    return 0;
   }
   var offset = offsets[id.length][parent];
   var parentID = _.map(id.split(''), function (letter, i) {
     return i > offset ? '0' : letter;
   });
   return parentID.join('');
+};
+
+ID.prototype.directParentID = function () {
+  return this.parentID(this.level() - 1);
 };
 
 ID.prototype.getDisplayType = function (plural) {
