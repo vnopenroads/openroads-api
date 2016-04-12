@@ -132,7 +132,7 @@ ID.prototype.parentID = function (parent) {
     return id;
   }
   else if (parent === 'n') {
-    return 0;
+    return '0';
   }
   var offset = offsets[id.length][parent];
   var parentID = _.map(id.split(''), function (letter, i) {
