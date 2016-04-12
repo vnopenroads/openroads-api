@@ -162,53 +162,35 @@ module.exports = [
       var id = +(req.params.id || '');
 
       // Query for boundary.
-      if (Boolean(req.query.boundary) === true) {
-        getAdminBoundary(id).then(function (boundary) {
+      return getAdminBoundary(id).then(function (boundary) {
+        if (Boolean(req.query.boundary)) {
           var props = fixProperties(boundary, boundary.properties);
-          // Result is a geoJSON;
-          var result = {
+          return res({
             type: boundary.type,
             properties: props,
             geometry: boundary.geometry
-          };
-
-          return res(result);
-        })
-        .catch(function (err) {
-          console.log('err', err);
-          res(Boom.wrap(err));
-        });
-      }
-      // Query for Road Network.
-      else if (Boolean(req.query.roadNetwork) === true) {
-        getAdminBoundary(id).then(function (boundary) {
+          });
+        }
+        // Query for Road Network.
+        else if (Boolean(req.query.roadNetwork)) {
           return queryPolygon(boundary).then(function (roads) {
             var props = fixProperties(boundary, roads.properties);
-            // Result is a geoJSON;
-            var result = {
+            return res({
               type: roads.type,
               properties: props,
               features: roads.features
-            };
-            return res(result);
+            });
           });
-        })
-        .catch(function (err) {
-          console.log('err', err);
-          res(Boom.wrap(err));
-        });
-      }
-      // Return meta.
-      else {
-        getAdminBoundary(id).then(function (boundary) {
-          var main = fixProperties(boundary, boundary.properties);
-          return res(main);
-        })
-        .catch(function (err) {
-          console.log('err', err);
-          res(Boom.wrap(err));
-        });
-      }
+        }
+        // Return meta.
+        else {
+          return res(fixProperties(boundary, boundary.properties));
+        }
+      })
+      .catch(function (err) {
+        console.log('err', err);
+        res(Boom.wrap(err));
+      });
     }
   },
 
@@ -376,65 +358,54 @@ module.exports = [
    *   ]
    * }
    */
+
   {
     method: 'GET',
     path: '/admin/{id}/subregions',
     handler: function (req, res) {
       var id = +(req.params.id || '');
 
-      if (Boolean(req.query.boundary) === true) {
-        getAdminBoundary(id).then(function (boundary) {
-          if (boundary.adminType <= 2) {
-            return res(Boom.badRequest('Request region is too large.'));
-          }
+      return getAdminBoundary(id).then(function (boundary) {
+        // Reject subregion queries that request too much data.
+        if (req.query.boundary && boundary.adminType <= 2) {
+          return res(Boom.badRequest('Request region is too large.'));
+        }
+        return getSubregionFeatures(boundary.adminType, id, boundary).then(function (subregions) {
+          // If boundary is requested, assume we're drawing something
+          // and return geojson.
+          if (Boolean(req.query.boundary)) {
+            var features = subregions.features.map(function(subregion) {
+              var properties = getSubregionProps(subregion);
+              properties.type = boundary.adminType + 1;
+              delete properties.bbox;
 
-          return getSubregionFeatures(boundary.adminType, id, boundary).then(function (subregions) {
-            var features = _.map(subregions.features, function (o) {
-              var obj = _.pick(o, 'type', 'geometry');
-              switch (boundary.adminType) {
-                case 3:
-                  obj.properties = {
-                    id: +(o.id),
-                    name: o.name,
-                    type: 4,
-                    completeness: o.completeness
-                  };
-                  break;
-                  // There are no subregions for adminType 4
-              }
-              return obj;
+              return {
+                type: subregion.type,
+                geometry: subregion.geomtry,
+                properties: properties
+              };
             });
 
             var props = fixProperties(boundary, subregions.properties);
-            // Result is a geoJSON;
-            var result = {
+            return res({
               type: subregions.type,
               properties: props,
               features: features
-            };
-
-            return res(result);
-          });
-        })
-        .catch(function (err) {
-          console.log('err', err);
-          res(Boom.wrap(err));
-        });
-      }
-      else {
-        getAdminBoundary(id).then(function (boundary) {
-          return getSubregionFeatures(boundary.adminType, id, boundary).then(function (subregions) {
+            });
+          }
+          // Otherwise, cut down the response and return vanilla json.
+          else {
             var main = fixProperties(boundary, boundary.properties);
             main.adminAreas = subregions.features.map(getSubregionProps);
             main.bbox = extent(boundary);
             return res(main);
-          });
-        })
-        .catch(function (err) {
-          console.log('err', err);
-          res(Boom.wrap(err));
+          }
         });
-      }
+      })
+      .catch(function (err) {
+        console.log('err', err);
+        res(Boom.wrap(err));
+      });
     }
   },
 
@@ -557,7 +528,7 @@ module.exports = [
  *
  * @return props
  */
-var fixProperties = function (baseMeta, rawProps) {
+function fixProperties (baseMeta, rawProps) {
   var props = _.pick(rawProps, ['NAME_0', 'NAME_1', 'NAME_2', 'NAME_3', 'NAME_4', 'ID_0_OR', 'ID_1_OR', 'ID_2_OR', 'ID_3_OR', 'ID_4_OR']);
   props = _.omit(props, _.isNull);
   props.id = baseMeta.id;
