@@ -131,7 +131,7 @@ function handleAdminWaytasks (req, res) {
     });
 };
 
-function handleWaytaks (req, res) {
+function handleWayTasks (req, res) {
   let way_id = Number(req.params.way_id);
   let query = knex('waytasks')
     .select()
@@ -217,7 +217,7 @@ module.exports = [
    * @api {get} /admin/waytasks Get the to-fix tasks for the country.
    * @apiGroup Administrative areas
    * @apiName GetAdminWaytasksCountry
-   * @apiDescription This endpoint returns the tasks for the country. See the 
+   * @apiDescription This endpoint returns the tasks for the country. See the
    * documentation for `admin/:id/waytasks` for more info.
    * @apiVersion 0.1.0
    *
@@ -317,14 +317,14 @@ module.exports = [
    *       "details": "Details on this other issue with road 5"
    *     }
    *   ]
-   *   
+   *
    * }
    */
   {
     method: 'GET',
     path: '/way/{way_id}/waytasks',
     handler: function handler (req, res) {
-      return handleWaytaks(req, res);
+      return handleWayTasks(req, res);
     }
   }
 ];
