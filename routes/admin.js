@@ -381,7 +381,7 @@ module.exports = [
 
               return {
                 type: subregion.type,
-                geometry: subregion.geomtry,
+                geometry: subregion.geometry,
                 properties: properties
               };
             });
