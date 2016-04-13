@@ -1,7 +1,7 @@
 'use strict';
-
 const Boom = require('boom');
 const knex = require('../connection');
+const _ = require('lodash');
 
 function serializeAdminWaytasks (knexResult, queryString) {
   let meta = knexResult[0];
@@ -28,13 +28,17 @@ function serializeAdminWaytasks (knexResult, queryString) {
       if (!(task.way_id in resultsByWay)) { resultsByWay[task.way_id] = []; }
       resultsByWay[task.way_id].push({
         type: task.type,
-        details: task.details
+        details: task.details,
+        state: task.state,
       });
     });
     Object.keys(resultsByWay).forEach(function (way_id) {
+      // All tasks have the same state.
+      let state = resultsByWay[way_id][0].state
       results.push({
         way_id: Number(way_id),
-        tasks: resultsByWay[way_id]
+        tasks: resultsByWay[way_id].map(o => _.omit(o, 'state')),
+        state: state
       });
     });
 
@@ -75,7 +79,9 @@ function serializeWaytasks (knexResult, way_id) {
 
   let response = {
     way_id: way_id,
-    tasks: tasks
+    tasks: tasks,
+    // All tasks have the same state.
+    state: knexResult[0].state
   };
   return response;
 };
@@ -224,6 +230,59 @@ module.exports = [
     path: '/admin/waytasks',
     handler: function handler (req, res) {
       return handleAdminWaytasks(req, res);
+    }
+  },
+  /**
+   * @api {put} /admin/waytasks/state Change the state of the specified waytasks
+   * @apiGroup Administrative areas
+   * @apiName SetAdminWaytasksState
+   * @apiDescription This endpoint sets the specified state to the list of
+   * specified waytasks. At the moment waytasks state can only be set as
+   * "pending"
+   * @apiVersion 0.1.0
+   *
+   * @apiSuccess {Array} pending List of ways for which to set the state pending.
+   *
+   * @apiExample {curl} Example Usage:
+   *  curl -d '{
+   *   "pending": [1, 2]
+   *  }' -H 'Content-Type: application/json' http://localhost:4000/admin/waytasks/state
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *  "statusCode": 200,
+   *  "message": "Ok!"
+   *   }
+   */
+  {
+    method: 'PUT',
+    path: '/admin/waytasks/state',
+    handler: function handler (req, res) {
+      // Only handle pending state for now.
+      if (!req.payload.pending || !_.isArray(req.payload.pending)) {
+        return res(Boom.badData('Data format is not valid.'));
+      }
+
+      var ids = req.payload.pending.filter(_.isNumber);
+
+      if (!ids.length) {
+        return res(Boom.badData('No data to process.'));
+      }
+
+      knex('waytasks')
+        .whereIn('way_id', ids)
+        .update({
+          state: 'pending'
+        })
+        .then(function (result) {
+          return res({
+            statusCode: 200,
+            message: 'Ok!'
+          });
+        })
+        .catch(function (err) {
+          return res(Boom.wrap(err));
+        });
     }
   },
  /**
