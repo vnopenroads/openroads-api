@@ -4,24 +4,6 @@ var knex = require('../../connection.js');
 var changesets = [];
 
 describe('changeset create endpoint', function () {
-  after(function (done) {
-    // Delete newly created changesets.
-    knex.transaction(function(transaction) {
-      return transaction('changesets').whereIn('id', changesets).del().returning('*')
-        .then(function(deleted) {
-          console.log(deleted.length, 'changesets deleted');
-          return transaction('users').whereIn('id', [99, 1337]).del().returning('*');
-        })
-        .then(function(deleted) {
-          console.log(deleted.length, 'users deleted');
-        })
-    })
-    .then(function() {
-      return done();
-    })
-    .catch(done);
-  });
-
   it('returns a numerical changeset id.', function (done) {
     server.injectThen({
       method: 'PUT',
@@ -49,8 +31,8 @@ describe('changeset create endpoint', function () {
       method: 'PUT',
       url: '/changeset/create',
       payload: {
-        uid: 1337,
-        user: 'openroads test user',
+        uid: Math.floor(Math.random() * 1000),
+        user: Math.random().toString(36).substring(7),
         comment: 'test comment'
       }
     })

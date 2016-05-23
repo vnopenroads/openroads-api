@@ -11,6 +11,10 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 
 script: 
+  - git clone git@github.com:opengovt/openroads-data.git
+  - cd openroads-data/db
+  - make test-db
+  - cd ../..
   - docker-compose stop
   - docker-compose rm -f
   - docker-compose run api ./wait.sh npm test
