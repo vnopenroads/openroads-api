@@ -41,8 +41,8 @@ describe('projects endpoint', function() {
       obj.should.have.keys('projects', 'name', 'type', 'id');
       obj.projects.meta.total.should.equal(2);
       obj.projects.results.should.have.length(2);
-      obj.projects.results[0].project_code.should.equal('2015-IVB-25');
-      obj.projects.results[1].project_code.should.equal('2015-IVB-26');
+      obj.projects.results[0].code.should.equal('2015-IVB-25');
+      obj.projects.results[1].code.should.equal('2015-IVB-26');
       done();
     })
     .catch(done);
@@ -58,7 +58,7 @@ describe('projects endpoint', function() {
       obj.should.have.keys('projects', 'name', 'type', 'id');
       obj.projects.meta.total.should.equal(2);
       obj.projects.results.should.have.length(1);
-      obj.projects.results[0].project_code.should.equal('2015-IVB-25');
+      obj.projects.results[0].code.should.equal('2015-IVB-25');
       done();
     })
     .catch(done);
@@ -74,7 +74,7 @@ describe('projects endpoint', function() {
       obj.should.have.keys('projects', 'name', 'type', 'id');
       obj.projects.meta.total.should.equal(2);
       obj.projects.results.should.have.length(1);
-      obj.projects.results[0].project_code.should.equal('2015-IVB-26');
+      obj.projects.results[0].code.should.equal('2015-IVB-26');
       done();
     })
     .catch(done);
