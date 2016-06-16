@@ -65,13 +65,15 @@ module.exports = [
       let query = knex('admin_boundaries')
         .select([
           'projecttasks.*',
+          'projects.bbox',
           'admin_boundaries.name AS adminName',
           'admin_boundaries.type AS adminType',
           'admin_boundaries.id AS adminID'
         ])
         .where('admin_boundaries.id', id)
         .orderBy('projecttasks.id')
-        .leftJoin('projecttasks', knex.raw(`${id} = ANY(projecttasks.adminids)`));
+        .leftJoin('projecttasks', knex.raw(`${id} = ANY(projecttasks.adminids)`))
+        .leftJoin('projects', 'projects.id', 'projecttasks.id');
 
       query
         .then(function (knexResult) {
@@ -88,7 +90,7 @@ module.exports = [
 
           let results = [];
           if (hasProjecttasks) {
-            results = knexResult.map(o => _.pick(o, ['id', 'type']))
+            results = knexResult.map(o => _.pick(o, ['id', 'type', 'bbox']))
           }
 
           let projecttasks = {
