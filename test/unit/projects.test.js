@@ -17,16 +17,17 @@ describe('projects endpoint', function() {
     .catch(done);
   });
 
-  it('returns 404 if no projects with specified type', function(done) {
+  it('returns empty result array if no projects with specified type', function(done) {
     server.injectThen({
       method: 'GET',
       url: '/admin/13581180010/projects?type=FOO'
     })
     .then(function (resp) {
       var obj = JSON.parse(resp.payload);
-      obj.should.have.keys('statusCode', 'error', 'message');
-      obj.statusCode.should.equal(404);
-      assert(/FOO/.test(obj.message)).should.ok;
+      console.log('obj', obj);
+      obj.should.have.keys('id', 'name', 'projects', 'type');
+      obj.projects.results.should.be.empty;
+      obj.projects.meta.total.should.equal(0);
       done();
     })
     .catch(done);
