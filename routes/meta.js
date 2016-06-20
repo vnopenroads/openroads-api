@@ -4,32 +4,32 @@ const knex = require('../connection');
 
 module.exports = [
  /**
-  * @api {get} /meta/projects/types Get all project types in the database.
+  * @api {get} /meta/projects Get all project meta information.
    * @apiGroup Meta
-   * @apiName GetProjectTypes
-   * @apiDescription This endpoint returns a unique list of project types.
+   * @apiName GetProjectMeta
+   * @apiDescription This endpoint returns a list of project meta information.
    * @apiVersion 0.1.0
    *
-   * @apiSuccess {Object} types Types of projects
+   * @apiSuccess {Object} type Types of projects
    *
    * @apiExample {curl} Example Usage:
-   *    curl http://localhost:4000/meta/projects/types
+   *    curl http://localhost:4000/meta/projects
    *
-   * @apiSuccessExample {json} types
+   * @apiSuccessExample {json}
    * {
-   *   "types": ["BUB", "TRIP", "TRIP Subproject"]
+   *   "type": ["BUB", "TRIP", "TRIP Subproject"]
    * }
    */
   {
     method: 'GET',
-    path: '/meta/projects/types',
+    path: '/meta/projects',
     handler: function handler (req, res) {
       knex('projects')
       .distinct('type')
       .select()
       .then(function (types) {
         return res({
-          types: types.map(d => d.type)
+          type: types.map(d => d.type)
         });
       })
       .catch(function (err) {
