@@ -82,11 +82,9 @@ module.exports = [
       // Therefore, should cast `id` to avoid SQL injection
       let id = req.params.id ? Number(req.params.id) : 0;
       let projectType = req.query.type;
-      let where = {
-        'admin_boundaries.id': id
-      };
+      let filters = {};
       if (projectType) {
-        where['projects.type'] = projectType;
+        filters['projects.type'] = projectType;
       }
 
       let query = knex('admin_boundaries')
@@ -96,18 +94,19 @@ module.exports = [
           'admin_boundaries.type AS adminType',
           'admin_boundaries.id AS adminID'
         ])
-        .where(where)
+        .where('admin_boundaries.id', id)
         .orderBy('projects.id')
-        .leftJoin('projects', knex.raw(`${id} = ANY(projects.adminids)`));
+        .leftJoin('projects', function () {
+          this.on(knex.raw(`${id} = ANY(projects.adminids)`));
+          _.forEach(filters, (v, k) => {
+            this.andOn(k, knex.raw('?', v));
+          });
+        });
 
       query
         .then(function (knexResult) {
           if (knexResult.length === 0) {
-            let notFound = "Area ID's boundary was not found in the database";
-            if (projectType) {
-              notFound += ' or no projects with type ' + projectType;
-            }
-            return Boom.notFound(notFound);
+            return Boom.notFound("Area ID's boundary was not found in the database");
           }
 
           let meta = knexResult[0];
