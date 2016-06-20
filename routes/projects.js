@@ -81,6 +81,11 @@ module.exports = [
       // Knex doesn't support array data types, so have to use raw SQL for the query
       // Therefore, should cast `id` to avoid SQL injection
       let id = req.params.id ? Number(req.params.id) : 0;
+      let projectType = req.query.type;
+      let filters = {};
+      if (projectType) {
+        filters['projects.type'] = projectType;
+      }
 
       let query = knex('admin_boundaries')
         .select([
@@ -91,12 +96,16 @@ module.exports = [
         ])
         .where('admin_boundaries.id', id)
         .orderBy('projects.id')
-        .leftJoin('projects', knex.raw(`${id} = ANY(projects.adminids)`));
+        .leftJoin('projects', function () {
+          this.on(knex.raw(`${id} = ANY(projects.adminids)`));
+          _.forEach(filters, (v, k) => {
+            this.andOn(k, knex.raw('?', v));
+          });
+        });
 
       query
         .then(function (knexResult) {
           if (knexResult.length === 0) {
-            // If no results were returned, the area doesn't exist
             return Boom.notFound("Area ID's boundary was not found in the database");
           }
 

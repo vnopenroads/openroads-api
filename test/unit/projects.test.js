@@ -1,4 +1,5 @@
 'use strict';
+var assert = require('should');
 
 describe('projects endpoint', function() {
   it('should respond with 404 for non existent admin area', function(done) {
@@ -11,6 +12,22 @@ describe('projects endpoint', function() {
       obj.should.have.keys('statusCode', 'error', 'message');
       obj.statusCode.should.equal(404);
       obj.message.should.equal('Area ID\'s boundary was not found in the database');
+      done();
+    })
+    .catch(done);
+  });
+
+  it('returns empty result array if no projects with specified type', function(done) {
+    server.injectThen({
+      method: 'GET',
+      url: '/admin/13581180010/projects?type=FOO'
+    })
+    .then(function (resp) {
+      var obj = JSON.parse(resp.payload);
+      console.log('obj', obj);
+      obj.should.have.keys('id', 'name', 'projects', 'type');
+      obj.projects.results.should.be.empty;
+      obj.projects.meta.total.should.equal(0);
       done();
     })
     .catch(done);
