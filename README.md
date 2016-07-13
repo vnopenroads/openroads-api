@@ -27,7 +27,7 @@ You can also just spin up the database and make it available on `$DOCKER_HOST:54
 
 ```sh
 npm run docker-start-db # start the db in the on its own at 
-npm run docker-kill-db # kills the db
+npm run docker-kill # kills the db
 ```
 
 The database will already be populated with test data.
