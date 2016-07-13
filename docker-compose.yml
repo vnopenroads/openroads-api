@@ -1,15 +1,13 @@
-postgres:
+db:
   image: openroads-db:test
   ports:
     - "5433:5432"
 api:
   build: .
+  command: dockerize -wait tcp://db:5432 -timeout 20s npm start
   environment:
-    - DATABASE_URL=postgres://postgres@postgres:5432/postgres
-    - WAIT_COMMAND= [ $$(psql postgres://postgres@postgres:5432/postgres -c "select count(*) from admin_boundaries" | head -n 3 | tail -n 1) -gt 0 ]
-    - WAIT_SLEEP=2
-    - WAIT_START_CMD=npm test
+    - DATABASE_URL=postgres://postgres@db:5432/postgres
   links:
-    - postgres:postgres
+    - db
   ports:
     - "4000:4000"
