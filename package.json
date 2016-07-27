@@ -11,7 +11,7 @@
     "docker-stop": "docker-compose stop",
     "docker-logs": "docker-compose logs api",
     "docker-test": "npm run docker-build && docker-compose run api dockerize -wait tcp://db:5432 -timeout 20s npm test; npm run docker-kill",
-    "docker-start-db": "docker-compose up -d postgres",
+    "docker-start-db": "docker-compose up -d db",
     "docker-kill": "docker-compose down",
     "gendoc": "./node_modules/.bin/apidoc -i routes",
     "postinstall": "npm run gendoc"
