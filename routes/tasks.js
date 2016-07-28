@@ -139,7 +139,15 @@ function handleWayTasks (req, res) {
 
   query
     .then(function (knexResult) {
-      return serializeWaytasks(knexResult, way_id);
+      if (knexResult.length === 0) {
+        return {
+          way_id: way_id,
+          tasks: [],
+          state: null
+        };
+      } else {
+        return serializeWaytasks(knexResult, way_id);
+      }
     })
     .then(res)
     .catch(err => { res(Boom.wrap(err))});
