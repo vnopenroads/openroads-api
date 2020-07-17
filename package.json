@@ -38,7 +38,7 @@
     "hapi-router": "^3.0.1",
     "knex": "^0.7.6",
     "libxmljs": "^0.18.0",
-    "lodash": "^3.6.0",
+    "lodash": "^4.17.19",
     "pg": "^4.3.0",
     "turf-buffer": "^1.0.4",
     "turf-extent": "^1.0.4",
